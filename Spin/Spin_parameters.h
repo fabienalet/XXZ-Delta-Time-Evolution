@@ -620,7 +620,7 @@ Parameters::Parameters(int myrank_) {
     std::stringstream specialstatestr;
     specialstatestr.str(specialstate_string);
     unsigned short int ss;
-    int mysz;
+    int mysz=0;
     while (specialstatestr >> ss) {
       if (ss==0) { special_conf.push_back(0); mysz=-1;}
       else { if (ss==1) { special_conf.push_back(1); mysz+=1;}
