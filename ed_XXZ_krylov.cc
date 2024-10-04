@@ -194,6 +194,9 @@ int main(int argc,char **argv)
   /***** Loop over initial states ****/
 
   // list of initial states (each of these consists of one basis vector)
+ 
+
+
   std::vector<unsigned long int> init_states;
   if (myparameters.product_state_start)
   { // Here we find initial basis states which have an energy within deps of the central energy
@@ -264,11 +267,15 @@ int main(int argc,char **argv)
   }
   else
   {
+    if (myparameters.special_state_start)
+    { init_states.push_back(mybasis.index(myparameters.special_conf);}
+    else {
     if(myrank==0)
     {
       std::cout << "# Nothing specified. Starting from Néel state = " << ineel << endl;
     }
     init_states.push_back(ineel);
+    }
   }
 
   // Need to broadcast init_state, in 2 steps
@@ -395,7 +402,7 @@ int main(int argc,char **argv)
             Siz = myobservable.sz_local; }
               double Imb = myobservable.product_state_imbalance(nsa0, ca0, cb0);
               imbout << t << " " << Imb << endl;
-             // std::cout << "IMBALANCE " << i0 << " " << t << " " << Imb << std::endl;
+              std::cout << "IMBALANCE " << i0 << " " << t << " " << Imb << std::endl;
             }
                       if (myparameters.measure_return)
           { double a = PetscAbsScalar(state[i0]);

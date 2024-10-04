@@ -73,6 +73,31 @@ then ```bash script.conf``` then configuration tells you which command line to r
 
 ``` cd ~/src; git clone git@github.com:fabienalet/XXZ-Delta-Time-Evolution.git ```
 
+
+## For olympe
+
+```cd ~;mkdir build; mkdir build/XXZ-Delta-Time-Evolution; cd build/XXZ-Delta-Time-Evolution```
+Create a ```script.build``` file such as (CAREFUL : Change the correct path-to-gome Petsc and Slepc directory below !!):
+```
+module purge
+module load intel
+module load intelmpi
+module load cmake
+module load gcc/7.3.0
+export CC=icc
+export CXX=icpc
+export PETSC_DIR=path-to-home/src/petsc-3.20.5
+export SLEPC_DIR=path-to-home/src/slepc-3.20.4
+export PETSC_ARCH=complex
+export ED_PETSC_ARCH=$PETSC_ARCH
+cmake path-to-home/src/XXZ-Delta-Time-Evolution
+```
+
+then ```bash script.build```, then ```make xxz_krylov```
+(If the make command fail, re-load the modules by doing ``module purge; module load intel;module load intelmpi;module load cmake;module load gcc/7.3.0``
+
+
+## For lptsv7
 This may require that you create a public ssh-key on lptsv7, and then add it to your Github account (this can be a bit troublesome, but the info below is useful
 (https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
 Do the steps Generating a new SSH key, Adding your SSH key to the ssh-agent (I think the `UseKeychain yes` line should be skipped if you don't use a passphrase), and that should work.
@@ -96,12 +121,12 @@ export ED_PETSC_ARCH=$PETSC_ARCH
 cmake /home/prowal/src/XXZ-Delta-Time-Evolution
 ```
 
-then ```bash script.build```, then ```make xxz_krylov_te```
+then ```bash script.build```, then ```make xxz_krylov```
 (If the make command fail, re-load the modules by doing ``module purge; module load intel;module load impi;module load cmake``
 
 # Running the code : Direct Usage
 ```mkdir test;cd test```
-Create a ```te.options``` file such as :
+Create a ```krylov.options``` file such as :
 ```
 -L 16
 -disorder 5.0
@@ -109,11 +134,11 @@ Create a ```te.options``` file such as :
 -tmax 100
 -pbc 0
 
-#-measure_correlations
+#-measure_imbalance
 #-measure_entanglement
 ```
 Usage
-```../xxz_krylov_te -L 8 -tmax 1000```
+```../xxz_krylov -measure_entanglement 1 -meaure_imbalance 1```
 ```mpirun -np 10 ../xxz_krylov_te```
 
 # Running the code : Slurm Script 

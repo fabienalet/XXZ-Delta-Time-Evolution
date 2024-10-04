@@ -219,6 +219,25 @@ void Hamiltonian::get_parameters() {
     }
   }
 
+
+  PetscBool fields_string_set=PETSC_FALSE;
+  char* fields_c_string = new char[10000];
+  ierr = PetscOptionsGetString(NULL, NULL, "-fields", fields_c_string, 10000,
+                               &fields_string_set);  
+  if (fields_string_set) {
+    field.resize(0);
+    std::string fields_string(fields_c_string);
+    std::stringstream fieldstr;
+    fieldstr.str(fields_string);
+    double ss;
+    while (fieldstr >> ss) {
+      field.push_back(ss);
+    }
+    if (field.size()!=L) { std::cout << "Error !! Too few fields !!!\n"; exit(0);}
+    delete[] fields_c_string;
+  } 
+
+
   if (myrank == 0) {
     std::cout << "# field= { ";
     for (int i = 0; i < L; i++) {

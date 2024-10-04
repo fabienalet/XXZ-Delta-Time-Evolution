@@ -43,6 +43,8 @@ class Parameters {
   std::vector<double> time_points;
   std::vector<double> delta_t_points;
 
+  std::vector<unsigned short int> special_conf;
+
   int myrank;
   PetscInt L;
   PetscInt LA;
@@ -605,6 +607,33 @@ Parameters::Parameters(int myrank_) {
   ierr = PetscOptionsGetBool(NULL, NULL, "-write_wf", &write_wf, NULL);
 
   int each_measurement = num_times / nmeasures;
+
+
+ PetscBool special_state_start=PETSC_FALSE;
+  char* specialstate_c_string = new char[10000];
+  ierr = PetscOptionsGetString(NULL, NULL, "-special_state", specialstate_c_string, 10000,
+                               &special_state_start); 
+  if (special_state_start) {
+    special_conf.resize(0);
+    std::string specialstate_string(specialstate_c_string);
+    std::stringstream specialstatestr;
+    specialstatestr.str(specialstate_string);
+    unsigned short int ss;
+    while (specialstatestr >> ss) {
+      if (ss==0) { special_conf.push_back(0);}
+      else { if (ss==1) { special_conf.push_back(1);}
+      else { std::cout << "Errot !! Not boolean value !!!\n"; exit(0);}
+    }
+    }
+    if (special_conf.size()!=L) { std::cout << "Error !! Too few boolean values !!!\n"; exit(0);}
+    delete[] specialstate_c_string;
+    // avoid all other options
+    num_product_states=1;
+    product_state_start=0;
+    cdw_start=0;
+
+  } 
+
 
   char* targets_c_string = new char[1000];
   ierr = PetscOptionsGetString(NULL, NULL, "-targets", targets_c_string, 1000,
