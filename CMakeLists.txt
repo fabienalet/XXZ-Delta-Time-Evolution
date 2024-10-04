@@ -42,14 +42,6 @@ add_definitions(-DUSE_MKL)
 message("Using MKL")
 endif(${ED_USE_MKL})
 
-add_executable(floquet_te floquet_time_evolution.cc)
-target_link_libraries(floquet_te ${MPILIB} ${LAPACKLIB} petsc)
+add_executable(xxz_krylov ed_XXZ_krylov.cc)
+target_link_libraries(xxz_krylov ${MPILIB} ${LAPACKLIB} slepc petsc)
 
-add_executable(floquet_te_fast floquet_time_evolution_FHWT.cc)
-target_link_libraries(floquet_te_fast ${MPILIB} ${LAPACKLIB} petsc)
-
-add_executable(floquet_te_fast2 floquet_time_evolution_FHWT2.cc)
-target_link_libraries(floquet_te_fast2 ${MPILIB} ${LAPACKLIB} petsc)
-
-add_executable(floquet_te_fast4 floquet_time_evolution_FHWT4.cc)
-target_link_libraries(floquet_te_fast4 ${MPILIB} ${LAPACKLIB} petsc)
