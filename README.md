@@ -134,19 +134,21 @@ Create a ```krylov.options``` file such as :
 -tmax 100
 -num_times 100
 #-loggrid 1
--pbc 0
+-pbc 1
 
 #-measure_imbalance
 #-measure_entanglement
 ```
 Usage
-```../xxz_krylov -measure_entanglement 1 -meaure_imbalance 1```
-```../xxz_krylov -L 4 -fields "1.0 1.4 -2.0 -3.2" ```
-```../xxz_krylov -L 6 -special_initial_state "1 1 0 1 0 0" ```
+```./xxz_krylov -measure_entanglement 1 -meaure_imbalance 1```
 
--measure_entanglement 1 -meaure_imbalance 1```
+```./xxz_krylov -L 4 -fields "1.0 1.4 -2.0 -3.2" ```
 
-```mpirun -np 10 ../xxz_krylov_te```
+```./xxz_krylov -L 6 -special_initial_state "1 1 0 1 0 0" ```
+
+```./xxz_krylov -measure_entanglement 1 -meaure_imbalance 1```
+
+```mpirun -np 10 ../xxz_krylov```
 
 # Running the code : Slurm Script 
 Not correct at the moment
