@@ -299,13 +299,14 @@ int main(int argc,char **argv)
     mybasis.get_conf_coefficients(i0, nsa0, ca0, cb0);
     // creating the filenames (could be improved/modified)
     if(myrank==0){
-    if (measure_correlations) { myparameters.init_filename_correlations(corrout,i0);  PetscOptionsGetBool(NULL, NULL, "-omp", &omp_switch, NULL);   }
-    if (measure_participation) { myparameters.init_filename_participation(partout,i0);	}
-    if (measure_local) { myparameters.init_filename_imbalance(locout,i0);	}
-    if (measure_imbalance) { myparameters.init_filename_imbalance(partout,i0);	    }
-    if (measure_entanglement) {  myparameters.init_filename_entanglement(entout,i0); entout.precision(20);
-        PetscOptionsGetInt(NULL, NULL, "-LAmin", &LAmin, NULL); PetscOptionsGetInt(NULL, NULL, "-LAmax", &LAmax, NULL); }
-      if (measure_return) { myparameters.init_filename_return(retout,i0); }
+    if (myparameters.measure_correlations) { myparameters.init_filename_correlations(corrout,i0);  PetscOptionsGetBool(NULL, NULL, "-omp", &omp_switch, NULL);   }
+    if (myparameters.measure_participation) { myparameters.init_filename_participation(partout,i0);	}
+    if (myparameters.measure_local) { myparameters.init_filename_imbalance(locout,i0);	}
+    if (myparameters.measure_imbalance) { myparameters.init_filename_imbalance(partout,i0);	    }
+    if (myparameters.measure_entanglement) {  myparameters.init_filename_entanglement(entout,i0); entout.precision(20);
+      //  PetscOptionsGetInt(NULL, NULL, "-LAmin", &LAmin, NULL); PetscOptionsGetInt(NULL, NULL, "-LAmax", &LAmax, NULL);
+       }
+      if (myparameters.measure_return) { myparameters.init_filename_return(retout,i0); }
       }
 
     // Initialise Psi(0) (with the initial state) and Res(0)
@@ -388,7 +389,7 @@ int main(int argc,char **argv)
             for (int r = 0; r < L; ++r) {
                locout << "SZ " << i0 << " " << t << " " << r << " " << Siz[r] << std::endl;}
             }
-        `if (myparameters.measure_imbalance)
+        if (myparameters.measure_imbalance)
             { // TODO CHECK IF IMPROVABLE
             if (!(myparameters.measure_local)) { myobservable.compute_local_magnetization(state);
             Siz = myobservable.sz_local; }

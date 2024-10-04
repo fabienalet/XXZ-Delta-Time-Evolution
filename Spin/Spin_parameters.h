@@ -38,6 +38,7 @@ class Parameters {
   void init_filename_participation(ofstream& partout,int inistate);
   void init_filename_return(ofstream& retout,int inistate);
   void init_filename_imbalance(ofstream& imbout,int inistate);
+`void init_filename_local(ofstream& locout,int inistate);
 
   std::vector<double> time_points;
   std::vector<double> delta_t_points;
@@ -138,7 +139,7 @@ void Parameters::init_filename_return(ofstream& fileout,int init_conf)
 void Parameters::init_filename_imbalance(ofstream& fileout,int init_conf)
 {
   std::stringstream filename;
-    filename << "Imb"." << string_from_basis << string_from_H
+    filename << "Imb." << string_from_basis << string_from_H
                 << ".init_conf=" << init_conf << ".dat";
     fileout.open((filename.str()).c_str());
     fileout.precision(20);
