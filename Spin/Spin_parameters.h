@@ -629,7 +629,6 @@ Parameters::Parameters(int myrank_) {
     if (special_conf.size()!=L) { std::cout << "Error !! Too few boolean values !!!\n"; exit(0);}
     delete[] specialstate_c_string;
     // avoid all other options
-    num_product_states=1;
     product_state_start=PETSC_FALSE;
     cdw_start=PETSC_FALSE;
 
