@@ -630,7 +630,7 @@ Parameters::Parameters(int myrank_) {
     if (special_conf.size()!=L) { std::cout << "Error !! Too few boolean values !!!\n"; exit(0);}
     double Sz = 0;
     PetscOptionsGetReal(NULL, NULL, "-Sz", &Sz, NULL);
-    if (int(2*Sz)!=mysz) { std::cout << "Error !! Not correct Sz !!!\n"; exit(0);}
+    if ((int(2*Sz))!=mysz) { std::cout << "Error !! Not correct Sz !!!\n"; cout << mysz << " " << Sz << " " << (int(2*Sz)) << endl;  exit(0);}
     
     delete[] specialstate_c_string;
     // avoid all other options
