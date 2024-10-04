@@ -1,4 +1,4 @@
-static char help[] = "Krylov for XXZ chain \n (C) Fabien Alet 2024. \n\n"
+static char help[] = "Krylov for XXZ chain \n (C) Fabien Alet 2024. \n\n";
 /****** This program needs to be linked to a complex petsc-slepc installation !!! *********/
 
 #define PETSC_DESIRE_COMPLEX
