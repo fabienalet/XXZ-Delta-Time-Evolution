@@ -32,6 +32,13 @@ class Parameters {
                                  ofstream& tcorrout,
                                  double target);
   void init_filenames_energy(ofstream& enout, ofstream& rgapout, double target);
+
+  void init_filename_correlations(ofstream& corrout,int inistate);
+  void init_filename_entanglement(ofstream& entout,int inistate);
+  void init_filename_participation(ofstream& partout,int inistate);
+  void init_filename_return(ofstream& retout,int inistate);
+  void init_filename_imbalance(ofstream& imbout,int inistate);
+
   std::vector<double> time_points;
   std::vector<double> delta_t_points;
 
@@ -82,6 +89,61 @@ class Parameters {
   std::string string_from_H;
   std::string string_from_basis;
 };
+
+void Parameters::init_filename_local(ofstream& fileout,int init_conf)
+{
+  std::stringstream filename;
+    filename << "Loc." << string_from_basis << string_from_H
+                << ".init_conf=" << init_conf << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
+void Parameters::init_filename_correlations(ofstream& fileout,int init_conf)
+{
+  std::stringstream filename;
+    filename << "Corr." << string_from_basis << string_from_H
+                << ".init_conf=" << init_conf << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
+void Parameters::init_filename_entanglement(ofstream& fileout,int init_conf)
+{
+  std::stringstream filename;
+    filename << "Ent." << string_from_basis << string_from_H
+                << ".init_conf=" << init_conf << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
+void Parameters::init_filename_participation(ofstream& fileout,int init_conf)
+{
+  std::stringstream filename;
+    filename << "Part." << string_from_basis << string_from_H
+                << ".init_conf=" << init_conf << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
+void Parameters::init_filename_return(ofstream& fileout,int init_conf)
+{
+  std::stringstream filename;
+    filename << "Ret." << string_from_basis << string_from_H
+                << ".init_conf=" << init_conf << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
+void Parameters::init_filename_imbalance(ofstream& fileout,int init_conf)
+{
+  std::stringstream filename;
+    filename << "Imb"." << string_from_basis << string_from_H
+                << ".init_conf=" << init_conf << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
 
 void Parameters::init_filenames(ofstream& entout, ofstream& imbout,
                                 ofstream& locout, ofstream& retout,

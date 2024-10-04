@@ -183,8 +183,8 @@ int main(int argc,char **argv)
 
   /*****  Get and initialize vectors *****/
   Vec Psi_t, res;
-  MatCreateVecs(H, PETSC_NULL, &Psi_t);
-  MatCreateVecs(H, PETSC_NULL, &res);
+  MatCreateVecs(H, NULL, &Psi_t);
+  MatCreateVecs(H, NULL, &res);
 
   /********* Initialize time grid ********/
   myparameters.Initialize_timegrid();
@@ -210,10 +210,10 @@ int main(int argc,char **argv)
     VecScatterBegin(ctx, Diagonal, diag_local, INSERT_VALUES, SCATTER_FORWARD);
     VecScatterEnd(ctx, Diagonal, diag_local, INSERT_VALUES, SCATTER_FORWARD);
     }
-    else { VecCreateSeq(PETSC_COMM_SELF,nconf,&diag_local); ierr = VecCopy(Diagonal,diag_local);  }
+    else { VecCreateSeq(PETSC_COMM_SELF,nconf,&diag_local); VecCopy(Diagonal,diag_local);  }
     // If no number of sample is specified, we start from just 1
     int seed3=15101976;
-    PetscOptionsGetInt(NULL,NULL,"-seed3",&seed3,NULL);CHKERRQ(ierr);
+    PetscOptionsGetInt(NULL,NULL,"-seed3",&seed3,NULL);
     int Nsamp = myparameters.num_product_states;
     double epsmin=0.45;
     double epsmax=0.55;
@@ -283,44 +283,31 @@ int main(int argc,char **argv)
     std::cout << std::endl;
   }
 
-  PetscBool measure_correlations=PETSC_FALSE;
-  PetscBool measure_participation=PETSC_TRUE;
-  PetscBool measure_entanglement=PETSC_TRUE;
-  PetscBool measure_return=PETSC_TRUE;
-  PetscOptionsGetBool(NULL, NULL, "-measure_correlations", &measure_correlations, NULL);
-  PetscOptionsGetBool(NULL, NULL, "-measure_participation", &measure_participation, NULL);
-  PetscOptionsGetBool(NULL, NULL, "-measure_entanglement", &measure_entanglement, NULL);
-  PetscOptionsGetBool(NULL, NULL, "-measure_return", &measure_return, NULL);
 
   Vec Vec_local;
-	ofstream corrout; ofstream partout;ofstream entout; ofstream retout;
+	ofstream corrout; ofstream partout;ofstream entout; ofstream retout; ofstream imbout; ofstream locout;
   PetscBool omp_switch=PETSC_FALSE;
-  PetscInt LAmax=L/2; // for disordered samples, all entanglemnt blocks are interesting
-  PetscInt LAmin=2;
-	if(myrank==0){
-  if (measure_correlations) { myparameters2.init_filenames_correlations(corrout);  PetscOptionsGetBool(NULL, NULL, "-omp", &omp_switch, NULL);   }
-  if (measure_participation) { myparameters2.init_filenames_participation(partout);	}
-  if (measure_entanglement) {  myparameters2.init_filenames_entanglement(entout); entout.precision(20);
-  PetscOptionsGetInt(NULL, NULL, "-LAmin", &LAmin, NULL); PetscOptionsGetInt(NULL, NULL, "-LAmax", &LAmax, NULL); }
-  if (measure_return) { myparameters2.init_filenames_return(retout); }
-  }
-
+  std::vector<double> Siz(L, 0.); 
+  std::vector< std::vector<double> > Gij(L); for (int k=0;k<L;++k) { Gij[k].resize(L,0.);}
 
 /*********** loop over initial states **********/
   for (auto i0: init_states)
   { // parameters of the initial configuration
+    
+
+    int nsa0, ca0, cb0;
+    mybasis.get_conf_coefficients(i0, nsa0, ca0, cb0);
+    // creating the filenames (could be improved/modified)
     if(myrank==0){
-    if (measure_correlations) { myparameters2.init_filenames_correlations(corrout,i0);  PetscOptionsGetBool(NULL, NULL, "-omp", &omp_switch, NULL);   }
-    if (measure_participation) { myparameters2.init_filenames_participation(partout,i0);	}
-    if (measure_entanglement) {  myparameters2.init_filenames_entanglement(entout,i0); entout.precision(20);
+    if (measure_correlations) { myparameters.init_filename_correlations(corrout,i0);  PetscOptionsGetBool(NULL, NULL, "-omp", &omp_switch, NULL);   }
+    if (measure_participation) { myparameters.init_filename_participation(partout,i0);	}
+    if (measure_local) { myparameters.init_filename_imbalance(locout,i0);	}
+    if (measure_imbalance) { myparameters.init_filename_imbalance(partout,i0);	    }
+    if (measure_entanglement) {  myparameters.init_filename_entanglement(entout,i0); entout.precision(20);
         PetscOptionsGetInt(NULL, NULL, "-LAmin", &LAmin, NULL); PetscOptionsGetInt(NULL, NULL, "-LAmax", &LAmax, NULL); }
-      if (measure_return) { myparameters2.init_filenames_return(retout,i0); }
+      if (measure_return) { myparameters.init_filename_return(retout,i0); }
       }
 
-//    int nsa0, ca0, cb0;
- //   mybasis.get_conf_coefficients(i0, nsa0, ca0, cb0);
-    // creating the filenames (could be improved/modified)
-   
     // Initialise Psi(0) (with the initial state) and Res(0)
     VecSet(Psi_t,0.0);
     VecSetValue(Psi_t,i0,1.0,INSERT_VALUES);
@@ -402,7 +389,9 @@ int main(int argc,char **argv)
                locout << "SZ " << i0 << " " << t << " " << r << " " << Siz[r] << std::endl;}
             }
         `if (myparameters.measure_imbalance)
-            { // TODO CHECK THIS
+            { // TODO CHECK IF IMPROVABLE
+            if (!(myparameters.measure_local)) { myobservable.compute_local_magnetization(state);
+            Siz = myobservable.sz_local; }
               double Imb = myobservable.product_state_imbalance(nsa0, ca0, cb0);
               imbout << t << " " << Imb << endl;
              // std::cout << "IMBALANCE " << i0 << " " << t << " " << Imb << std::endl;
@@ -437,7 +426,7 @@ int main(int argc,char **argv)
       // put back Res in Psi_t for next time evolution
       VecCopy(res, Psi_t);
     } // end of t_index
-    f (myrank==0) {  entout.close(); imbout.close(); retout.close(); partout.close(); locout.close(); }
+    if (myrank==0) {  entout.close(); imbout.close(); retout.close(); partout.close(); corrout.close(); }
   } // end of io loop over initial states
 
   SlepcFinalize();
