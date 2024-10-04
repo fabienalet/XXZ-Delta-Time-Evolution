@@ -1,35 +1,32 @@
-static char help[] = "Krylov for XXZ chain \n (C) Fabien Alet 2022. \n\n"
-  "The command line options are:\n"
-  "  -L <L>, where <L> = size of the chain [default 8]\n"
-  "  -seed_inistates <ss>, where <ss> is a seed for the random generation of initial states\n"
-  "  ( .... Description not complete ....) \n"
-  "\n";
-
+static char help[] = "Krylov for XXZ chain \n (C) Fabien Alet 2024. \n\n"
 /****** This program needs to be linked to a complex petsc-slepc installation !!! *********/
 
 #define PETSC_DESIRE_COMPLEX
-#define PETSC_USE_COMPLEX 1
 #include <complex>
-
-#include <slepceps.h>
-
 #include <slepcmfn.h>
-
-#include <omp.h>
-#include <algorithm>
-#include <iostream>
+#include <slepceps.h>
+#include <boost/dynamic_bitset.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
 #include <fstream>
-#include <sstream>
+#include <iostream>
 #include <map>
-#include <random>
-
+#include <omp.h>
+#include <sstream>
+#include <malloc.h>
+#include<chrono>
 
 #ifdef USE_MKL
 #include <mkl.h>
 #include <mkl_cblas.h>
 #include <mkl_lapack.h>
 #else
-typedef struct __MKL_Complex16 { double real; double imag; } MKL_Complex16;
+typedef struct __MKL_Complex16 {
+  double real;
+  double imag;
+} MKL_Complex16;
 typedef int MKL_INT;
 typedef MKL_Complex16 lapack_complex_double;
 
@@ -37,7 +34,7 @@ typedef MKL_Complex16 lapack_complex_double;
 #include <lapacke.h>
 #endif
 
-double PI=acos(-1.);
+double PI = acos(-1.);
 using namespace std;
 
 #include "Spin/Spin_parameters.h"
