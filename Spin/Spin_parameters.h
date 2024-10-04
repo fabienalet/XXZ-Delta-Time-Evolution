@@ -620,13 +620,18 @@ Parameters::Parameters(int myrank_) {
     std::stringstream specialstatestr;
     specialstatestr.str(specialstate_string);
     unsigned short int ss;
+    int mysz;
     while (specialstatestr >> ss) {
-      if (ss==0) { special_conf.push_back(0);}
-      else { if (ss==1) { special_conf.push_back(1);}
+      if (ss==0) { special_conf.push_back(0); mysz=-1;}
+      else { if (ss==1) { special_conf.push_back(1); mysz+=1;}
       else { std::cout << "Errot !! Not boolean value !!!\n"; exit(0);}
     }
     }
     if (special_conf.size()!=L) { std::cout << "Error !! Too few boolean values !!!\n"; exit(0);}
+    double Sz = 0;
+    PetscOptionsGetReal(NULL, NULL, "-Sz", &Sz, NULL);
+    if (int(2*Sz)!=mysz) { std::cout << "Error !! Not correct Sz !!!\n"; exit(0);}
+    
     delete[] specialstate_c_string;
     // avoid all other options
     product_state_start=PETSC_FALSE;

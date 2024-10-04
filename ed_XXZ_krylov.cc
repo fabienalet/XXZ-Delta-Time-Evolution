@@ -188,7 +188,6 @@ int main(int argc,char **argv)
 
   /********* Initialize time grid ********/
   myparameters.Initialize_timegrid();
-  cout << "***Special state start = " << myparameters.special_state_start << endl;
   /********* Initial state ***************/
 
   /***** Loop over initial states ****/
