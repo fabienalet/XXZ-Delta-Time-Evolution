@@ -267,6 +267,9 @@ int main(int argc,char **argv)
   }
   else
   {
+
+      cout << "***Special state start = " << myparameters.special_state_start << endl;
+
     if (myparameters.special_state_start)
     { cout << "YY\n"; init_states.push_back(mybasis.index(myparameters.special_conf));}
     else {

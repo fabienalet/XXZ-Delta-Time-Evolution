@@ -633,6 +633,7 @@ Parameters::Parameters(int myrank_) {
     cdw_start=PETSC_FALSE;
 
   } 
+  cout << "Special state start = " << special_state_start << endl;
 
 
   char* targets_c_string = new char[1000];
