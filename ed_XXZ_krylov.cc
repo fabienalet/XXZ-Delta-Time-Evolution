@@ -188,7 +188,7 @@ int main(int argc,char **argv)
 
   /********* Initialize time grid ********/
   myparameters.Initialize_timegrid();
-
+  cout << "***Special state start = " << myparameters.special_state_start << endl;
   /********* Initial state ***************/
 
   /***** Loop over initial states ****/
@@ -268,10 +268,11 @@ int main(int argc,char **argv)
   else
   {
 
-      cout << "***Special state start = " << myparameters.special_state_start << endl;
-
     if (myparameters.special_state_start)
-    { cout << "YY\n"; init_states.push_back(mybasis.index(myparameters.special_conf));}
+    { unsigned long int ii=mybasis.index(myparameters.special_conf);
+      if(myrank==0) { cout << "#Starting with Special state = "; for (int r=0;r<L;r++) { std::cout << myparameters.special_conf[r];}
+      cout << " with index= " << ii << endl;}
+      init_states.push_back(ii);}
     else {
     if(myrank==0)
     {

@@ -610,7 +610,7 @@ Parameters::Parameters(int myrank_) {
   int each_measurement = num_times / nmeasures;
 
 
- PetscBool special_state_start=PETSC_FALSE;
+  special_state_start=PETSC_FALSE;
   char* specialstate_c_string = new char[10000];
   ierr = PetscOptionsGetString(NULL, NULL, "-special_state", specialstate_c_string, 10000,
                                &special_state_start); 
@@ -633,7 +633,6 @@ Parameters::Parameters(int myrank_) {
     cdw_start=PETSC_FALSE;
 
   } 
-  cout << "Special state start = " << special_state_start << endl;
 
 
   char* targets_c_string = new char[1000];
