@@ -5,6 +5,11 @@ static char help[] = "Krylov for XXZ chain \n (C) Fabien Alet 2024. \n\n";
 #include <complex>
 #include <slepcmfn.h>
 #include <slepceps.h>
+#include <boost/dynamic_bitset.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int.hpp>
+#include <boost/random/uniform_int_distribution.hpp>
+#include <boost/random/uniform_real_distribution.hpp>
 #include <fstream>
 #include <iostream>
 #include <map>
