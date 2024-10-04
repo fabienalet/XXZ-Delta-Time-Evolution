@@ -302,7 +302,7 @@ int main(int argc,char **argv)
     if (myparameters.measure_correlations) { myparameters.init_filename_correlations(corrout,i0);  PetscOptionsGetBool(NULL, NULL, "-omp", &omp_switch, NULL);   }
     if (myparameters.measure_participation) { myparameters.init_filename_participation(partout,i0);	}
     if (myparameters.measure_local) { myparameters.init_filename_imbalance(locout,i0);	}
-    if (myparameters.measure_imbalance) { myparameters.init_filename_imbalance(partout,i0);	    }
+    if (myparameters.measure_imbalance) { myparameters.init_filename_imbalance(imbout,i0);	    }
     if (myparameters.measure_entanglement) {  myparameters.init_filename_entanglement(entout,i0); entout.precision(20);
       //  PetscOptionsGetInt(NULL, NULL, "-LAmin", &LAmin, NULL); PetscOptionsGetInt(NULL, NULL, "-LAmax", &LAmax, NULL);
        }

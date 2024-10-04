@@ -523,7 +523,7 @@ Parameters::Parameters(int myrank_) {
   measure_entanglement_at_all_cuts = PETSC_FALSE;
   measure_imbalance = PETSC_FALSE;
   measure_return = PETSC_FALSE;
-  measure_participation = PETSC_TRUE;
+  measure_participation = PETSC_FALSE;
   measure_eigenvector_largest_coefficients = PETSC_FALSE;
   measure_eigenvector_largest_coefficients_with_sign = PETSC_FALSE;
   measure_all_part_entropy = PETSC_FALSE;
