@@ -38,7 +38,7 @@ class Parameters {
   void init_filename_participation(ofstream& partout,int inistate);
   void init_filename_return(ofstream& retout,int inistate);
   void init_filename_imbalance(ofstream& imbout,int inistate);
-`void init_filename_local(ofstream& locout,int inistate);
+  void init_filename_local(ofstream& locout,int inistate);
 
   std::vector<double> time_points;
   std::vector<double> delta_t_points;
