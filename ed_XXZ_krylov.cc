@@ -268,7 +268,7 @@ int main(int argc,char **argv)
   else
   {
     if (myparameters.special_state_start)
-    { init_states.push_back(mybasis.index(myparameters.special_conf);}
+    { init_states.push_back(mybasis.index(myparameters.special_conf));}
     else {
     if(myrank==0)
     {

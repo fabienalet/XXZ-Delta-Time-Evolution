@@ -60,6 +60,7 @@ class Parameters {
 
   PetscBool cdw_start;
   PetscBool product_state_start;
+  PetscBool special_state_start;
   PetscInt num_product_states;
   PetscReal TEEmin;
   PetscReal TEEmax;
@@ -629,8 +630,8 @@ Parameters::Parameters(int myrank_) {
     delete[] specialstate_c_string;
     // avoid all other options
     num_product_states=1;
-    product_state_start=0;
-    cdw_start=0;
+    product_state_start=PETSC_FALSE;
+    cdw_start=PETSC_FALSE;
 
   } 
 
