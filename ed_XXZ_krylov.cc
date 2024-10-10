@@ -31,7 +31,7 @@ typedef struct __MKL_Complex16 {
 typedef int MKL_INT;
 typedef MKL_Complex16 lapack_complex_double;
 
-#include <cblas.h>
+//#include <cblas.h>
 #include <lapacke.h>
 #endif
 
@@ -58,10 +58,12 @@ int main(int argc,char **argv)
 
   /************* Init parallel work *********************************/
   // For parallelization on node (openMP)
-  int ENV_NUM_THREADS=mkl_get_max_threads(); /// Get value of OMP_NUM_THREADS
-  omp_set_num_threads(ENV_NUM_THREADS);
+  int ENV_NUM_THREADS=omp_get_num_threads();
+  omp_set_num_threads(1);
   #ifdef USE_MKL
-  mkl_set_num_threads(ENV_NUM_THREADS);
+  ENV_NUM_THREADS=mkl_get_max_threads(); /// Get value of OMP_NUM_THREADS 
+  mkl_set_num_threads(1);
+  omp_set_num_threads(1)
   #endif
   // In case of openMP problems, one could desactivate openMP for the Krylov code
   // omp_set_num_threads(1);

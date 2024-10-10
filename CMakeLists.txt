@@ -31,16 +31,24 @@ link_directories(
 
 # MKL
 ### LAPACK from MKL
-# need to be adapted for other lapack's
+
+# MKL
+set(ED_USE_MKL 0)
+if(${ED_USE_MKL})
 include_directories($ENV{MKLROOT}/include/)
 link_directories($ENV{MKL_ROOT}/lib/intel64/)
-set(LAPACKLIB mkl_lapack95_lp64 mkl_scalapack_lp64 mkl_blacs_intelmpi_lp64 mkl_intel_lp64 mkl_intel_thread mkl_core iomp5 pthread )
-
-set(ED_USE_MKL 1)
-if(${ED_USE_MKL})
 add_definitions(-DUSE_MKL)
+set(LAPACKLIB mkl_lapack95_lp64 mkl_scalapack_lp64 mkl_blacs_intelmpi_lp64 mkl_intel_lp64 mkl_intel_thread mkl_core iomp5 pthread )
 message("Using MKL")
+else()
+include_directories($ENV{OPENBLAS_ROOT}/include)
+link_directories($ENV{OPENBLAS_ROOT}/lib/)
+include_directories($ENV{SCALAPACK_ROOT}/include)
+link_directories($ENV{SCALAPACK_ROOT}/lib/)
+set(LAPACKLIB scalapack openblas omp)
 endif(${ED_USE_MKL})
+
+
 
 add_executable(xxz_krylov ed_XXZ_krylov.cc)
 target_link_libraries(xxz_krylov ${MPILIB} ${LAPACKLIB} slepc petsc)

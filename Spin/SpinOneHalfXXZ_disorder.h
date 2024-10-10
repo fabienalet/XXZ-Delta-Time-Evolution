@@ -608,14 +608,14 @@ void Hamiltonian::diagonalize_lapack(double *A, double w[], bool eigenvectors) {
   /* Query the optimal workspace */
   lwork = -1;
   liwork = -1;
-  // tell the routine whether or not to compute the eigenvectors
-  char *vectors = "N";
-  if (eigenvectors) vectors = "V";
 #ifdef USE_MKL
-  dsyevd(vectors, "Lower", &myn, &A[0], &lda, w, &wkopt, &lwork, &iwkopt,
-         &liwork, &info);
+  if (eigenvectors) {dsyevd("V", "Lower", &myn, &A[0], &lda, w, &wkopt, &lwork, &iwkopt,&liwork, &info);}
+  else { dsyevd("N", "Lower", &myn, &A[0], &lda, w, &wkopt, &lwork, &iwkopt,&liwork, &info)}
 #else
-LAPACK_dsyevd(LAPACK_ROW_MAJOR,"N", "Lower", (lapack_int) myn, &A[0], (lapack_int) lda, w);
+// LAPACK_dsyevd(LAPACK_ROW_MAJOR,"N", "Lower", (lapack_int) myn, &A[0], (lapack_int) lda, w);
+
+if (eigenvectors) { LAPACKE_dsyevd(LAPACK_ROW_MAJOR,'V', 'L', (int) myn,&A[0], (int) myn, w);}
+else { LAPACKE_dsyevd(LAPACK_ROW_MAJOR,'N', 'L', (int) myn,&A[0], (int) myn, w);}
 
 //dsyevd_(vectors, "Lower", &myn, &A[0], &lda, w, &wkopt, &lwork, &iwkopt,
 //         &liwork, &info);
@@ -627,8 +627,10 @@ LAPACK_dsyevd(LAPACK_ROW_MAJOR,"N", "Lower", (lapack_int) myn, &A[0], (lapack_in
   iwork = (MKL_INT *)malloc(liwork * sizeof(MKL_INT));
   // Perform the diagonalization
 #ifdef USE_MKL
-  dsyevd(vectors, "Lower", &myn, &A[0], &lda, w, work, &lwork, iwork, &liwork,
-         &info);
+  if (eigenvectors) { dsyevd("V", "Lower", &myn, &A[0], &lda, w, work, &lwork, iwork, &liwork,
+         &info);}
+         else { dsyevd("N", "Lower", &myn, &A[0], &lda, w, work, &lwork, iwork, &liwork,
+         &info);}
 #else
 //dsyevd_(vectors, "Lower", &myn, &A[0], &lda, w, &wkopt, &lwork, &iwkopt,
 //         &liwork, &info);
