@@ -723,6 +723,8 @@ void observable::compute_entanglement_spectrum(PetscScalar *state) {
        //           rwork, iwork, &info);
           LAPACKE_zgesdd( LAPACK_ROW_MAJOR, "N", &m, &n, &psi_reshaped[0], &lda, &local_svd_spectrum[0], u,
                  &ldu, vt, &ldvt);
+                 LAPACKE_zgesdd( LAPACK_ROW_MAJOR, "N", (lapack_int) m, (lapack_int)  n, (double __complex__ *) &psi_reshaped[0], (lapack_int)  lda, &local_svd_spectrum[0], u,
+                 (lapack_int) ldu, vt, (lapack_int) ldvt);
 #endif
 #ifdef USE_MKL
           lwork = (MKL_INT)wkopt.real;
