@@ -611,16 +611,26 @@ void Hamiltonian::diagonalize_lapack(double *A, double w[], bool eigenvectors) {
   // tell the routine whether or not to compute the eigenvectors
   char *vectors = "N";
   if (eigenvectors) vectors = "V";
+#ifdef USE_MKL
   dsyevd(vectors, "Lower", &myn, &A[0], &lda, w, &wkopt, &lwork, &iwkopt,
          &liwork, &info);
+#else
+dsyevd_(vectors, "Lower", &myn, &A[0], &lda, w, &wkopt, &lwork, &iwkopt,
+         &liwork, &info);
+#endif
   // Allocate the optimal workspace
   lwork = (MKL_INT)wkopt;
   work = (double *)malloc(lwork * sizeof(double));
   liwork = iwkopt;
   iwork = (MKL_INT *)malloc(liwork * sizeof(MKL_INT));
   // Perform the diagonalization
+#ifdef USE_MKL
   dsyevd(vectors, "Lower", &myn, &A[0], &lda, w, work, &lwork, iwork, &liwork,
          &info);
+#else
+dsyevd_(vectors, "Lower", &myn, &A[0], &lda, w, &wkopt, &lwork, &iwkopt,
+         &liwork, &info);
+#endif
   free((void *)iwork);
   free((void *)work);
   // return w;

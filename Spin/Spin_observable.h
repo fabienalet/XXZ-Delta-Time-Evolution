@@ -716,18 +716,23 @@ void observable::compute_entanglement_spectrum(PetscScalar *state) {
           double __complex__ *work;
           double __complex__ u[ldu * m], vt[ldvt * n];
           double rwork[5 * m * m + 7 * m];
-          zgesdd_("N", &m, &n, (double __complex__ *)&psi_reshaped[0], &lda,
-                  &local_svd_spectrum[0], u, &ldu, vt, &ldvt, &wkopt, &lwork,
+        //  zgesdd_("N", &m, &n, (double __complex__ *)&psi_reshaped[0], &lda,&local_svd_spectrum[0], u, &ldu, vt, &ldvt, &wkopt, &lwork,rwork, iwork, &info);
+                  zgesdd_("N", &m, &n, (double __complex__ *)&psi_reshaped[0], &m,
+                  &local_svd_spectrum[0], u, &m, vt, &n, &wkopt, &lwork,
                   rwork, iwork, &info);
 #endif
+#ifdef USE_MKL
           lwork = (MKL_INT)wkopt.real;
           work = (MKL_Complex16 *)malloc(lwork * sizeof(MKL_Complex16));
-#ifdef USE_MKL
           zgesdd("N", &m, &n, &psi_reshaped[0], &lda, &local_svd_spectrum[0], u,
                  &ldu, vt, &ldvt, work, &lwork, rwork, iwork, &info);
 #else
-          zgesdd_("N", &m, &n, &psi_reshaped[0], &lda, &local_svd_spectrum[0],
-                  u, &ldu, vt, &ldvt, work, &lwork, rwork, iwork, &info);
+// TODO
+          lwork = (int) creal(wkopt);
+          work = (double __complex__  *)malloc(lwork * sizeof(double __complex__ ));
+
+          zgesdd_("N", &m, &n, &psi_reshaped[0], &m, &local_svd_spectrum[0],
+                  u, &m, vt, &n, work, &lwork, rwork, iwork, &info);
 #endif
 #else
           double wkopt;
@@ -874,7 +879,7 @@ PetscOptionsGetBool(NULL,NULL,"-special_print",&print,NULL);
 //    std::cout << "Starting dhseqr2\n";
 
 
-    dhseqr("E","N",&n,&ilo,&ihi,&copyA[0],&n,&WR[0],&WI[0],NULL,&n,work,&lwork,&info);
+  //  dhseqr("E","N",&n,&ilo,&ihi,&copyA[0],&n,&WR[0],&WI[0],NULL,&n,work,&lwork,&info);
     if (info != 0) cerr << "Error in LAPACKE_dhseqr " << info << " error" << endl;
   if (print)  std::cout << "**** eigenvalues seems to be \n";
 
