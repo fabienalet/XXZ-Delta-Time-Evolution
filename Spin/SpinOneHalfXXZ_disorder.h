@@ -615,8 +615,10 @@ void Hamiltonian::diagonalize_lapack(double *A, double w[], bool eigenvectors) {
   dsyevd(vectors, "Lower", &myn, &A[0], &lda, w, &wkopt, &lwork, &iwkopt,
          &liwork, &info);
 #else
-dsyevd_(vectors, "Lower", &myn, &A[0], &lda, w, &wkopt, &lwork, &iwkopt,
-         &liwork, &info);
+LAPACK_dsyevd(LAPACK_ROW_MAJOR,vectors, "Lower", &myn, &A[0], &lda, w);
+
+//dsyevd_(vectors, "Lower", &myn, &A[0], &lda, w, &wkopt, &lwork, &iwkopt,
+//         &liwork, &info);
 #endif
   // Allocate the optimal workspace
   lwork = (MKL_INT)wkopt;
@@ -628,8 +630,8 @@ dsyevd_(vectors, "Lower", &myn, &A[0], &lda, w, &wkopt, &lwork, &iwkopt,
   dsyevd(vectors, "Lower", &myn, &A[0], &lda, w, work, &lwork, iwork, &liwork,
          &info);
 #else
-dsyevd_(vectors, "Lower", &myn, &A[0], &lda, w, &wkopt, &lwork, &iwkopt,
-         &liwork, &info);
+//dsyevd_(vectors, "Lower", &myn, &A[0], &lda, w, &wkopt, &lwork, &iwkopt,
+//         &liwork, &info);
 #endif
   free((void *)iwork);
   free((void *)work);

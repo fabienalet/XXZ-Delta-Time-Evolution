@@ -1,6 +1,7 @@
 #ifndef OBS_H
 #define OBS_H
 
+
 class observable {
   typedef std::vector<unsigned short int> Conf;
 
@@ -717,9 +718,11 @@ void observable::compute_entanglement_spectrum(PetscScalar *state) {
           double __complex__ u[ldu * m], vt[ldvt * n];
           double rwork[5 * m * m + 7 * m];
         //  zgesdd_("N", &m, &n, (double __complex__ *)&psi_reshaped[0], &lda,&local_svd_spectrum[0], u, &ldu, vt, &ldvt, &wkopt, &lwork,rwork, iwork, &info);
-                  zgesdd_("N", &m, &n, (double __complex__ *)&psi_reshaped[0], &m,
-                  &local_svd_spectrum[0], u, &m, vt, &n, &wkopt, &lwork,
-                  rwork, iwork, &info);
+        //          zgesdd_("N", &m, &n, (double __complex__ *)&psi_reshaped[0], &m,
+       //           &local_svd_spectrum[0], u, &m, vt, &n, &wkopt, &lwork,
+       //           rwork, iwork, &info);
+          LAPACKE_zgesdd( LAPACK_ROW_MAJOR, "N", &m, &n, &psi_reshaped[0], &lda, &local_svd_spectrum[0], u,
+                 &ldu, vt, &ldvt);
 #endif
 #ifdef USE_MKL
           lwork = (MKL_INT)wkopt.real;
@@ -728,11 +731,11 @@ void observable::compute_entanglement_spectrum(PetscScalar *state) {
                  &ldu, vt, &ldvt, work, &lwork, rwork, iwork, &info);
 #else
 // TODO
-          lwork = (int) creal(wkopt);
-          work = (double __complex__  *)malloc(lwork * sizeof(double __complex__ ));
+//          lwork = (int) creal(wkopt);
+ //         work = (double __complex__  *)malloc(lwork * sizeof(double __complex__ ));
 
-          zgesdd_("N", &m, &n, &psi_reshaped[0], &m, &local_svd_spectrum[0],
-                  u, &m, vt, &n, work, &lwork, rwork, iwork, &info);
+//          zgesdd_("N", &m, &n, &psi_reshaped[0], &m, &local_svd_spectrum[0],
+//                  u, &m, vt, &n, work, &lwork, rwork, iwork, &info);
 #endif
 #else
           double wkopt;
