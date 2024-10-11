@@ -610,7 +610,7 @@ void Hamiltonian::diagonalize_lapack(double *A, double w[], bool eigenvectors) {
   liwork = -1;
 #ifdef USE_MKL
   if (eigenvectors) {dsyevd("V", "Lower", &myn, &A[0], &lda, w, &wkopt, &lwork, &iwkopt,&liwork, &info);}
-  else { dsyevd("N", "Lower", &myn, &A[0], &lda, w, &wkopt, &lwork, &iwkopt,&liwork, &info)}
+  else { dsyevd("N", "Lower", &myn, &A[0], &lda, w, &wkopt, &lwork, &iwkopt,&liwork, &info);}
 #else
 // LAPACK_dsyevd(LAPACK_ROW_MAJOR,"N", "Lower", (lapack_int) myn, &A[0], (lapack_int) lda, w);
 

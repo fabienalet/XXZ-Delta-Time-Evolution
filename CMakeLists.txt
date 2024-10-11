@@ -33,7 +33,7 @@ link_directories(
 ### LAPACK from MKL
 
 # MKL
-set(ED_USE_MKL 0)
+set(ED_USE_MKL 1)
 if(${ED_USE_MKL})
 include_directories($ENV{MKLROOT}/include/)
 link_directories($ENV{MKL_ROOT}/lib/intel64/)
