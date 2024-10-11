@@ -233,6 +233,9 @@ int main(int argc, char **argv) {
   ierr = MatAssemblyBegin(sigmas[k], MAT_FINAL_ASSEMBLY);
   ierr = MatAssemblyEnd(sigmas[k], MAT_FINAL_ASSEMBLY);
   }
+  for (int k = 0; k < L; ++k) {
+  MatView(sigmas[k],PETSC_VIEWER_STDOUT_WORLD);
+  }
 
   for (double &renorm_target : targets) {  // new setup
     double target = renorm_target * (Emaxc - Eminc) + Eminc;
@@ -267,8 +270,8 @@ int main(int argc, char **argv) {
 
 
     Vec use1,use2;
-    MatCreateVecs(H, NULL, &use1);
-    MatCreateVecs(H, NULL, &use2);
+    MatCreateVecs(sigmas[0], NULL, &use1);
+    MatCreateVecs(sigmas[0], NULL, &use2);
 
     if (nconv > 0) {
       ofstream entout;
