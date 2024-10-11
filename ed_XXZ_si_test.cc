@@ -236,7 +236,7 @@ int main(int argc, char **argv) {
   ierr = MatAssemblyEnd(sigmas[k], MAT_FINAL_ASSEMBLY);
   }
   for (int k = 0; k < L; ++k) {
-  MatView(sigmas[k],PETSC_VIEWER_STDOUT_WORLD);
+  //MatView(sigmas[k],PETSC_VIEWER_STDOUT_WORLD);
   }
 
   for (double &renorm_target : targets) {  // new setup
