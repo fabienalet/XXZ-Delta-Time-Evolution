@@ -223,8 +223,10 @@ int main(int argc, char **argv) {
                 else { MatSetValue(sigmas[k], row_ctr, row_ctr, (PetscScalar)-1., ADD_VALUES);}
           }
         }
+        row_ctr++;
       }
     }
+
   }
 
   for (int k = 0; k < L; ++k) {
