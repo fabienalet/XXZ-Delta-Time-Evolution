@@ -59,11 +59,11 @@ int main(int argc, char **argv) {
  // For parallelization on node (openMP)
   int ENV_NUM_THREADS=omp_get_num_threads();
   omp_set_num_threads(ENV_NUM_THREADS);
-  #ifdef USE_MKL
+#ifdef USE_MKL
   ENV_NUM_THREADS=mkl_get_max_threads(); /// Get value of OMP_NUM_THREADS 
   mkl_set_num_threads(ENV_NUM_THREADS);
-  omp_set_num_threads(ENV_NUM_THREADS)
-  #endif
+  omp_set_num_threads(ENV_NUM_THREADS);
+#endif
   // For parallelization between nodes (MPI)
   int myrank, mpisize;
   MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
@@ -182,7 +182,7 @@ int main(int argc, char **argv) {
   // Initialize file names
 
   Vec xr;
-  MatCreateVecs(H, PETSC_NULL, &xr);
+  MatCreateVecs(H, NULL, &xr);
   
   std::vector<double> targets;
   if (myparameters.target_infinite_temperature) {
@@ -199,12 +199,12 @@ int main(int argc, char **argv) {
     targets = myparameters.targets;
   }
 
-  std::vector<Vec> sigmas;
+  std::vector<Mat> sigmas;
   sigmas.resize(L);
-  for (int k=0;k<L;++k) { MatCreateVecs(H, PETSC_NULL, &sigmas[k]);}
+  //for (int k=0;k<L;++k) { MatCreateVecs(H, NULL, &sigmas[k]);}
   {
   std::vector<PetscInt> d_nnz(Iend - Istart,1);
-  std::vector<PetscInt> d_nnz(Iend - Istart,0);
+  std::vector<PetscInt> o_nnz(Iend - Istart,0);
   for (int k=0;k<L;++k) { MatCreateAIJ(PETSC_COMM_WORLD, Iend - Istart, PETSC_DECIDE,nconf,nconf, 0, d_nnz.data(), 0,
                o_nnz.data(), &(sigmas[k])); } // check &(sigmas[k]
   }
@@ -267,8 +267,8 @@ int main(int argc, char **argv) {
 
 
     Vec use1,use2;
-    MatCreateVecs(H, PETSC_NULL, &use1);
-    MatCreateVecs(H, PETSC_NULL, &use2);
+    MatCreateVecs(H, NULL, &use1);
+    MatCreateVecs(H, NULL, &use2);
 
     if (nconv > 0) {
       ofstream entout;
