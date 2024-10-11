@@ -213,12 +213,12 @@ int main(int argc, char **argv) {
     for (int ca = 0; ca < mybasis.Confs_in_A[nsa].size(); ++ca) {
       std::vector<unsigned short int> config(L, 0);
       std::vector<unsigned short int> confA =mybasis.Confs_in_A[nsa][ca];
-      for (int r = 0; r < LA; ++r) {config[r] = confA[r];}
+      for (int r = 0; r < mybasis.LA; ++r) {config[r] = confA[r];}
       for (int cb = 0; cb < mybasis.Confs_in_B[nsa].size(); ++cb) {
         if ((row_ctr >= Istart) && (row_ctr < Iend)) {
           std::vector<unsigned short int> confB =mybasis. Confs_in_B[nsa][cb];
-          for (int r = 0; r < LB; ++r) { config[r + LA] = confB[r]; }
-          for (int k = 0; k < L; ++r) {
+          for (int r = 0; r < mybasis.LB; ++r) { config[r + mybasis.LA] = confB[r]; }
+          for (int k = 0; k < L; ++k) {
                 if (config[k]) { MatSetValue(sigmas[k], row_ctr, row_ctr, (PetscScalar)1., ADD_VALUES);}
                 else { MatSetValue(sigmas[k], row_ctr, row_ctr, (PetscScalar)-1., ADD_VALUES);}
           }
@@ -227,7 +227,7 @@ int main(int argc, char **argv) {
     }
   }
 
-  for (int k = 0; k < L; ++r) {
+  for (int k = 0; k < L; ++k) {
   MatSetOption(sigmas[k], MAT_SYMMETRIC, PETSC_TRUE);
   MatSetOption(sigmas[k], MAT_SYMMETRY_ETERNAL, PETSC_TRUE);
   ierr = MatAssemblyBegin(sigmas[k], MAT_FINAL_ASSEMBLY);
