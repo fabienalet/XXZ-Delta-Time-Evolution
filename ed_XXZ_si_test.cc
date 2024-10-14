@@ -301,9 +301,21 @@ int main(int argc, char **argv) {
         energies.push_back(PetscRealPart(Er));
 
         // Create series of S_i^z | n > and compute their variances
-        
+
+        for (int j = i+1; j < nconv; j++) { 
+          EPSGetEigenpair(eps2, j, &Ei, NULL, use2, NULL);
+          for (int k=0;k<L;++k) {
+          MatMult(sigmas[k],xr,use1);
+          double mixed;
+          VecDot(use2,use1,&mixed);
+          if (myrank==0) { cout << "**Overlap < Ef= " << Ei << " | sigma " << k+1 << " | Er= " << Er << " > = " << mixed << endl; }
+          }
+        }
+
         for (int k=0;k<L;++k) {
           MatMult(sigmas[k],xr,use1);
+
+
           // use1=sigma | n >
           MatMult(H,use1,use2);
           // use2 = H sigma | n >
