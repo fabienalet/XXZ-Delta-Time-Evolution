@@ -312,6 +312,7 @@ int main(int argc, char **argv) {
           }
         }
 */
+/*
         for (int k=0;k<L;++k) {
           MatMult(sigmas[k],xr,use1);
           double nn;
@@ -326,6 +327,7 @@ int main(int argc, char **argv) {
           double variance=E2var-Evar*Evar;
           if (myrank==0) { cout << "***Sigmas " << k+1 << " " << Er << " " << Evar << " " << variance << " (norm=" << nn << endl; }
         }
+*/
         if (myparameters.write_wf) {
           std::stringstream filename;
           filename << "Eigenvector" << i << "."
