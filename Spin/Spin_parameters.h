@@ -79,6 +79,8 @@ class Parameters {
   PetscBool measure_correlations;
   PetscBool measure_transverse_correlations;
   PetscBool measure_all_part_entropy;
+  PetscBool measure_KL;
+  PetscBool measure_all_KL;
   double qmin;
   double qmax;
   int Nq;
@@ -671,6 +673,14 @@ Parameters::Parameters(int myrank_) {
 
   int each_measurement = num_times / nmeasures;
 
+  measure_KL = PETSC_FALSE;
+  measure_all_KL = PETSC_FALSE;
+  ierr = PetscOptionsGetBool(NULL, NULL, "-measure_KL", &measure_KL, NULL);
+  ierr =
+      PetscOptionsGetBool(NULL, NULL, "-measure_all_KL", &measure_all_KL, NULL);
+  if (measure_all_KL) {
+    measure_KL = PETSC_TRUE;
+  }
 
   special_state_start=PETSC_FALSE;
   char* specialstate_c_string = new char[10000];
