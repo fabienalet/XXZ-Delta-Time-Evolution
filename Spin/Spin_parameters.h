@@ -604,6 +604,9 @@ Parameters::Parameters(int myrank_) {
   Nq = 1;
   Ncoeffs_elc = 128;
 
+  PetscOptionsGetBool(NULL, NULL, "-measure_participation",
+                             &measure_participation, NULL);
+
   ierr = PetscOptionsGetBool(NULL, NULL, "-measure_correlations",
                              &measure_correlations, NULL);  // CHKERRQ(ierr);
   ierr = PetscOptionsGetBool(NULL, NULL, "-measure_transverse_correlations",
