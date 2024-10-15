@@ -610,7 +610,7 @@ double observable::KLd(PetscScalar *state1, PetscScalar *state2) {
     double ai = PetscAbsScalar(state1[i]);
     double bi = PetscAbsScalar(state2[i]);
     if ((ai != 0) && (bi != 0)) {
-      entropy += -2.0 * ai * ai * log(ai / bi);
+      entropy += 2.0 * ai * ai * log(ai / bi);
     }
   }
   return entropy;
