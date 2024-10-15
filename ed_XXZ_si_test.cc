@@ -283,7 +283,7 @@ int main(int argc, char **argv) {
       ofstream tcorrout;
       ofstream KLout;
       if (myparameters.measure_KL) {
-        myparameters.init_filenames_eigenstate(entout, locout, partout,corrout, tcorrout,
+        myparameters.init_filenames_eigenstate(entout, locout, partout,corrout, tcorrout,KLout,
                                              renorm_target);
       }
       else {
