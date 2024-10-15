@@ -639,6 +639,7 @@ double observable::entang_entropy(double q) {
 
 void observable::compute_entanglement_spectrum(PetscScalar *state) {
   entanglement_spectrum.resize(0);
+  
 // cout << "*** State \n";
 // for (int p=0;p<number_valid_coverings;++p) {
 //	cout << state[p] << endl;
@@ -775,7 +776,6 @@ void observable::compute_entanglement_spectrum(PetscScalar *state) {
       }  // sectorsize>1
     }    // sectorsize>0
   }      // loop over sectors
-
   double sum = 0.;
   for (int pp = 0; pp < entanglement_spectrum.size(); ++pp) {
     sum += entanglement_spectrum[pp];

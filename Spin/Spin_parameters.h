@@ -70,6 +70,7 @@ class Parameters {
   PetscReal TEEmax;
   PetscInt nmeasures;
 
+  PetscBool measure_entanglement_spectrum;
   PetscBool measure_entanglement;
   PetscBool measure_local;
   PetscBool measure_entanglement_at_all_cuts;
@@ -603,6 +604,10 @@ Parameters::Parameters(int myrank_) {
   qmax = 2.;
   Nq = 1;
   Ncoeffs_elc = 128;
+
+  measure_entanglement_spectrum=PETSC_FALSE;
+  PetscOptionsGetBool(NULL, NULL, "-measure_entanglement_spectrum",&measure_entanglement_spectrum, NULL);
+
 
   PetscOptionsGetBool(NULL, NULL, "-measure_participation",
                              &measure_participation, NULL);

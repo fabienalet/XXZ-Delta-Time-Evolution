@@ -438,6 +438,14 @@ int main(int argc, char **argv) {
 
           if (myparameters.measure_entanglement) {
             myobservable.compute_entanglement_spectrum(state);
+            if (myparameters.measure_entanglement_spectrum) { 
+              std::vector<double> es=myobservable.entanglement_spectrum;
+              std::sort(es.begin(), es.end());
+              cout << "*** ES " << Er << endl;
+              for (int p=0;p<myobservable.entanglement_spectrum.size();++p) {
+                cout << es[p] << endl;
+              }
+            }
             double S1 = myobservable.entang_entropy(1);
             entout << S1 << "\n";
             double S2=myobservable.entang_entropy(2);
