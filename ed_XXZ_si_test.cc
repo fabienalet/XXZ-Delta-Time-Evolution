@@ -406,7 +406,7 @@ int main(int argc, char **argv) {
           else {
             double PE = myobservable.part_entropy(state, 1);
             // parout << PetscRealPart(Er) << " " << PE << "\n";}
-            partout << PE << "\n";
+            partout << PE << " " << PetscRealPart(Er) << "\n";
           }
 
           if (myparameters.measure_local) {
