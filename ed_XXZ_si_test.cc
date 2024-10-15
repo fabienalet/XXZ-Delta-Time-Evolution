@@ -419,7 +419,7 @@ int main(int argc, char **argv) {
             Gij =myobservable.get_two_points_connected_correlation(state);
             for (int r = 0; r < L; ++r) {
               for (int s = r; s < L; ++s) {
-	              corrout << r << " " << " " << s << " " << Gij[r][s] << endl;
+	              corrout << r+1 << " " << " " << s+1 << " " << Gij[r][s] << " " << PetscRealPart(Er) << endl;
             } }
 
           }
