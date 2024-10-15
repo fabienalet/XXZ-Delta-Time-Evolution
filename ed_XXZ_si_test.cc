@@ -281,9 +281,15 @@ int main(int argc, char **argv) {
       ofstream partout;
       ofstream corrout;
       ofstream tcorrout;
+      ofstream KLout;
+      if (myparameters.measure_KL) {
+        myparameters.init_filenames_eigenstate(entout, locout, partout,corrout, tcorrout,
+                                             renorm_target);
+      }
+      else {
       myparameters.init_filenames_eigenstate(entout, locout, partout,corrout, tcorrout,
                                              renorm_target);
-
+      }
 
       std::vector<double> energies;
       std::vector<double> rgap;
@@ -294,6 +300,9 @@ int main(int argc, char **argv) {
       for (int k=0;k<L;++k) { Gij[k].resize(L,0.);}
       std::vector< std::vector<double> > Tij(L);
       for (int k=0;k<L;++k) { Tij[k].resize(L,0.);}
+
+      std::vector<PetscScalar *> all_states;
+      if (myparameters.measure_KL) { if (myrank==0) { all_states.resize(nconv); }}
 
       for (int i = 0; i < nconv; i++) {
         ierr = EPSGetEigenpair(eps2, i, &Er, &Ei, xr, NULL);
@@ -356,20 +365,12 @@ int main(int argc, char **argv) {
           PetscScalar *state;
           VecGetArray(Vec_local, &state);
 
-          // checking out parity ...
-          /*
-          std::cout << "*** Eigenvector " << i << std::endl;
-          for (int p = 0; p < nconf; p++) {
-            std::cout << p << " " << state[p] << std::endl;
+          if ((myparameters.measure_KL)) {
+            all_states[i] = (PetscScalar *)calloc(nconf, sizeof(PetscScalar));
+            std::copy(state, state + nconf, all_states[i]);
+            // all_states[i] = state;
           }
-          if (state[mybasis->ineel] == state[mybasis->ineel2]) {
-            std::cout << "Suggesting Eigenvector " << i
-                      << " is Inversion-symmetric (I=1)\n";
-          } else {
-            std::cout << "Suggesting Eigenvector " << i
-                      << " is not symmetric (I=-1)\n";
-          }
-          */
+          
           if (myparameters.measure_all_part_entropy) {
             double qmin = myparameters.qmin;
             std::vector<double> qs;
@@ -453,6 +454,31 @@ int main(int argc, char **argv) {
       partout.close();
       corrout.close();
       tcorrout.close();
+
+      if (myrank == 0) {
+        if (myparameters.measure_KL) {
+            if (myparameters.measure_all_KL) {
+            for (int p = 0; p < all_states.size(); ++p) {
+            for (int p2 = p + 1; p2 < all_states.size(); ++p2) {
+              double KL = myobservable.KLd(all_states[p], all_states[p2]);
+              KLout << KL << " " << energies[p] << " " << energies[p2] << std::endl;
+            }
+          }
+            }
+            else { // only consecutive
+          // order KL according to Energies ...
+          // follow https://stackoverflow.com/questions/37242285/sort-an-array-according-to-the-sequence-of-another-array
+          std::vector<size_t> indices(nconv);
+          std::iota(indices.begin(), indices.end(), 0);
+          std::sort(indices.begin(), indices.end(), [&](size_t i1, size_t i2) { return energies[i1] < energies[i2]; });
+          for (int p=0;p<(nconv-1);++p) 
+          { double KL = myobservable.KLd(all_states[indices[p]], all_states[indices[p+1]]);
+            KLout << KL << std::endl;
+          }
+            }
+        }
+      }
+      KLout.close();
 
       if (myrank == 0) {
         ofstream enout;

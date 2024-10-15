@@ -31,6 +31,10 @@ class Parameters {
                                  ofstream& partout, ofstream& corrout,
                                  ofstream& tcorrout,
                                  double target);
+  void init_filenames_eigenstate(ofstream& entout, ofstream& locout,
+                                 ofstream& partout, ofstream& corrout,
+                                 ofstream& tcorrout, ofstream& KLout,
+                                 double target);
   void init_filenames_energy(ofstream& enout, ofstream& rgapout, double target);
 
   void init_filename_correlations(ofstream& corrout,int inistate);
@@ -391,6 +395,64 @@ void Parameters::init_filenames_eigenstate(ofstream& entout, ofstream& locout,
                      << string_from_basis << string_from_H << ".dat";
     parthistout.open((parthistfilename.str()).c_str());
     parthistout.precision(20);
+  }
+
+}
+
+
+
+void Parameters::init_filenames_eigenstate(ofstream& entout, ofstream& locout,
+                                           ofstream& partout,
+                                           ofstream& corrout, 
+                                           ofstream& tcorrout, ofstream& KLout,
+                                           double target) {
+  if (measure_entanglement) {
+    std::stringstream filename;
+    filename << "ENT." << string_from_basis << string_from_H << ".target"
+             << target << ".dat";
+    entout.open((filename.str()).c_str());
+    entout.precision(20);
+  }
+
+
+  if (measure_local) {
+    std::stringstream locfilename;
+    locfilename << "LocalObservable." << string_from_basis << string_from_H
+                << ".target" << target << ".dat";
+    locout.open((locfilename.str()).c_str());
+    locout.precision(20);
+  }
+
+  if (measure_participation) {
+    std::stringstream partfilename;
+    partfilename << "Participation." << string_from_basis << string_from_H
+                 << ".target" << target << ".dat";
+    partout.open((partfilename.str()).c_str());
+    partout.precision(20);
+  }
+
+  if (measure_correlations) {
+    std::stringstream corrfilename;
+    corrfilename << "Correl."
+                     << string_from_basis << string_from_H << ".dat";
+    corrout.open((corrfilename.str()).c_str());
+    corrout.precision(20);
+  }
+
+  if (measure_transverse_correlations) {
+    std::stringstream tcorrfilename;
+    tcorrfilename << "TransverseCorrel."
+                  << string_from_basis << string_from_H << ".dat";
+    tcorrout.open((tcorrfilename.str()).c_str());
+    tcorrout.precision(20);
+  }
+
+  if (measure_KL) {
+    std::stringstream KLfilename;
+    KLfilename << "KL." << string_from_basis
+               << string_from_H << ".target" << target << ".dat";
+    KLout.open((KLfilename.str()).c_str());
+    KLout.precision(20);
   }
 
 }
