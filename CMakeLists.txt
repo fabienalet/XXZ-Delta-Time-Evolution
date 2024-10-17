@@ -55,3 +55,6 @@ target_link_libraries(xxz_krylov ${MPILIB} ${LAPACKLIB} slepc petsc)
 
 add_executable(xxz_si_test ed_XXZ_si_test.cc)
 target_link_libraries(xxz_si_test ${MPILIB} ${LAPACKLIB} slepc petsc)
+
+add_executable(xxz_si_prod ed_XXZ_si_prod.cc)
+target_link_libraries(xxz_si_prod ${MPILIB} ${LAPACKLIB} slepc petsc)
