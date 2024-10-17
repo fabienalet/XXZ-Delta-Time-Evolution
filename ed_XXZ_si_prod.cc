@@ -66,6 +66,7 @@ int main(int argc, char **argv) {
   omp_set_num_threads(ENV_NUM_THREADS);
 #endif
 */
+int ENV_NUM_THREADS=omp_get_num_threads();
   // For parallelization between nodes (MPI)
   int myrank, mpisize;
   MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
@@ -359,10 +360,10 @@ int main(int argc, char **argv) {
                 }
           }
           bool prediction_strong_correl_found=PETSC_FALSE;
-          if (prediction_strong_correl_pair.size!=0) {
+          if (prediction_strong_correl_pair.size()!=0) {
             prediction_strong_correl_found=PETSC_TRUE;
             std::cout << "### Prediction strong correl for Eigenstate with energy " << Er << endl;
-            for (int ss=0;ss<prediction_strong_correl_pair.size;++ss) {
+            for (int ss=0;ss<prediction_strong_correl_pair.size();++ss) {
             std::cout << "### Prediction strong correl for pair : " << prediction_strong_correl_pair[ss].first << " " << prediction_strong_correl_pair[ss].second << endl;}
           }
         
