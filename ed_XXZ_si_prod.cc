@@ -349,13 +349,17 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         for (int k=0;k<L;++k) {
           MatMult(sigmas[k],xr,use1);
           VecDot(use1,xr,&sz[k]);
+          std::cout << k << " " << sz[k] << " " << Er << endl;
         }
         std::vector< pair<int,int> > prediction_strong_correl_pair;
         for (int j=0;j<L;++j)
           { if (fabs(sz[j])<sz_cutoff)
-                { for (int k=j+1;k<L;++k)
+                { std::cout << j << " passes the deal " << Er << endl;
+                for (int k=j+1;k<L;++k)
                     { if ( (fabs(sz[k])<sz_cutoff) && ( (fabs(sz[k]*sz[j])<sz_product_cutoff) ) )
-                      { prediction_strong_correl_pair.push_back(make_pair(j,k));}
+                      { std::cout << "together with " << k << " " << Er << endl;
+                        
+                        prediction_strong_correl_pair.push_back(make_pair(j,k));}
                     }
                 }
           }
