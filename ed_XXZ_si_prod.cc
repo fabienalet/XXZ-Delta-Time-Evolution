@@ -429,8 +429,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
         cout << "Weight "; for (int c=0;c<number_of_weight_cutoff_values;++c) { cout << weight_cutoff[c] << " ";} cout << endl;
         for (int range=1;range<=(L/2);++range) {
-          cout << "Weight-range " << rangr << " ";
-           for (int c=0;c<number_of_weight_cutoff_values;++c) { cout << weight_at_range_at_cutoff[c][r]/weight_at_range_at_cutoff[c][0] << " ";} cout << endl;
+          cout << "Weight-range " << ranger << " ";
+           for (int c=0;c<number_of_weight_cutoff_values;++c) { cout << weight_at_cutoff_at_range[c][r]/weight_at_cutoff_at_range[c][0] << " ";} cout << endl;
         }
       }
 
@@ -444,7 +444,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           cout << "Sz " << k << " " << sz[k] << " " << energies_to_follow[ll] << endl;
           MatMult(sigmas[k],xr,use1);
           
-          std::vector<double> szkp(L-k-1;)
+          std::vector<double> szkp(L-k-1);
             for (int pp=k+1;pp<L;++pp)
               { 
                 MatMult(sigmas[pp],use1,use2);
@@ -452,7 +452,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                 cout << "SzSz " << k << " " << p << " " << 0.25*(szkp[pp-k-1]-sz[k]*sz[pp]) << " " << Er << endl;
               }
         }
-         
+                 
         }
         else {  // measure only guessed correlations
         int s=sites_to_follow[ll].size();
