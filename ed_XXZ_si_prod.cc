@@ -314,8 +314,14 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       std::vector< std::vector<double> > Tij(L);
       for (int k=0;k<L;++k) { Tij[k].resize(L,0.);}
 
-      std::vector<PetscScalar *> all_states;
-      if (myparameters.measure_KL) { if (myrank==0) { all_states.resize(nconv); }}
+      //std::vector<PetscScalar *> all_states;
+      //if (myparameters.measure_KL) { if (myrank==0) { all_states.resize(nconv); }}
+
+      std::vector<int> eigenstates_to_follow;
+      std::vector< std::vector<int> > sites_to_follow;
+      std::vector< std::vector<pair<int,int> > > pairs_to_follow;
+      std::vector< std::vector<double> > sz_to_follow;
+
 
       for (int i = 0; i < nconv; i++) {
         ierr = EPSGetEigenpair(eps2, i, &Er, &Ei, xr, NULL);
@@ -336,7 +342,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 */
 
         PetscBool sz_cutoff_set;
-        PetscReal sz_cutoff=0.0225;
+        PetscReal sz_cutoff=0.05;
         PetscOptionsGetReal(NULL, NULL, "-sz_cutoff", &sz_cutoff,&sz_cutoff_set); 
         PetscBool sz_product_cutoff_set;
         PetscReal sz_product_cutoff=sz_cutoff*sz_cutoff;
@@ -348,20 +354,26 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
         if (sz_product_cutoff_set) { sz_cutoff_set=PETSC_TRUE;}
 
+        std::vector< pair<int,int> > prediction_strong_correl_pair;
+        std::vector< int > prediction_site;
         if (sz_cutoff_set) {
         std::vector<double> sz(L,0.);
         for (int k=0;k<L;++k) {
           MatMult(sigmas[k],xr,use1);
           VecDot(use1,xr,&sz[k]);
-          std::cout << k << " " << sz[k] << " " << Er << endl;
+          //std::cout << "Sz " << k << " " << sz[k] << " " << Er << endl;
         }
-        std::vector< pair<int,int> > prediction_strong_correl_pair;
+        
+
+
+
         for (int j=0;j<L;++j)
           { if (fabs(sz[j])<sz_cutoff)
-                { std::cout << j << " passes the deal " << Er << endl;
+                { prediction_site.push_back(j);
+                  //std::cout << j << " passes the deal " << Er << endl;
                 for (int k=j+1;k<L;++k)
                     { if ( (fabs(sz[k])<sz_cutoff) && ( (fabs(sz[k]*sz[j])<sz_product_cutoff) ) )
-                      { std::cout << "together with " << k << " " << Er << endl;
+                      { //std::cout << "together with " << k << " " << Er << endl;
                         
                         prediction_strong_correl_pair.push_back(make_pair(j,k));}
                     }
@@ -374,41 +386,147 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             for (int ss=0;ss<prediction_strong_correl_pair.size();++ss) {
             std::cout << "### Prediction strong correl for pair : " << prediction_strong_correl_pair[ss].first << " " << prediction_strong_correl_pair[ss].second << endl;}
           }
-        
+
         }
-      
 
+        if (prediction_site.size()!=0) { eigenstates_to_follow.push_back(i); sites_to_follow.push_back(prediction_site); 
+        energies_to_follow.push_back(Er); sz_to_follow.push_back(sz);
+        if (prediction_strong_correl_pair.size()!=0) { pairs_to_follow.push_back(prediction_strong_correl_pair);}
+        }
 
-        if (myparameters.measure_variance) {
+            if (compute_weight)
+          { int 
+          PetscInt number_of_weight_cutoff_values=9;
+        PetscOptionsGetInt(NULL, NULL, "-cutoff_values", &number_of_weight_cutoff_values,NULL); 
+            std::vector<double>  weight_cutoff(number_of_weight_cutoff_values,0.);
+           for (int c=0;c<number_of_weight_cutoff_values;++c) { weight_cutoff[c]=(c+1)*0.25/(number_of_weight_cutoff_values+1);}
+          std::vector< std::vector<double> > weight_at_cutoff_at_range;
+          weight_at_range_at_cutoff.resize(number_of_weight_cutoff_values);
+          for (int c=0;c<number_of_weight_cutoff_values;++c) { weight_at_range_at_cutoff[c].resize(L/2+1);}
+          
+          for (int k=0;k<L;++k) {
+              MatMult(sigmas[k],xr,use1);
+              for (int range=1;range<=(L/2);++range) {
+                  MatMult(sigmas[(k+range)%L],use1,use2); // pbc assumed here - TODO : change for obc
+                  double C;
+                  VecDot(use2,xr,&C);
+                  C=0.25*fabs(C-sz[k]*sz[(k+range)%L]);
+                  for (int c=number_of_weight_cutoff_values-1;c<0;c--)
+                  { weight_at_range_at_cutoff[c][0]+=1.0;
+                    if (C>weight_cutoff[c]) {weight_at_range_at_cutoff[c][range]+=1.0;}
+                      else { break;}
+                  }
+              }
+          }
+
+        cout << "Weight "; for (int c=0;c<number_of_weight_cutoff_values;++c) { cout << weight_cutoff[c] << " ";} cout << endl;
+        for (int range=1;range<=(L/2);++range) {
+          cout << "Weight-range " << r << " ";
+           for (int c=0;c<number_of_weight_cutoff_values;++c) { cout << weight_at_range_at_cutoff[c][r]/weight_at_range_at_cutoff[c][0] << " ";} cout << endl;
+        }
+      }
+
+      int ll=0;
+      for (std::vector<int>::iterator it=eigenstates_to_follow.begin();it!=eigenstates_to_follow.end();++it) {
+        EPSGetEigenpair(eps2, *it, &Er, &Ei, xr, NULL);
+
+        if (measure_everything) {
+        std::vector<double> sz=sz_to_follow[ll];
+        cout << 
         for (int k=0;k<L;++k) {
+          cout << "Sz " << k << " " << sz[k] << " " << energies_to_follow[ll] << endl;
           MatMult(sigmas[k],xr,use1);
-          double nn;
-          VecDot(use1,use1,&nn);
-
-          // use1=sigma | n >
-          MatMult(H,use1,use2);
-          // use2 = H sigma | n >
-          double Evar,E2var;
-          VecDot(use1,use2,&Evar);
-          VecDot(use2,use2,&E2var);
-          double variance=E2var-Evar*Evar;
-          if (myrank==0) { cout << "***Sigmas " << k+1 << " " << Er << " " << Evar << " " << variance << " (norm=" << nn << endl; }
+          
+          std::vector<double> szkp(L-k-1;)
+            for (int pp=k+1;pp<L;++pp)
+              { 
+                MatMult(sigmas[pp],use1,use2);
+                VecDot(use2,xr,&szkp[pp-k-1]);
+                cout << "SzSz " << k << " " << p << " " << 0.25*(szkp[pp-k-1]-sz[k]*sz[pp]) << " " << Er << endl;
+              }
+        }
+         
+        }
+        else {  // measure only guessed correlations
+        int s=sites_to_follow[ll].size();
+        std::vector<double> sz=sz_to_follow[ll];
+        for (int si=0;si<s;++si) {
+          int k=sites_to_follow[ll][si];
+          cout << "Sz " << k << " " << sz[k] << " " << energies_to_follow[ll] << endl;
+          MatMult(sigmas[k],xr,use1);
+          std::vector<double> szkp(s-si-1;)
+          for (int pp=si+1;pp<s;++pp)
+              { MatMult(sigmas[sites_to_follow[ll][pp]],use1,use2);
+                VecDot(use2,xr,&szkp[pp-k-1]);
+                cout << "SzSz " << k << " " << sites_to_follow[ll][pp] << " " << 0.25*(szkp[pp-k-1]-sz[k]*sz[sites_to_follow[ll][pp]]) << " " << Er << endl;
+              }
         }
         }
 
-        if (myparameters.write_wf) {
-          std::stringstream filename;
-          filename << "Eigenvector" << i << "."
-                   << myparameters.string_from_basis
-                   << myparameters.string_from_H << ".dat";
-          std::string str(filename.str());
-          /* write vector **/
-          PetscViewer viewer;
-          PetscViewerBinaryOpen(PETSC_COMM_WORLD, str.c_str(), FILE_MODE_WRITE,
-                                &viewer);
-          VecView(xr, viewer);
+        double pi; 
+          double local_S1=0.;
+          for (int row_ctr = Istart; row_ctr<Iend;++row_ctr) {
+            VecGetValues( xr, 1, &row_ctr, &pi );
+             if ((pi != 0)) {
+             local_S1 -= 2.0* pi * pi * log(pi);
+              }
+          }
+          double global_S1;
+          MPI_Reduce(&local_S1, &global_S1, 1, MPI_double, MPI_SUM, 0,PETSC_COMM_WORLD);
+          cout << "S1 " << global_S1 << " " << energies_to_follow[ll] << endl;
+
+        // measure KL, and < n | sigma_i | m > with other states
+        int llj=0; double Er2;
+        for (std::vector<int>::iterator jt=it+1;jt!=eigenstates_to_follow.end();++jt) {
+
+          EPSGetEigenpair(eps2, *it, &Er2, &Ei, use1, NULL);
+          double pi; double qi;
+          double local_KL=0.;
+          for (int row_ctr = Istart; row_ctr<Iend;++row_ctr) {
+            VecGetValues( xr, 1, &row_ctr, &pi );
+            VecGetValues( use1, 1, &row_ctr, &qi );
+             if ((pi != 0) && (qi != 0)) {
+             local_KL += 2.0 * pi * pi * log(pi / qi);
+              }
+          }
+          double global_KL;
+          MPI_Reduce(&local_KL, &global_KL, 1, MPI_double, MPI_SUM, 0,PETSC_COMM_WORLD);
+          //MPI_AllReduce(&local_KL, &global_KL, 1, MPI_double, MPI_SUM, PETSC_COMM_WORLD);
+          // myrank=0
+          if (myrank==0) {
+          cout << "KL " << global_KL << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
+          }
+
+          if (measure_everything) {
+              std::vector<double> sigma_indicator(L,0);
+            for (int k=0;k<L;++k) {
+              MatMult(sigmas[k],xr,use2);
+              VecDot(use2,us1,&sigma_indicator[k]);
+            }
+            for (int k=0;k<L;++k) {
+              std::cout << "Sigmaindic " << k << " " << sigma_indicator[k] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
+            }
+          }
+          else {
+            int s=sites_to_follow[ll].size();
+            std::vector<double> sigma_indicator(s,0.);
+            for (int si=0;si<s;++si) {
+            int k=sites_to_follow[ll][si];
+              MatMult(sigmas[k],xr,use2);
+              VecDot(use2,use1,&sigma_indicator[si]);
+            }
+            for (int si=0;si<s;++si) {
+              std::cout << "Sigmaindic " << sites_to_follow[ll][si] << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
+            }
+          }
+      llj++;
         }
 
+        ll++;
+        // other measurements on eigenstate to follow ...
+        PetscBool other_measurements=PETSC_FALSE
+        if (other_measurements) {
+           /*
         if (mpisize == 1) {
           VecCreateSeq(PETSC_COMM_SELF, nconf, &Vec_local);
           ierr = VecCopy(xr, Vec_local);
@@ -420,70 +538,10 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           VecScatterEnd(ctx, xr, Vec_local, INSERT_VALUES, SCATTER_FORWARD);
           VecScatterDestroy(&ctx);
         }
+       
         if (myrank == 0) {
           PetscScalar *state;
           VecGetArray(Vec_local, &state);
-
-          if ((myparameters.measure_KL)) {
-            all_states[i] = (PetscScalar *)calloc(nconf, sizeof(PetscScalar));
-            std::copy(state, state + nconf, all_states[i]);
-            // all_states[i] = state;
-          }
-          
-          if (myparameters.measure_all_part_entropy) {
-            double qmin = myparameters.qmin;
-            std::vector<double> qs;
-            double mymin = qmin;
-            double current_q;
-            if (qmin < 1) {
-              current_q = qmin;
-              for (int p = 0; p < 9; ++p) {
-                qs.push_back(current_q);
-                current_q += (1. - qmin) / 9.;
-              }
-              mymin = 1;
-            }
-            current_q = mymin;
-            double dq = (myparameters.qmax - mymin) / (myparameters.Nq - 1);
-            for (int nq = 0; nq < myparameters.Nq - 1; ++nq) {
-              qs.push_back(current_q);
-              current_q += dq;
-            }
-            qs.push_back(current_q);
-            double real_Nq = qs.size();
-            std::vector<double> entropies(real_Nq, 0.);
-            entropies = myobservable.all_part_entropy(
-                state, myparameters.Nq, myparameters.qmin, myparameters.qmax);
-
-            for (int nq = 0; nq < real_Nq; ++nq) {
-              partout << "S[q=" << qs[nq] << "] " << entropies[nq] << "\n";
-            }
-            partout << "S[q=infty]= " << myobservable.Smax(state) << "\n";
-          }
-
-          else {
-            double PE = myobservable.part_entropy(state, 1);
-            // parout << PetscRealPart(Er) << " " << PE << "\n";}
-            partout << PE << " " << PetscRealPart(Er) << "\n";
-          }
-
-          if (myparameters.measure_local) {
-            myobservable.compute_local_magnetization(state);
-            Siz = myobservable.sz_local;
-            for (int r = 0; r < L; ++r) {
-              locout << r << " " << Siz[r] << endl;
-            }
-          }
-
-          if (myparameters.measure_correlations) {
-            Gij =myobservable.get_two_points_connected_correlation(state);
-            for (int r = 0; r < L; ++r) {
-              for (int s = r; s < L; ++s) {
-	              corrout << r+1 << " " << " " << s+1 << " " << Gij[r][s] << " " << PetscRealPart(Er) << endl;
-            } }
-
-          }
-
           if (myparameters.measure_transverse_correlations){
             // get two points transverse correlations
             Tij = myobservable.get_SpSm_correlation(state);
@@ -492,8 +550,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                 tcorrout << r << " " << " " << s << " " << Tij[r][s] << endl;
             } }
           }
-
-
           if (myparameters.measure_entanglement) {
             myobservable.compute_entanglement_spectrum(state);
             if (myparameters.measure_entanglement_spectrum) { 
@@ -506,47 +562,25 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             }
             double S1 = myobservable.entang_entropy(1);
             entout << S1 << "\n";
-            double S2=myobservable.entang_entropy(2);
-            cout << "S2 = " << S2 << " " << Er << std::endl;
+           // double S2=myobservable.entang_entropy(2);
+           // cout << "S2 = " << S2 << " " << Er << std::endl;
           }
 
 
           VecRestoreArray(Vec_local, &state);
         }
         VecDestroy(&Vec_local);
+        */
       }
 
+/*
       entout.close();
       locout.close();
       partout.close();
       corrout.close();
       tcorrout.close();
-
-      if (myrank == 0) {
-        if (myparameters.measure_KL) {
-            if (myparameters.measure_all_KL) {
-            for (int p = 0; p < all_states.size(); ++p) {
-            for (int p2 = p + 1; p2 < all_states.size(); ++p2) {
-              double KL = myobservable.KLd(all_states[p], all_states[p2]);
-              KLout << KL << " " << energies[p] << " " << energies[p2] << std::endl;
-            }
-          }
-            }
-            else { // only consecutive
-          // order KL according to Energies ...
-          // follow https://stackoverflow.com/questions/37242285/sort-an-array-according-to-the-sequence-of-another-array
-          std::vector<size_t> indices(nconv);
-          std::iota(indices.begin(), indices.end(), 0);
-          std::sort(indices.begin(), indices.end(), [&](size_t i1, size_t i2) { return energies[i1] < energies[i2]; });
-          for (int p=0;p<(nconv-1);++p) 
-          { double KL = myobservable.KLd(all_states[indices[p]], all_states[indices[p+1]]);
-            KLout << KL << std::endl;
-          }
-            }
-        }
-      }
       KLout.close();
-
+*/
       if (myrank == 0) {
         ofstream enout;
         ofstream rgapout;
@@ -583,6 +617,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
     }
   }
 
+    } // nconv>0
+  }// target
   SlepcFinalize();
   return 0;
 }
