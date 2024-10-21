@@ -467,9 +467,11 @@ int ENV_NUM_THREADS=omp_get_num_threads();
          //   VecGetValues( xr, 1, row_ctr, &pi );
          //   cout << "A " << pi << endl;
             VecGetValues( xr, 1, &row_ctr, &pi );
-         //   cout << "B " << pi << endl;
+            cout << "B " << pi << endl;
              if ((pi != 0)) {
+             
              local_S1 -= 2.0* pi * pi * log(pi);
+              cout << pi << " " << local_S1 << endl;
               }
           }
           double global_S1=0.;
