@@ -570,7 +570,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       }
       }
 
-    } // nconv>0
+    
 /*
       entout.close();
       locout.close();
@@ -612,7 +612,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         rgapout.close();
         enout.close();
       }
-    
+    } // nconv>0
   }// target
   SlepcFinalize();
   return 0;
