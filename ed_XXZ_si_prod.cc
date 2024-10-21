@@ -423,7 +423,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                   Normalization[range]+=1.0;
                   std::cout << "W: " << k << " " << range << " C=" << C << endl;
                   for (int c=number_of_weight_cutoff_values-1;c<0;c--)
-                  { cout << " Testing (r=" << range " c=" << c << "with weight : " << weight_cutoff[c];
+                  { cout << " Testing (r=" << range << " c=" << c << "with weight : " << weight_cutoff[c];
                    
                     if (C>weight_cutoff[c]) {cout << "Passing ... \n"; weight_at_cutoff_at_range[c][range]+=1.0;}
                       else {cout <<"\n"; break;}
