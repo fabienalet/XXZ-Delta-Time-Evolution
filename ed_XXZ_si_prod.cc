@@ -460,8 +460,13 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
         double pi; 
           double local_S1=0.;
+          //std::vector<double> local_pi(Iend-Istart);
+         // VecGetValues( xr, Iend-Istart, row_ctr, &local_pi );
           for (int row_ctr = Istart; row_ctr<Iend;++row_ctr) {
+            VecGetValues( xr, 1, row_ctr, &pi );
+            cout << "A " << pi << endl;
             VecGetValues( xr, 1, &row_ctr, &pi );
+            cout << "B " << pi << endl;
              if ((pi != 0)) {
              local_S1 -= 2.0* pi * pi * log(pi);
               }
