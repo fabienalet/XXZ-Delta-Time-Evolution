@@ -462,6 +462,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           double local_S1=0.;
           //std::vector<double> local_pi(Iend-Istart);
          // VecGetValues( xr, Iend-Istart, row_ctr, &local_pi );
+         VecView(xr,PETSC_VIEWER_STDOUT_WORLD);
           for (int row_ctr = Istart; row_ctr<Iend;++row_ctr) {
          //   VecGetValues( xr, 1, row_ctr, &pi );
          //   cout << "A " << pi << endl;
