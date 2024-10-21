@@ -429,7 +429,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
         cout << "Weight "; for (int c=0;c<number_of_weight_cutoff_values;++c) { cout << weight_cutoff[c] << " ";} cout << endl;
         for (int range=1;range<=(L/2);++range) {
-          cout << "Weight-range " <<  << " ";
+          cout << "Weight-range " << range << " ";
            for (int c=0;c<number_of_weight_cutoff_values;++c) { cout << weight_at_cutoff_at_range[c][range]/weight_at_cutoff_at_range[c][0] << " ";} cout << endl;
         }
       }
