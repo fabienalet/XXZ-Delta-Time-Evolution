@@ -410,8 +410,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
            for (int c=0;c<number_of_weight_cutoff_values;++c) { weight_cutoff[c]=(c+1)*0.25/(number_of_weight_cutoff_values+1);}
           std::vector< std::vector<double> > weight_at_cutoff_at_range;
           weight_at_cutoff_at_range.resize(number_of_weight_cutoff_values);
+
           for (int c=0;c<number_of_weight_cutoff_values;++c) { weight_at_cutoff_at_range[c].resize(L/2+1);}
-          
+          std::vector<double> Normalization(L/2+1,0.);
           for (int k=0;k<L;++k) {
               MatMult(sigmas[k],xr,use1);
               for (int range=1;range<=(L/2);++range) {
@@ -419,11 +420,13 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                   double C;
                   VecDot(use2,xr,&C);
                   C=0.25*fabs(C-sz[k]*sz[(k+range)%L]);
+                  Normalization[range]+=1.0;
                   std::cout << "W: " << k << " " << range << " C=" << C << endl;
                   for (int c=number_of_weight_cutoff_values-1;c<0;c--)
-                  { weight_at_cutoff_at_range[c][0]+=1.0;
-                    if (C>weight_cutoff[c]) {weight_at_cutoff_at_range[c][range]+=1.0;}
-                      else { break;}
+                  { cout << " Testing (r=" << range " c=" << c << "with weight : " << weight_cutoff[c];
+                   
+                    if (C>weight_cutoff[c]) {cout << "Passing ... \n"; weight_at_cutoff_at_range[c][range]+=1.0;}
+                      else {cout <<"\n"; break;}
                   }
               }
           }
@@ -431,7 +434,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         cout << "Weight "; for (int c=0;c<number_of_weight_cutoff_values;++c) { cout << weight_cutoff[c] << " ";} cout << endl;
         for (int range=1;range<=(L/2);++range) {
           cout << "Weight-range " << range << " ";
-           for (int c=0;c<number_of_weight_cutoff_values;++c) { cout << weight_at_cutoff_at_range[c][range]/weight_at_cutoff_at_range[c][0] << " ";} cout << endl;
+           for (int c=0;c<number_of_weight_cutoff_values;++c) { cout << weight_at_cutoff_at_range[c][range]/Normalization[range] << " ";} cout << endl;
         }
       }
 
