@@ -482,15 +482,15 @@ int ENV_NUM_THREADS=omp_get_num_threads();
              local_S1 -= 2.0* pi * pi * log(pi);
               }
           }
-          double global_S1;
+          double global_S1=0.;
           MPI_Reduce(&local_S1, &global_S1, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
           cout << "S1 " << global_S1 << " " << energies_to_follow[ll] << endl;
 
         // measure KL, and < n | sigma_i | m > with other states
         int llj=0; double Er2;
-        for (std::vector<int>::iterator jt=it+1;jt!=eigenstates_to_follow.end();++jt) {
-
-          EPSGetEigenpair(eps2, *it, &Er2, &Ei, use1, NULL);
+        for (std::vector<int>::iterator jt=eigenstates_to_follow.begin();jt!=eigenstates_to_follow.end();++jt) {
+          if (it!=jt) {
+          EPSGetEigenpair(eps2, *jt, &Er2, &Ei, use1, NULL);
           double pi; double qi;
           double local_KL=0.;
           for (int row_ctr = Istart; row_ctr<Iend;++row_ctr) {
@@ -529,6 +529,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             for (int si=0;si<s;++si) {
               std::cout << "Sigmaindic " << sites_to_follow[ll][si] << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
             }
+          }
           }
       llj++;
         }
@@ -583,7 +584,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         VecDestroy(&Vec_local);
         */
       }
+      }
 
+    } // nconv>0
 /*
       entout.close();
       locout.close();
@@ -625,9 +628,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         rgapout.close();
         enout.close();
       }
-    }
-  }
-
     } // nconv>0
   }// target
   SlepcFinalize();
