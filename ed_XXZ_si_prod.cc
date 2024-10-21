@@ -462,20 +462,22 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           double local_S1=0.;
           //std::vector<double> local_pi(Iend-Istart);
          // VecGetValues( xr, Iend-Istart, row_ctr, &local_pi );
-         VecView(xr,PETSC_VIEWER_STDOUT_WORLD);
+       //  VecView(xr,PETSC_VIEWER_STDOUT_WORLD);
           for (int row_ctr = Istart; row_ctr<Iend;++row_ctr) {
          //   VecGetValues( xr, 1, row_ctr, &pi );
          //   cout << "A " << pi << endl;
             VecGetValues( xr, 1, &row_ctr, &pi );
-            cout << "B " << pi << endl;
+         //   cout << "B " << pi << endl;
              if ((pi != 0)) {
              local_S1 -= 2.0* pi * pi * log(pi);
               }
           }
           double global_S1=0.;
+          cout << local_S1 << endl;
           MPI_Reduce(&local_S1, &global_S1, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
           cout << "S1 " << global_S1 << " " << energies_to_follow[ll] << endl;
-
+          MPI_Reduce(&local_S1, &global_S1, 1, MPI_DOUBLE, MPI_SUM, 0,MPI_COMM_WORLD);
+          cout << "S1 " << global_S1 << " " << energies_to_follow[ll] << endl;
         // measure KL, and < n | sigma_i | m > with other states
         int llj=0; double Er2;
         for (std::vector<int>::iterator jt=eigenstates_to_follow.begin();jt!=eigenstates_to_follow.end();++jt) {
