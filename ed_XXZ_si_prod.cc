@@ -356,7 +356,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         for (int k=0;k<L;++k) {
           MatMult(sigmas[k],xr,use1);
           VecDot(use1,xr,&sz[k]);
-          //std::cout << "Sz " << k << " " << sz[k] << " " << Er << endl;
+          std::cout << "Sz " << k << " " << sz[k] << " " << Er << endl;
         }
         
         for (int j=0;j<L;++j)
