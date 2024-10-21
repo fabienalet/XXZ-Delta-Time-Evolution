@@ -325,7 +325,11 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
       PetscBool compute_weight=PETSC_TRUE;
       PetscOptionsGetBool(NULL, NULL, "-compute_weight", &compute_weight,NULL); 
-        
+
+      PetscBool measure_everything=PETSC_TRUE;
+      PetscOptionsGetBool(NULL, NULL, "-measure_everything", &measure_everything,NULL); 
+        PetscBool other_measurements=PETSC_FALSE;
+      PetscOptionsGetBool(NULL, NULL, "-other_measurements", &other_measurements,NULL); 
 
       for (int i = 0; i < nconv; i++) {
         ierr = EPSGetEigenpair(eps2, i, &Er, &Ei, xr, NULL);
@@ -355,13 +359,13 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         sz_cutoff*=2;
         sz_product_cutoff*=4;
 
-
         if (sz_product_cutoff_set) { sz_cutoff_set=PETSC_TRUE;}
 
         std::vector< pair<int,int> > prediction_strong_correl_pair;
         std::vector< int > prediction_site;
-        if (sz_cutoff_set) {
         std::vector<double> sz(L,0.);
+        if (sz_cutoff_set) {
+        
         for (int k=0;k<L;++k) {
           MatMult(sigmas[k],xr,use1);
           VecDot(use1,xr,&sz[k]);
@@ -397,6 +401,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         energies_to_follow.push_back(Er); sz_to_follow.push_back(sz);
         if (prediction_strong_correl_pair.size()!=0) { pairs_to_follow.push_back(prediction_strong_correl_pair);}
         }
+      
 
             if (compute_weight)
           {  PetscInt number_of_weight_cutoff_values=9;
@@ -404,8 +409,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             std::vector<double>  weight_cutoff(number_of_weight_cutoff_values,0.);
            for (int c=0;c<number_of_weight_cutoff_values;++c) { weight_cutoff[c]=(c+1)*0.25/(number_of_weight_cutoff_values+1);}
           std::vector< std::vector<double> > weight_at_cutoff_at_range;
-          weight_at_range_at_cutoff.resize(number_of_weight_cutoff_values);
-          for (int c=0;c<number_of_weight_cutoff_values;++c) { weight_at_range_at_cutoff[c].resize(L/2+1);}
+          weight_at_cutoff_at_range.resize(number_of_weight_cutoff_values);
+          for (int c=0;c<number_of_weight_cutoff_values;++c) { weight_at_cutoff_at_range[c].resize(L/2+1);}
           
           for (int k=0;k<L;++k) {
               MatMult(sigmas[k],xr,use1);
@@ -415,8 +420,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                   VecDot(use2,xr,&C);
                   C=0.25*fabs(C-sz[k]*sz[(k+range)%L]);
                   for (int c=number_of_weight_cutoff_values-1;c<0;c--)
-                  { weight_at_range_at_cutoff[c][0]+=1.0;
-                    if (C>weight_cutoff[c]) {weight_at_range_at_cutoff[c][range]+=1.0;}
+                  { weight_at_cutoff_at_range[c][0]+=1.0;
+                    if (C>weight_cutoff[c]) {weight_at_cutoff_at_range[c][range]+=1.0;}
                       else { break;}
                   }
               }
@@ -424,7 +429,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
         cout << "Weight "; for (int c=0;c<number_of_weight_cutoff_values;++c) { cout << weight_cutoff[c] << " ";} cout << endl;
         for (int range=1;range<=(L/2);++range) {
-          cout << "Weight-range " << r << " ";
+          cout << "Weight-range " << rangr << " ";
            for (int c=0;c<number_of_weight_cutoff_values;++c) { cout << weight_at_range_at_cutoff[c][r]/weight_at_range_at_cutoff[c][0] << " ";} cout << endl;
         }
       }
@@ -435,7 +440,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
         if (measure_everything) {
         std::vector<double> sz=sz_to_follow[ll];
-        cout << 
         for (int k=0;k<L;++k) {
           cout << "Sz " << k << " " << sz[k] << " " << energies_to_follow[ll] << endl;
           MatMult(sigmas[k],xr,use1);
@@ -457,7 +461,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           int k=sites_to_follow[ll][si];
           cout << "Sz " << k << " " << sz[k] << " " << energies_to_follow[ll] << endl;
           MatMult(sigmas[k],xr,use1);
-          std::vector<double> szkp(s-si-1;)
+          std::vector<double> szkp(s-si-1);
           for (int pp=si+1;pp<s;++pp)
               { MatMult(sigmas[sites_to_follow[ll][pp]],use1,use2);
                 VecDot(use2,xr,&szkp[pp-k-1]);
@@ -493,7 +497,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               }
           }
           double global_KL;
-          MPI_Reduce(&local_KL, &global_KL, 1, MPI_double, MPI_SUM, 0,PETSC_COMM_WORLD);
+          MPI_Reduce(&local_KL, &global_KL, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
           //MPI_AllReduce(&local_KL, &global_KL, 1, MPI_double, MPI_SUM, PETSC_COMM_WORLD);
           // myrank=0
           if (myrank==0) {
@@ -504,7 +508,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               std::vector<double> sigma_indicator(L,0);
             for (int k=0;k<L;++k) {
               MatMult(sigmas[k],xr,use2);
-              VecDot(use2,us1,&sigma_indicator[k]);
+              VecDot(use2,use1,&sigma_indicator[k]);
             }
             for (int k=0;k<L;++k) {
               std::cout << "Sigmaindic " << k << " " << sigma_indicator[k] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
