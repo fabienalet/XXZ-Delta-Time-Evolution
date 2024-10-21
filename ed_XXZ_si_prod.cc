@@ -331,25 +331,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         PetscBool other_measurements=PETSC_FALSE;
       PetscOptionsGetBool(NULL, NULL, "-other_measurements", &other_measurements,NULL); 
 
-      for (int i = 0; i < nconv; i++) {
-        ierr = EPSGetEigenpair(eps2, i, &Er, &Ei, xr, NULL);
-        CHKERRQ(ierr);
-        energies.push_back(PetscRealPart(Er));
 
-        // Create series of S_i^z | n > and compute their variances
-/*
-        for (int j = i+1; j < nconv; j++) { 
-          EPSGetEigenpair(eps2, j, &Ei, NULL, use2, NULL);
-          for (int k=0;k<L;++k) {
-          MatMult(sigmas[k],xr,use1);
-          double mixed;
-          VecDot(use2,use1,&mixed);
-          if (myrank==0) { cout << "**Overlap < Ef= " << Ei << " | sigma " << k+1 << " | Er= " << Er << " > = " << mixed << endl; }
-          }
-        }
-*/
-
-        PetscBool sz_cutoff_set;
+      PetscBool sz_cutoff_set;
         PetscReal sz_cutoff=0.05;
         PetscOptionsGetReal(NULL, NULL, "-sz_cutoff", &sz_cutoff,&sz_cutoff_set); 
         PetscBool sz_product_cutoff_set;
@@ -359,22 +342,23 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         sz_cutoff*=2;
         sz_product_cutoff*=4;
 
+      for (int i = 0; i < nconv; i++) {
+        ierr = EPSGetEigenpair(eps2, i, &Er, &Ei, xr, NULL);
+        CHKERRQ(ierr);
+        energies.push_back(PetscRealPart(Er));
+
         if (sz_product_cutoff_set) { sz_cutoff_set=PETSC_TRUE;}
 
         std::vector< pair<int,int> > prediction_strong_correl_pair; prediction_strong_correl_pair.resize(0);
         std::vector< int > prediction_site; prediction_site.resize(0);
         std::vector<double> sz(L,0.);
         if (sz_cutoff_set) {
-        
         for (int k=0;k<L;++k) {
           MatMult(sigmas[k],xr,use1);
           VecDot(use1,xr,&sz[k]);
           //std::cout << "Sz " << k << " " << sz[k] << " " << Er << endl;
         }
         
-
-
-
         for (int j=0;j<L;++j)
           { if (fabs(sz[j])<sz_cutoff)
                 { prediction_site.push_back(j);
@@ -437,7 +421,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
            for (int c=0;c<number_of_weight_cutoff_values;++c) { cout << weight_at_cutoff_at_range[c][range]/Normalization[range] << " ";} cout << endl;
         }
       }
-
+      }
       int ll=0;
       for (std::vector<int>::iterator it=eigenstates_to_follow.begin();it!=eigenstates_to_follow.end();++it) {
         EPSGetEigenpair(eps2, *it, &Er, &Ei, xr, NULL);
@@ -628,7 +612,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         rgapout.close();
         enout.close();
       }
-    } // nconv>0
+    
   }// target
   SlepcFinalize();
   return 0;
