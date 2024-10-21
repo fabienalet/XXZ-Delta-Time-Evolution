@@ -318,10 +318,14 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       //if (myparameters.measure_KL) { if (myrank==0) { all_states.resize(nconv); }}
 
       std::vector<int> eigenstates_to_follow;
+      std::vector<double> energies_to_follow;
       std::vector< std::vector<int> > sites_to_follow;
       std::vector< std::vector<pair<int,int> > > pairs_to_follow;
       std::vector< std::vector<double> > sz_to_follow;
 
+      PetscBool compute_weight=PETSC_TRUE;
+      PetscOptionsGetBool(NULL, NULL, "-compute_weight", &compute_weight,NULL); 
+        
 
       for (int i = 0; i < nconv; i++) {
         ierr = EPSGetEigenpair(eps2, i, &Er, &Ei, xr, NULL);
@@ -395,8 +399,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         }
 
             if (compute_weight)
-          { int 
-          PetscInt number_of_weight_cutoff_values=9;
+          {  PetscInt number_of_weight_cutoff_values=9;
         PetscOptionsGetInt(NULL, NULL, "-cutoff_values", &number_of_weight_cutoff_values,NULL); 
             std::vector<double>  weight_cutoff(number_of_weight_cutoff_values,0.);
            for (int c=0;c<number_of_weight_cutoff_values;++c) { weight_cutoff[c]=(c+1)*0.25/(number_of_weight_cutoff_values+1);}
