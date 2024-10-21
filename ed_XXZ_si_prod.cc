@@ -467,18 +467,15 @@ int ENV_NUM_THREADS=omp_get_num_threads();
          //   VecGetValues( xr, 1, row_ctr, &pi );
          //   cout << "A " << pi << endl;
             VecGetValues( xr, 1, &row_ctr, &pi );
-            cout << "B " << pi << endl;
+            //cout << "B " << pi << endl;
              if ((pi != 0)) {
-             cout << "log = " << log(pi) << endl;
-             local_S1 -= 2.0* pi * pi * log(pi);
-              cout << pi << " " << local_S1 << endl;
+             //cout << "log = " << log(pi) << endl;
+             local_S1 -= 2.0* pi * pi * log(fabs(pi));
+            //  cout << pi << " " << local_S1 << endl;
               }
           }
           double global_S1=0.;
-          cout << local_S1 << endl;
           MPI_Reduce(&local_S1, &global_S1, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
-          cout << "S1 " << global_S1 << " " << energies_to_follow[ll] << endl;
-          MPI_Reduce(&local_S1, &global_S1, 1, MPI_DOUBLE, MPI_SUM, 0,MPI_COMM_WORLD);
           cout << "S1 " << global_S1 << " " << energies_to_follow[ll] << endl;
         // measure KL, and < n | sigma_i | m > with other states
         int llj=0; double Er2;
@@ -491,7 +488,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             VecGetValues( xr, 1, &row_ctr, &pi );
             VecGetValues( use1, 1, &row_ctr, &qi );
              if ((pi != 0) && (qi != 0)) {
-             local_KL += 2.0 * pi * pi * log(pi / qi);
+             local_KL += 2.0 * pi * pi * log(fabs(pi / qi));
               }
           }
           double global_KL;
