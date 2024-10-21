@@ -361,8 +361,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
         if (sz_product_cutoff_set) { sz_cutoff_set=PETSC_TRUE;}
 
-        std::vector< pair<int,int> > prediction_strong_correl_pair;
-        std::vector< int > prediction_site;
+        std::vector< pair<int,int> > prediction_strong_correl_pair; prediction_strong_correl_pair.resize(0);
+        std::vector< int > prediction_site; prediction_site.resize(0);
         std::vector<double> sz(L,0.);
         if (sz_cutoff_set) {
         
@@ -419,6 +419,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                   double C;
                   VecDot(use2,xr,&C);
                   C=0.25*fabs(C-sz[k]*sz[(k+range)%L]);
+                  std::cout << "W: " << k << " " << range << " C=" << C << endl;
                   for (int c=number_of_weight_cutoff_values-1;c<0;c--)
                   { weight_at_cutoff_at_range[c][0]+=1.0;
                     if (C>weight_cutoff[c]) {weight_at_cutoff_at_range[c][range]+=1.0;}
