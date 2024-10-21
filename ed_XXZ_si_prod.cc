@@ -429,8 +429,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
         cout << "Weight "; for (int c=0;c<number_of_weight_cutoff_values;++c) { cout << weight_cutoff[c] << " ";} cout << endl;
         for (int range=1;range<=(L/2);++range) {
-          cout << "Weight-range " << ranger << " ";
-           for (int c=0;c<number_of_weight_cutoff_values;++c) { cout << weight_at_cutoff_at_range[c][r]/weight_at_cutoff_at_range[c][0] << " ";} cout << endl;
+          cout << "Weight-range " <<  << " ";
+           for (int c=0;c<number_of_weight_cutoff_values;++c) { cout << weight_at_cutoff_at_range[c][range]/weight_at_cutoff_at_range[c][0] << " ";} cout << endl;
         }
       }
 
@@ -449,7 +449,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               { 
                 MatMult(sigmas[pp],use1,use2);
                 VecDot(use2,xr,&szkp[pp-k-1]);
-                cout << "SzSz " << k << " " << p << " " << 0.25*(szkp[pp-k-1]-sz[k]*sz[pp]) << " " << Er << endl;
+                cout << "SzSz " << k << " " << pp << " " << 0.25*(szkp[pp-k-1]-sz[k]*sz[pp]) << " " << Er << endl;
               }
         }
                  
@@ -479,7 +479,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               }
           }
           double global_S1;
-          MPI_Reduce(&local_S1, &global_S1, 1, MPI_double, MPI_SUM, 0,PETSC_COMM_WORLD);
+          MPI_Reduce(&local_S1, &global_S1, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
           cout << "S1 " << global_S1 << " " << energies_to_follow[ll] << endl;
 
         // measure KL, and < n | sigma_i | m > with other states
@@ -531,7 +531,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
         ll++;
         // other measurements on eigenstate to follow ...
-        PetscBool other_measurements=PETSC_FALSE
+        PetscBool other_measurements=PETSC_FALSE;
         if (other_measurements) {
            /*
         if (mpisize == 1) {
