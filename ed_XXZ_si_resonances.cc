@@ -458,10 +458,11 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
         cout << "AA " << s << " " << sz.size() << endl;
         for (int si=0;si<s;++si) {
-          int k=sites_to_follow[ll][si];
+          int k=(int) sites_to_follow[ll][si];
           cout << si << " out of " << s << " is " << k << " (ll=" << ll << endl;
           cout << "Sz " << k << " " << sz[k] << " " << energies_to_follow[ll] << endl;
           MatMult(sigmas[k],xr,use1);
+          /*
           if (s>1)  {
           std::vector<double> szkp(s-si-1);
           for (int pp=si+1;pp<s;++pp)
@@ -473,6 +474,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
               }
           }
+          */
         }
         }
 
