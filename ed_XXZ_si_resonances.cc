@@ -473,12 +473,12 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         }
         // measure KL, and < n | sigma_i | m > with other states
         int llj=0; double Er2;
-        if ((myparameters.measure_KL) || (measure_everything)) {
+        if ((myparameters.measure_KL) || (measure_sigma)) {
         for (std::vector<int>::iterator jt=eigenstates_to_follow.begin();jt!=eigenstates_to_follow.end();++jt) {
           if (it!=jt) {
           EPSGetEigenpair(eps2, *jt, &Er2, &Ei, use1, NULL);
           if (myparameters.measure_KL) {
-            if (myparameters.measure_all_KL) {
+          //  if (myparameters.measure_all_KL) {
 
           double pi; double qi;
           double local_KL=0.;
@@ -496,7 +496,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           if (myrank==0) {
           KLout << global_KL << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
           }
-            } }
+            }
+            // }
           if (measure_sigma_indicator) {
             if (measure_everything) {
               std::vector<double> sigma_indicator(L,0);
