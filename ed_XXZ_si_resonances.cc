@@ -453,7 +453,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             
           std::vector<double> szkp(s-si-1);
           
-          for (int pp=si+1;pp<s;++pp)l
+          for (int pp=si+1;pp<s;++pp)
               { 
                 int p=(int)  sites_to_follow[ll][pp];
                 MatMult(sigmas[p],use1,use2);
