@@ -473,7 +473,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         }
         // measure KL, and < n | sigma_i | m > with other states
         int llj=0; double Er2;
-        if ((myparameters.measure_KL) || (measure_sigma)) {
+        if ((myparameters.measure_KL) || (measure_sigma_indicator)) {
         for (std::vector<int>::iterator jt=eigenstates_to_follow.begin();jt!=eigenstates_to_follow.end();++jt) {
           if (it!=jt) {
           EPSGetEigenpair(eps2, *jt, &Er2, &Ei, use1, NULL);
