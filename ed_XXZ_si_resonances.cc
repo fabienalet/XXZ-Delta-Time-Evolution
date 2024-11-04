@@ -657,7 +657,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         if (energies_to_follow.size()) {
         enout << "### Special energies\n";
         int ll=0;
-        for (std::vector<int>::iterator it=energies_to_follow.begin();it!=energies_to_follow.end();++it) {
+        for (std::vector<double>::iterator it=energies_to_follow.begin();it!=energies_to_follow.end();++it) {
             enout << *it << endl;
         }
         }
