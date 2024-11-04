@@ -366,7 +366,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         for (int k=0;k<L;++k) {
           MatMult(sigmas[k],xr,use1);
           VecDot(use1,xr,&sz[k]);
-          if (myparameters.measure_local) { locout << k << " " << sz[k] << " " << Er << endl; }
+         // if (myparameters.measure_local) { locout << k << " " << sz[k] << " " << Er << endl; } // TODO maybe only for special sites ? second loop instead of here ?
         }
         
         for (int j=0;j<L;++j)
@@ -425,8 +425,11 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
         if (measure_everything) {
         std::vector<double> sz=sz_to_follow[ll];
+        if (myparameters.measure_local) { 
+        for (int k=0;k<L;++k) { locout << k << " " << sz[k] << " " << Er << endl; } 
+        }
         for (int k=0;k<L;++k) {
-//          cout << "Sz " << k << " " << sz[k] << " " << energies_to_follow[ll] << endl;
+//          cout << "Sz " << k << " " << sz[k] << " " <<  << endl;
           MatMult(sigmas[k],xr,use1);
           
           std::vector<double> szkp(L-k-1);
@@ -517,7 +520,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               VecDot(use2,use1,&sigma_indicator[k]);
             }
             for (int k=0;k<L;++k) {
-              sigmaout << "Sig " <<  k << " " << sigma_indicator[k] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
+              sigmaout << "Sig " <<  k << " " << sigma_indicator[k] << " " << energies_to_follow[]ll << " " <<  Er2 << endl;
             }
           } 
           else {
@@ -632,7 +635,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         enout << "# Erenorm_target = " << renorm_target << endl;
         
         for (int i = 0; i < nconv; i++) {
-          cout << energies[i] << "\n";
+    //      cout << energies[i] << "\n";
           enout << energies[i] << endl;
         }
         
@@ -651,7 +654,13 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         for (int i = 0; i < rgap.size(); ++i) {
           rgapout << rgap[i] << endl;
         }
-
+        if (energies_to_follow.size()!=0) {
+        enout << "### Special energies\n";
+        int ll=0;
+        for (std::vector<int>::iterator it=energies_to_follow.begin();it!=energies_to_follow.end();++it) {
+            enout << *it << endl;
+        }
+        }
         rgapout.close();
         enout.close();
       }
