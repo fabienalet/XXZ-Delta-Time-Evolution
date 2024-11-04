@@ -342,7 +342,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       PetscOptionsGetBool(NULL, NULL, "-other_measurements", &other_measurements,NULL); 
 
 
-      PetscBool sz_cutoff_set;
+      PetscBool sz_cutoff_set=PETSC_TRUE;
         PetscReal sz_cutoff=0.05;
         PetscOptionsGetReal(NULL, NULL, "-sz_cutoff", &sz_cutoff,&sz_cutoff_set); 
         PetscBool sz_product_cutoff_set;
@@ -602,10 +602,10 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           if (compute_weight) { // TODO Weight file
            ofstream weightout;
            myparameters.init_filename_weight(weightout);
-           weightout << "#Weight "; for (int c=0;c<number_of_weight_cutoff_values;++c) { cout << weight_cutoff[c] << " ";} cout << endl;
+           weightout << "#Weight "; for (int c=0;c<number_of_weight_cutoff_values;++c) { weightout << weight_cutoff[c] << " ";} weightout << endl;
           for (int range=1;range<=(L/2);++range) {
             weightout << "#Weight-range " << range << " ";
-            for (int c=0;c<number_of_weight_cutoff_values;++c) { cout << weight_at_cutoff_at_range[c][range]/Normalization[range] << " ";} cout << endl;
+            for (int c=0;c<number_of_weight_cutoff_values;++c) { weightout << weight_at_cutoff_at_range[c][range]/Normalization[range] << " ";} weightout << endl;
           }
             }
 
