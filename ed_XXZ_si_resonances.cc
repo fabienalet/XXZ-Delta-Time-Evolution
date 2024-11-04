@@ -520,7 +520,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               VecDot(use2,use1,&sigma_indicator[k]);
             }
             for (int k=0;k<L;++k) {
-              sigmaout << "Sig " <<  k << " " << sigma_indicator[k] << " " << energies_to_follow[]ll << " " <<  Er2 << endl;
+              sigmaout << "Sig " <<  k << " " << sigma_indicator[k] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
             }
           } 
           else {
@@ -654,7 +654,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         for (int i = 0; i < rgap.size(); ++i) {
           rgapout << rgap[i] << endl;
         }
-        if (energies_to_follow.size()!=0) {
+        if (energies_to_follow.size()) {
         enout << "### Special energies\n";
         int ll=0;
         for (std::vector<int>::iterator it=energies_to_follow.begin();it!=energies_to_follow.end();++it) {
