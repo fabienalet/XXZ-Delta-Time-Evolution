@@ -394,7 +394,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         if (prediction_site.size()!=0) { eigenstates_to_follow.push_back(i); sites_to_follow.push_back(prediction_site); 
         energies_to_follow.push_back(Er); sz_to_follow.push_back(sz);
         if (prediction_strong_correl_pair.size()!=0) { pairs_to_follow.push_back(prediction_strong_correl_pair);}
-        cout << i << " " << sites_to_follow.size() << " " << sz_to_follow.size() << " " << prediction_strong_correl_pair.size() << endl;
+        cout << i << " " << prediction_site.size() << " " << sz.size() << " " << prediction_strong_correl_pair.size() << endl;
 
 
         }
