@@ -284,7 +284,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       ofstream KLout;
       ofstream sigmaout;
       if (myparameters.measure_KL) { myparameters.init_filename_KL(KLout);}
-      if (myparameters.measure_local) { myparameters.init_filename_local(localout);}
+      if (myparameters.measure_local) { myparameters.init_filename_local(locout);}
       if (myparameters.measure_correlations) { myparameters.init_filename_correlations(corrout);}
       if (myparameters.measure_participation) { myparameters.init_filename_participation(partout);}
       if (myparameters.measure_entanglement) { myparameters.init_filename_entanglement(entout);}
@@ -314,9 +314,15 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
       PetscBool compute_weight=PETSC_TRUE;
       PetscOptionsGetBool(NULL, NULL, "-compute_weight", &compute_weight,NULL); 
+      PetscInt number_of_weight_cutoff_values=9; 
+      PetscOptionsGetInt(NULL, NULL, "-cutoff_values", &number_of_weight_cutoff_values,NULL);
+      std::vector< std::vector<double> > weight_at_cutoff_at_range;
+      std::vector<double> Normalization;
+      std::vector<double> weight_cutoff;
+
 
         if (compute_weight) {
-        std::vector<double>  weight_cutoff(number_of_weight_cutoff_values,0.);
+        weight_cutoff.resize(number_of_weight_cutoff_values,0.);
         for (int c=0;c<number_of_weight_cutoff_values;++c) { weight_cutoff[c]=(c+1)*0.25/(number_of_weight_cutoff_values+1);}
         weight_at_cutoff_at_range.resize(number_of_weight_cutoff_values);
         for (int c=0;c<number_of_weight_cutoff_values;++c) { weight_at_cutoff_at_range[c].resize(L/2+1);}
@@ -345,13 +351,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         
         sz_cutoff*=2;
         sz_product_cutoff*=4;
-
-
-        PetscInt number_of_weight_cutoff_values=9; 
-        PetscOptionsGetInt(NULL, NULL, "-cutoff_values", &number_of_weight_cutoff_values,NULL);
-        std::vector< std::vector<double> > weight_at_cutoff_at_range;
-        std::vector<double> Normalization;
-         
 
       for (int i = 0; i < nconv; i++) {
         ierr = EPSGetEigenpair(eps2, i, &Er, &Ei, xr, NULL);
@@ -462,7 +461,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
 
         double pi; 
-        if (measure_participation) {
+        if (myparameters.measure_participation) {
           double local_S1=0.;
           for (int row_ctr = Istart; row_ctr<Iend;++row_ctr) {
             VecGetValues( xr, 1, &row_ctr, &pi );
@@ -595,7 +594,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       if (myparameters.measure_correlations) { corrout.close();}
       if (myparameters.measure_participation) { partout.close();}
       if (myparameters.measure_entanglement) { entout.close();}
-       if (myparameters.measure_sigma_indicator) {sigmaout.close();}
+       if (measure_sigma_indicator) {sigmaout.close();}
 
 
 

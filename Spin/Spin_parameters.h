@@ -92,6 +92,7 @@ class Parameters {
   PetscBool measure_transverse_correlations;
   PetscBool measure_all_part_entropy;
   PetscBool measure_KL;
+  PetscBool measure_sigma_indicator;
   PetscBool measure_variance;
   PetscBool measure_all_KL;
   double qmin;
@@ -149,7 +150,7 @@ void Parameters::init_filename_correlations(ofstream& fileout)
     fileout.precision(20);
 }
 
-void Parameters::init_filename_correlations(ofstream& fileout)
+void Parameters::init_filename_sigma(ofstream& fileout)
 {
   std::stringstream filename;
     filename << "Sigma." << string_from_basis << string_from_H
@@ -167,7 +168,7 @@ void Parameters::init_filename_entanglement(ofstream& fileout,int init_conf)
     fileout.precision(20);
 }
 
-void Parameters::init_filename_entanglement(ofstream& fileoutf)
+void Parameters::init_filename_entanglement(ofstream& fileout)
 {
   std::stringstream filename;
     filename << "Ent." << string_from_basis << string_from_H
@@ -225,7 +226,7 @@ void Parameters::init_filename_KL(ofstream& KLout)
 {
     std::stringstream KLfilename;
     KLfilename << "KL." << string_from_basis
-               << string_from_H << ".target" << target << ".dat";
+               << string_from_H << ".dat";
     KLout.open((KLfilename.str()).c_str());
     KLout.precision(20);
 }
