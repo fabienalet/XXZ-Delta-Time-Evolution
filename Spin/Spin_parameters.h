@@ -38,11 +38,22 @@ class Parameters {
   void init_filenames_energy(ofstream& enout, ofstream& rgapout, double target);
 
   void init_filename_correlations(ofstream& corrout,int inistate);
+  void init_filename_correlations(ofstream& corrout);
+  
   void init_filename_entanglement(ofstream& entout,int inistate);
+  void init_filename_entanglement(ofstream& entout);
   void init_filename_participation(ofstream& partout,int inistate);
+  void init_filename_participation(ofstream& partout);
+  void init_filename_local(ofstream& locout,int inistate);
+  void init_filename_local(ofstream& locout);
+
   void init_filename_return(ofstream& retout,int inistate);
   void init_filename_imbalance(ofstream& imbout,int inistate);
-  void init_filename_local(ofstream& locout,int inistate);
+  
+  void init_filename_weight(ofstream& f);
+  void init_filename_KL(ofstream& f);
+  void init_filename_sigma(ofstream& f);
+  
 
   std::vector<double> time_points;
   std::vector<double> delta_t_points;
@@ -111,11 +122,38 @@ void Parameters::init_filename_local(ofstream& fileout,int init_conf)
     fileout.precision(20);
 }
 
+void Parameters::init_filename_local(ofstream& fileout)
+{
+  std::stringstream filename;
+    filename << "Loc." << string_from_basis << string_from_H
+                << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
 void Parameters::init_filename_correlations(ofstream& fileout,int init_conf)
 {
   std::stringstream filename;
     filename << "Corr." << string_from_basis << string_from_H
                 << ".init_conf=" << init_conf << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
+void Parameters::init_filename_correlations(ofstream& fileout)
+{
+  std::stringstream filename;
+    filename << "Corr." << string_from_basis << string_from_H
+                << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
+void Parameters::init_filename_correlations(ofstream& fileout)
+{
+  std::stringstream filename;
+    filename << "Sigma." << string_from_basis << string_from_H
+                << ".dat";
     fileout.open((filename.str()).c_str());
     fileout.precision(20);
 }
@@ -129,11 +167,29 @@ void Parameters::init_filename_entanglement(ofstream& fileout,int init_conf)
     fileout.precision(20);
 }
 
+void Parameters::init_filename_entanglement(ofstream& fileoutf)
+{
+  std::stringstream filename;
+    filename << "Ent." << string_from_basis << string_from_H
+                << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
 void Parameters::init_filename_participation(ofstream& fileout,int init_conf)
 {
   std::stringstream filename;
     filename << "Part." << string_from_basis << string_from_H
                 << ".init_conf=" << init_conf << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
+void Parameters::init_filename_participation(ofstream& fileout)
+{
+  std::stringstream filename;
+    filename << "Part." << string_from_basis << string_from_H
+                << ".dat";
     fileout.open((filename.str()).c_str());
     fileout.precision(20);
 }
@@ -154,6 +210,24 @@ void Parameters::init_filename_imbalance(ofstream& fileout,int init_conf)
                 << ".init_conf=" << init_conf << ".dat";
     fileout.open((filename.str()).c_str());
     fileout.precision(20);
+}
+
+void Parameters::init_filename_weight(ofstream& fileout)
+{
+  std::stringstream filename;
+    filename << "Weight." << string_from_basis << string_from_H
+                << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
+void Parameters::init_filename_KL(ofstream& KLout)
+{
+    std::stringstream KLfilename;
+    KLfilename << "KL." << string_from_basis
+               << string_from_H << ".target" << target << ".dat";
+    KLout.open((KLfilename.str()).c_str());
+    KLout.precision(20);
 }
 
 

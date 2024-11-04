@@ -26,6 +26,7 @@ class observable {
   double KLd(PetscScalar *state1, PetscScalar *state2);
   double entang_entropy(double q);
   void compute_entanglement_spectrum(PetscScalar *state);
+  void compute_entanglement_spectrum_debug(PetscScalar *state);
 
   void compute_special_matrix_brute_force(PetscScalar *state1, PetscScalar *state2,double scalar_product);
   double return_probability(PetscScalar *state, int i0) {
@@ -639,7 +640,9 @@ double observable::entang_entropy(double q) {
 
 void observable::compute_entanglement_spectrum(PetscScalar *state) {
   entanglement_spectrum.resize(0);
-  
+  PetscInt size_svd_switch=16;
+  PetscOptionsGetInt(NULL, NULL, "-size_svd_switch", &size_svd_switch,
+                             NULL);
 // cout << "*** State \n";
 // for (int p=0;p<number_valid_coverings;++p) {
 //	cout << state[p] << endl;
@@ -786,6 +789,177 @@ void observable::compute_entanglement_spectrum(PetscScalar *state) {
   omp_set_num_threads(1);
 #endif
 }
+
+void observable::compute_entanglement_spectrum_debug(PetscScalar *state) {
+  entanglement_spectrum.resize(0);
+  PetscInt size_svd_switch=16;
+  PetscOptionsGetInt(NULL, NULL, "-size_svd_switch", &size_svd_switch,
+                             NULL);
+// cout << "*** State \n";
+// for (int p=0;p<number_valid_coverings;++p) {
+//	cout << state[p] << endl;
+//}
+// cout << "Starting entanglement with MKL=" << mkl_get_max_threads() << endl;
+#ifdef USE_MKL
+  mkl_set_num_threads(number_threads);
+  omp_set_num_threads(number_threads);
+#else
+  omp_set_num_threads(number_threads);
+#endif
+
+  for (int nsa = 0; nsa < basis_pointer->valid_sectors;
+       ++nsa) {  // int nsb=basis_pointer->partner_sector[nsa];
+    int sizeA = basis_pointer->Confs_in_A[nsa].size();
+    int sizeB = basis_pointer->Confs_in_B[nsa].size();
+    int sectorsize = sizeA * sizeB;
+    int start = basis_pointer->starting_conf[nsa];
+    //	cout << "Sector " << nsa << " " << sizeA << " " << sizeB << " " << start
+    //<< std::endl;
+
+    if ((sectorsize > 0)) {
+      if (sectorsize == 1) {
+        int index = start;
+        double ame;
+        // if (index!=nconfs) { ame=PetscAbsScalar(state[index]);} else
+        // {ame=0.;}
+        ame = PetscAbsScalar(state[index]);
+        entanglement_spectrum.push_back(ame * ame);
+        //	cout << "Sector size=1; EE eigenvalue=" << ame*ame << endl;
+      } else {  // sectorsize>1
+      if (sizeA<=size_svd_switch) { // TODO Change minsize
+      std::vector<double> local_entanglement_spectrum(sizeA, 0.);
+#ifdef PETSC_USE_COMPLEX
+#ifdef USE_MKL
+      MKL_Complex16 *psi_mat = (MKL_Complex16 *)malloc(sizeA*sizeA * sizeof(MKL_Complex16));
+#else
+      double __complex__ *psi_mat= (double __complex__ *)malloc(sizeA*sizeA * sizeof(double __complex__));
+#endif
+#else
+      double *psi_mat = (double *)malloc(sizeA*sizeA * sizeof(double));
+#endif
+      char jobz='N'; char uplo='U';
+        MKL_INT lda = sizeA;
+        MKL_INT lrwork=sizeA; MKL_INT liwork=1;
+        MKL_INT iwork[liwork];  MKL_INT info;
+#ifdef PETSC_USE_COMPLEX
+#ifdef USE_MKL
+        MKL_INT lwork=sizeA+1;
+        MKL_Complex16 alpha, beta;
+        alpha.real=1.0; alpha.imag=0.0;
+        beta.real=0.0; beta.imag=0.0;
+        //cblas_zgemm(CblasRowMajor, CblasNoTrans, CblasTrans, sizeA, sizeA, sizeB, &alpha, &state[start], sizeB, &state[start],  sizeB, &beta, &psi_mat[0], sizeA);
+        cblas_zgemm(CblasRowMajor, CblasNoTrans, CblasConjTrans, sizeA, sizeA, sizeB, &alpha, &state[start], sizeB, &state[start],  sizeB, &beta, &psi_mat[0], sizeA);
+        
+        MKL_Complex16 work[lwork]; double rwork[lrwork]; // or MKL_Complex16 rwork[lwork] ?
+        zheevd(&jobz, &uplo, &sizeA, &psi_mat[0], &lda, &local_entanglement_spectrum[0], &work[0], &lwork, &rwork[0], &lrwork, &iwork[0], &liwork, &info);
+#else
+        MKL_INT lwork=sizeA+1;
+        double __complex__ alpha, beta;
+        alpha.real=1.0; alpha.imag=0.0;
+        beta.real=0.0; beta.imag=0.0;
+        cblas_zgemm(CblasRowMajor, CblasConjTrans, CblasNoTrans, sizeA, sizeA, sizeB, &alpha, &state[start], sizeB, &state[start],  sizeB, &beta, &psi_mat[0], sizeA);
+        double __complex__ work[lwork]; double rwork[lwork]; 
+        zheevd_(&jobz, &uplo, &sizeA, &psi_mat[0], &lda, &local_entanglement_spectrum[0], &work[0], &lwork, &rwork[0], &lrwork, &iwork[0], &liwork, &info);        
+#endif
+#else
+// always assume MKL here ...
+        MKL_INT lwork=2*sizeA+1;
+        double alpha=1.0; double beta=0.0;  
+        //cblas_dgemm(CblasRowMajor, CblasTrans, CblasNoTrans, sizeA, sizeA, sizeB, alpha, &state[start], sizeB, &state[start],  sizeB, beta, &psi_mat[0], sizeA);
+        cblas_dgemm(CblasRowMajor, CblasNoTrans, CblasTrans, sizeA, sizeA, sizeB, alpha, &state[start], sizeB, &state[start],  sizeB, beta, &psi_mat[0], sizeA);
+        
+        double work[lwork]; 
+        double rwork[lrwork];
+        dsyevd(&jobz, &uplo, &sizeA, &psi_mat[0], &lda, &local_entanglement_spectrum[0], &work[0], &lwork, &iwork[0], &liwork, &info);
+#endif        
+        free( (void*)psi_mat );
+      }
+      else { 
+        // now do svd
+        int minsize = min(sizeA, sizeB);
+        std::vector<double> local_svd_spectrum(minsize, 0.);
+        {
+          MKL_INT m = sizeB;
+          MKL_INT n = sizeA;
+          MKL_INT lda = m;
+          MKL_INT ldu = m;
+          MKL_INT ldvt = n;
+          MKL_INT info, lwork;
+          // if (sizeA!=sizeB) cout << "Selecting m=sizeA\n";
+          MKL_INT iwork[8 * minsize];
+          lwork = -1;
+#ifdef PETSC_USE_COMPLEX
+#ifdef USE_MKL 
+          MKL_Complex16 wkopt;
+          MKL_Complex16 *work;
+          MKL_Complex16 u[ldu * m], vt[ldvt * n];
+          double rwork[5 * m * m + 7 * m];
+          zgesdd("N", &m, &n, ((MKL_Complex16*)&(state[start])), &lda, &local_svd_spectrum[0], u,
+                 &ldu, vt, &ldvt, &wkopt, &lwork, rwork, iwork, &info);
+#else
+          double __complex__ wkopt;
+          double __complex__ *work;
+          double __complex__ u[ldu * m], vt[ldvt * n];
+          double rwork[5 * m * m + 7 * m];
+          zgesdd_("N", &m, &n, (double __complex__ *)&(state[start])), &lda,
+                  &local_svd_spectrum[0], u, &ldu, vt, &ldvt, &wkopt, &lwork,
+                  rwork, iwork, &info);
+#endif
+          lwork = (MKL_INT)wkopt.real;
+          work = (MKL_Complex16 *)malloc(lwork * sizeof(MKL_Complex16));
+#ifdef USE_MKL
+          zgesdd("N", &m, &n, ((MKL_Complex16*)&(state[start])), &lda, &local_svd_spectrum[0], u,
+                 &ldu, vt, &ldvt, work, &lwork, rwork, iwork, &info);
+#else
+          zgesdd_("N", &m, &n, (double __complex__ *)&(state[start])), &lda, &local_svd_spectrum[0],
+                  u, &ldu, vt, &ldvt, work, &lwork, rwork, iwork, &info);
+#endif
+#else
+          double wkopt;
+          double *work;
+          double u[ldu * m], vt[ldvt * n];
+#ifdef USE_MKL
+          dgesdd("N", &m, &n, &state[start], &lda, &local_svd_spectrum[0], u,
+                 &ldu, vt, &ldvt, &wkopt, &lwork, iwork, &info);
+#else
+          dgesdd_("N", &m, &n, &state[start], &lda, &local_svd_spectrum[0],
+                  u, &ldu, vt, &ldvt, &wkopt, &lwork, iwork, &info);
+#endif
+          lwork = (MKL_INT)wkopt;
+          work = (double *)malloc(lwork * sizeof(double));
+#ifdef USE_MKL
+          dgesdd("N", &m, &n, &state[start], &lda, &local_svd_spectrum[0], u,
+                 &ldu, vt, &ldvt, work, &lwork, iwork, &info);
+#else
+          dgesdd_("N", &m, &n, &state[start], &lda, &local_svd_spectrum[0],
+                  u, &ldu, vt, &ldvt, work, &lwork, iwork, &info);
+#endif
+#endif
+          free((void *)work);
+          //	mkl_set_num_threads(1);
+        }
+
+        double s;
+
+        for (int rr = 0; rr < local_svd_spectrum.size(); ++rr) {
+          s = local_svd_spectrum[rr];
+          entanglement_spectrum.push_back(s * s);
+          //	  std::cout << s*s << endl;
+        }
+      } // svd done
+      }  // sectorsize>1
+    }    // sectorsize>0
+    
+  }      // loop over sectors
+
+#ifdef USE_MKL
+  mkl_set_num_threads(1);
+  omp_set_num_threads(1);
+#else
+  omp_set_num_threads(1);
+#endif
+}
+
 
 void observable::compute_special_matrix_brute_force(PetscScalar *state1,PetscScalar *state2,double scalar_product) {
 double cutoff_precision=1e-15;
