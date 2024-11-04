@@ -457,9 +457,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               { 
                 int p=(int) sites_to_follow[ll][pp];
                 MatMult(sigmas[p],use1,use2);
-               // VecDot(use2,xr,&szkp[pp-k-1]);
+                VecDot(use2,xr,&szkp[pp-si-1]);
                 if (myparameters.measure_correlations) {
-	              corrout << k+1 << " " << p+1 << " " << 0.25*(szkp[pp-k-1]-sz[k]*sz[p]) << " " << Er << endl;
+	              corrout << k+1 << " " << p+1 << " " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl;
               }
 
               }
