@@ -395,10 +395,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
         energies_to_follow.push_back(Er); sz_to_follow.push_back(sz);
         if (prediction_strong_correl_pair.size()!=0) { pairs_to_follow.push_back(prediction_strong_correl_pair);}
-        cout << i << " " << prediction_site.size() << " " << sz.size() << " " << prediction_strong_correl_pair.size() << endl;
-        cout << "I'm pushing sites to follow = "; for (int tt=0;tt<sites_to_follow[sites_to_follow.size()-1].size();++tt) { cout << sites_to_follow[sites_to_follow.size()-1][tt] << " ";} cout << endl; 
-
-
         }
       
 
@@ -421,13 +417,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               }
           }
       }
-      }
-
-
-
-      for (int qq=0;qq<sites_to_follow.size();++qq) {
-        cout << "qq=" << qq << endl;
-        for (int tt=0;tt<sites_to_follow[qq].size();++tt) { cout << sites_to_follow[qq][tt] << " ";} cout << endl; 
       }
 
       int ll=0;
@@ -456,25 +445,22 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         int s=sites_to_follow[ll].size();
         std::vector<double> sz=sz_to_follow[ll];
 
-        cout << "AA " << s << " " << sz.size() << endl;
         for (int si=0;si<s;++si) {
           int k=(int) sites_to_follow[ll][si];
-          cout << si << " out of " << s << " is " << k << " (ll=" << ll << endl;
-          cout << "Sz " << k << " " << sz[k] << " " << energies_to_follow[ll] << endl;
           MatMult(sigmas[k],xr,use1);
-          /*
+          
           if (s>1)  {
           std::vector<double> szkp(s-si-1);
           for (int pp=si+1;pp<s;++pp)
-              { MatMult(sigmas[sites_to_follow[ll][pp]],use1,use2);
-                VecDot(use2,xr,&szkp[sites_to_follow[ll][pp]-k-1]);
+              { MatMult(sigmas[(int) sites_to_follow[ll][pp]],use1,use2);
+                VecDot(use2,xr,&szkp[((int) sites_to_follow[ll][pp])-k-1]);
                 if (myparameters.measure_correlations) {
-	              corrout << k+1 << " " << sites_to_follow[ll][pp]+1 << " " << 0.25*(szkp[sites_to_follow[ll][pp]-k-1]-sz[k]*sz[sites_to_follow[ll][pp]]) << " " << Er << endl;
+	              corrout << k+1 << " " << (int) sites_to_follow[ll][pp]+1 << " " << 0.25*(szkp[((int) sites_to_follow[ll][pp])-k-1]-sz[k]*sz[(int) sites_to_follow[ll][pp]]) << " " << Er << endl;
               }
 
               }
           }
-          */
+          
         }
         }
 
@@ -533,7 +519,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             int s=sites_to_follow[ll].size();
             std::vector<double> sigma_indicator(s,0.);
             for (int si=0;si<s;++si) {
-            int k=sites_to_follow[ll][si];
+            int k=(int) sites_to_follow[ll][si];
               MatMult(sigmas[k],xr,use2);
               VecDot(use2,use1,&sigma_indicator[si]);
             }
