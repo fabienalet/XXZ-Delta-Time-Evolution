@@ -422,6 +422,14 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           }
       }
       }
+
+
+
+      for (int qq=0;qq<sites_to_follow.size();++qq) {
+        cout << "qq=" << qq << endl;
+        for (int tt=0;tt<sites_to_follow[qq].size();++tt) { cout << sites_to_follow[qq][tt] << " ";} cout << endl; 
+      }
+
       int ll=0;
       for (std::vector<int>::iterator it=eigenstates_to_follow.begin();it!=eigenstates_to_follow.end();++it) {
         EPSGetEigenpair(eps2, *it, &Er, &Ei, xr, NULL);
