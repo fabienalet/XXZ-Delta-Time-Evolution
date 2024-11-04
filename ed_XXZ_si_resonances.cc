@@ -445,6 +445,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         else {  // measure only guessed correlations
         int s=sites_to_follow[ll].size();
         std::vector<double> sz=sz_to_follow[ll];
+
+        cout << "AA " << s << " " << sz.size() << endl;
         for (int si=0;si<s;++si) {
           int k=sites_to_follow[ll][si];
           cout << si << " out of " << s << " is " << k << endl;
