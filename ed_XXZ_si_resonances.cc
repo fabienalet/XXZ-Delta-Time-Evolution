@@ -444,15 +444,15 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         std::vector<double> sz=sz_to_follow[ll];
         for (int si=0;si<s;++si) {
           int k=sites_to_follow[ll][si];
-        //  cout << "Sz " << k << " " << sz[k] << " " << energies_to_follow[ll] << endl;
+          cout << "Sz " << k << " " << sz[k] << " " << energies_to_follow[ll] << endl;
           MatMult(sigmas[k],xr,use1);
           if (s>1)  {
           std::vector<double> szkp(s-si-1);
           for (int pp=si+1;pp<s;++pp)
               { MatMult(sigmas[sites_to_follow[ll][pp]],use1,use2);
-                VecDot(use2,xr,&szkp[pp-k-1]);
+                VecDot(use2,xr,&szkp[sites_to_follow[ll][pp]-k-1]);
                 if (myparameters.measure_correlations) {
-	              corrout << k+1 << " " << sites_to_follow[ll][pp]+1 << " " << 0.25*(szkp[pp-k-1]-sz[k]*sz[sites_to_follow[ll][pp]]) << " " << Er << endl;
+	              corrout << k+1 << " " << sites_to_follow[ll][pp]+1 << " " << 0.25*(szkp[sites_to_follow[ll][pp]-k-1]-sz[k]*sz[sites_to_follow[ll][pp]]) << " " << Er << endl;
               }
 
               }
