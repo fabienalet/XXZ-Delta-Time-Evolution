@@ -63,7 +63,7 @@ int main(int argc,char **argv)
   #ifdef USE_MKL
   ENV_NUM_THREADS=mkl_get_max_threads(); /// Get value of OMP_NUM_THREADS 
   mkl_set_num_threads(1);
-  omp_set_num_threads(1)
+  omp_set_num_threads(1);
   #endif
   // In case of openMP problems, one could desactivate openMP for the Krylov code
   // omp_set_num_threads(1);
@@ -332,6 +332,8 @@ int main(int argc,char **argv)
     VecNormalize(Psi_t,&norm);
     VecCopy(Psi_t,res);
 
+    PetscBool debug=PETSC_FALSE;
+    PetscOptionsGetBool(NULL, NULL, "-debug", &debug, NULL); 
 
     /****** Time loop ******/
     int t_index;
@@ -422,8 +424,8 @@ int main(int argc,char **argv)
             //cout << "PARTICIPATION " << i0 << " " << t << " " << P1 << endl;
           }
           if (myparameters.measure_entanglement)
-          {
-            myobservable.compute_entanglement_spectrum(state);
+          { if (debug) { myobservable.compute_entanglement_spectrum_debug(state); }
+              else { myobservable.compute_entanglement_spectrum(state); }
             double S1=myobservable.entang_entropy(1);
             entout << t << " " << S1 << endl;
             cout << "ENTANGLEMENT " << i0 << " " << t << " " << S1 << endl;
