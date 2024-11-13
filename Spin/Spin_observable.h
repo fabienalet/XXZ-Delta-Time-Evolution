@@ -857,7 +857,9 @@ void observable::compute_entanglement_spectrum_debug(PetscScalar *state) {
         double __complex__ alpha, beta;
         alpha.real=1.0; alpha.imag=0.0;
         beta.real=0.0; beta.imag=0.0;
-        cblas_zgemm(CblasRowMajor, CblasConjTrans, CblasNoTrans, sizeA, sizeA, sizeB, &alpha, &state[start], sizeB, &state[start],  sizeB, &beta, &psi_mat[0], sizeA);
+        cblas_zgemm(CblasRowMajor, CblasNoTrans, CblasConjTrans, sizeA, sizeA, sizeB, &alpha, &state[start], sizeB, &state[start],  sizeB, &beta, &psi_mat[0], sizeA);
+        
+       // cblas_zgemm(CblasRowMajor, CblasConjTrans, CblasNoTrans, sizeA, sizeA, sizeB, &alpha, &state[start], sizeB, &state[start],  sizeB, &beta, &psi_mat[0], sizeA);
         double __complex__ work[lwork]; double rwork[lwork]; 
         zheevd_(&jobz, &uplo, &sizeA, &psi_mat[0], &lda, &local_entanglement_spectrum[0], &work[0], &lwork, &rwork[0], &lrwork, &iwork[0], &liwork, &info);        
 #endif
