@@ -396,9 +396,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           bool prediction_strong_correl_found=PETSC_FALSE;
           if (prediction_strong_correl_pair.size()!=0) {
             prediction_strong_correl_found=PETSC_TRUE;
-            std::cout << "### Prediction strong correl for Eigenstate with energy " << Er << endl;
+            //std::cout << "### Prediction strong correl for Eigenstate with energy " << Er << endl;
             for (int ss=0;ss<prediction_strong_correl_pair.size();++ss) {
-            std::cout << "### Prediction strong correl for pair : " << prediction_strong_correl_pair[ss].first << " " << prediction_strong_correl_pair[ss].second << endl;}
+           // std::cout << "### Prediction strong correl for pair : " << prediction_strong_correl_pair[ss].first << " " << prediction_strong_correl_pair[ss].second << endl;}
           }
 
         }
@@ -649,6 +649,10 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             }
 
 
+ 	PetscBool interval_set=PETSC_FALSE;
+ 	char* eps_interval_string = new char[1000];
+   	PetscOptionsGetString(NULL, NULL, "-eps_interval", eps_interval_string, 1000,
+                                &interval_set);  // CHKERRQ(ierr);
 
         ofstream enout;
         ofstream rgapout;
@@ -656,7 +660,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         // as a header add info about the min/max energies
         enout << "# (Emin, Emax) = " << Eminc << "," << Emaxc << endl;
         enout << "# Etarget = " << target << endl;
-        enout << "# Erenorm_target = " << renorm_target << endl;
+        if (interval_set) { enout << "# E_interval " << eps_interval_string << endl;}
+        else { enout << "# Etarget = " << target << endl; }
+        enout << "# nconv = " << nconv << endl;
         
         for (int i = 0; i < nconv; i++) {
     //      cout << energies[i] << "\n";
