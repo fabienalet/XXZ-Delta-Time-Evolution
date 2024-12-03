@@ -659,7 +659,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         myparameters.init_filenames_energy(enout, rgapout, renorm_target);
         // as a header add info about the min/max energies
         enout << "# (Emin, Emax) = " << Eminc << "," << Emaxc << endl;
-        enout << "# Etarget = " << target << endl;
         if (interval_set) { enout << "# E_interval " << eps_interval_string << endl;}
         else { enout << "# Etarget = " << target << endl; }
         enout << "# nconv = " << nconv << endl;
