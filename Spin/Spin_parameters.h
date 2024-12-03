@@ -42,6 +42,7 @@ class Parameters {
   
   void init_filename_entanglement(ofstream& entout,int inistate);
   void init_filename_entanglement(ofstream& entout);
+  void init_filename_Cmax(ofstream& entout);
   void init_filename_participation(ofstream& partout,int inistate);
   void init_filename_participation(ofstream& partout);
   void init_filename_local(ofstream& locout,int inistate);
@@ -164,6 +165,16 @@ void Parameters::init_filename_entanglement(ofstream& fileout,int init_conf)
   std::stringstream filename;
     filename << "Ent." << string_from_basis << string_from_H
                 << ".init_conf=" << init_conf << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
+
+void Parameters::init_filename_Cmax(ofstream& fileout)
+{
+  std::stringstream filename;
+    filename << "Cmax." << string_from_basis << string_from_H
+                << ".dat";
     fileout.open((filename.str()).c_str());
     fileout.precision(20);
 }

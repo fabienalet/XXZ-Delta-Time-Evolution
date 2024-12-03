@@ -312,8 +312,19 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       PetscBool debug=PETSC_FALSE;
       PetscOptionsGetBool(NULL, NULL, "-debug", &debug,NULL);
 
+
+      
+
+
       PetscBool compute_weight=PETSC_TRUE;
+      
       PetscOptionsGetBool(NULL, NULL, "-compute_weight", &compute_weight,NULL); 
+
+      PetscBool measure_Cmax=PETSC_TRUE;
+      PetscOptionsGetBool(NULL, NULL, "-measure_Cmax", &measure_Cmax,NULL);
+      if (measure_Cmax) { compute_weight=PETSC_TRUE;}
+      
+
       PetscInt number_of_weight_cutoff_values=9; 
       PetscOptionsGetInt(NULL, NULL, "-cutoff_values", &number_of_weight_cutoff_values,NULL);
       std::vector< std::vector<double> > weight_at_cutoff_at_range;
@@ -328,6 +339,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         for (int c=0;c<number_of_weight_cutoff_values;++c) { weight_at_cutoff_at_range[c].resize(L/2+1);}
         Normalization.resize(L/2+1,0.);
         }
+ 
 
       PetscBool measure_everything=PETSC_TRUE;
       PetscOptionsGetBool(NULL, NULL, "-measure_everything", &measure_everything,NULL); 
@@ -398,14 +410,17 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         }
       
 
+            double Cmax=0.; double E_Cmax=0.; int site1_Cmax=-1; int site2_Cmax=-1;
+
             if (compute_weight)
-          {  double C;
+          {  double C; 
           for (int k=0;k<L;++k) {
               MatMult(sigmas[k],xr,use1);
               for (int range=1;range<=(L/2);++range) {
                   MatMult(sigmas[(k+range)%L],use1,use2); // pbc assumed here - TODO : change for obc           
                   VecDot(use2,xr,&C);
                   C=0.25*fabs(C-sz[k]*sz[(k+range)%L]);
+                  if (measure_Cmax) { if (C>Cmax) { E_Cmax=Er; Cmax=C; site1_Cmax=k; site2_Cmax=(k+range)%L;} }
                   Normalization[range]+=1.0;
                 //  std::cout << "W: " << k << " " << range << " C=" << C << endl;
                   for (int c=0;c<number_of_weight_cutoff_values;c++)
@@ -614,7 +629,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
 
       if (myrank == 0) {
-          if (compute_weight) { // TODO Weight file
+          if (compute_weight) { 
            ofstream weightout;
            myparameters.init_filename_weight(weightout);
            weightout << "#Weight "; for (int c=0;c<number_of_weight_cutoff_values;++c) { weightout << weight_cutoff[c] << " ";} weightout << endl;
@@ -622,6 +637,15 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             weightout << "#Weight-range " << range << " ";
             for (int c=0;c<number_of_weight_cutoff_values;++c) { weightout << weight_at_cutoff_at_range[c][range]/Normalization[range] << " ";} weightout << endl;
           }
+            weightout.close();
+
+            if (measure_Cmax) {
+              ofstream Cmaxout;
+              myparameters.init_filename_Cmax(Cmaxout);
+              Cmaxout << Cmax << " " << site1_Cmax << " " << site2_Cmax << " " << E_Cmax << endl;
+              Cmaxout.close();
+
+            }
             }
 
 
