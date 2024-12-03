@@ -275,6 +275,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
     MatCreateVecs(sigmas[0], NULL, &use1);
     MatCreateVecs(sigmas[0], NULL, &use2);
 
+    double Cmax=0.; double E_Cmax=0.; int site1_Cmax=-1; int site2_Cmax=-1;
+
     if (nconv > 0) {
       ofstream entout;
       ofstream locout;
@@ -410,7 +412,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         }
       
 
-            double Cmax=0.; double E_Cmax=0.; int site1_Cmax=-1; int site2_Cmax=-1;
 
             if (compute_weight)
           {  double C; 
