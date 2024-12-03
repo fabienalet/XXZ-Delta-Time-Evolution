@@ -660,8 +660,8 @@ void observable::compute_entanglement_spectrum(PetscScalar *state) {
     int sizeB = basis_pointer->Confs_in_B[nsa].size();
     int sectorsize = sizeA * sizeB;
     int start = basis_pointer->starting_conf[nsa];
-    //	cout << "Sector " << nsa << " " << sizeA << " " << sizeB << " " << start
-    //<< std::endl;
+   // 	cout << "Sector " << nsa << " " << sizeA << " " << sizeB << " " << start
+   // << std::endl;
 
     if ((sectorsize > 0)) {
       if (sectorsize == 1) {
@@ -671,7 +671,7 @@ void observable::compute_entanglement_spectrum(PetscScalar *state) {
         // {ame=0.;}
         ame = PetscAbsScalar(state[index]);
         entanglement_spectrum.push_back(ame * ame);
-        //	cout << "Sector size=1; EE eigenvalue=" << ame*ame << endl;
+       // 	cout << "Sector size=1; EE eigenvalue=" << ame*ame << endl;
       } else {  // sectorsize>1
 #ifdef PETSC_USE_COMPLEX
         std::vector<MKL_Complex16> psi_reshaped;
@@ -773,7 +773,7 @@ void observable::compute_entanglement_spectrum(PetscScalar *state) {
         for (int rr = 0; rr < local_svd_spectrum.size(); ++rr) {
           double s = local_svd_spectrum[rr];
           entanglement_spectrum.push_back(s * s);
-          //	  std::cout << s*s << endl;
+       //   	  std::cout << s*s << endl;
         }
 
       }  // sectorsize>1
@@ -813,8 +813,8 @@ void observable::compute_entanglement_spectrum_debug(PetscScalar *state) {
     int sizeB = basis_pointer->Confs_in_B[nsa].size();
     int sectorsize = sizeA * sizeB;
     int start = basis_pointer->starting_conf[nsa];
-    //	cout << "Sector " << nsa << " " << sizeA << " " << sizeB << " " << start
-    //<< std::endl;
+   // 	cout << "Sector " << nsa << " " << sizeA << " " << sizeB << " " << start
+  //  << std::endl;
 
     if ((sectorsize > 0)) {
       if (sectorsize == 1) {
@@ -874,6 +874,9 @@ void observable::compute_entanglement_spectrum_debug(PetscScalar *state) {
         double rwork[lrwork];
         dsyevd(&jobz, &uplo, &sizeA, &psi_mat[0], &lda, &local_entanglement_spectrum[0], &work[0], &lwork, &iwork[0], &liwork, &info);
 #endif        
+        for (int rr = 0; rr < local_entanglement_spectrum.size(); ++rr) {
+          entanglement_spectrum.push_back(abs(local_entanglement_spectrum[rr]));
+        }
         free( (void*)psi_mat );
       }
       else { 

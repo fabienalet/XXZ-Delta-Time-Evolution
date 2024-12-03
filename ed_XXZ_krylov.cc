@@ -335,6 +335,9 @@ int main(int argc,char **argv)
     PetscBool debug=PETSC_FALSE;
     PetscOptionsGetBool(NULL, NULL, "-debug", &debug, NULL); 
 
+    PetscBool print_entanglement_spectrum=PETSC_FALSE;
+    PetscOptionsGetBool(NULL, NULL, "-print_entanglement_spectrum", &print_entanglement_spectrum, NULL); 
+
     /****** Time loop ******/
     int t_index;
     double dt_measure=(myparameters.TEEmax-myparameters.TEEmin)/myparameters.nmeasures;
@@ -426,6 +429,11 @@ int main(int argc,char **argv)
           if (myparameters.measure_entanglement)
           { if (debug) { myobservable.compute_entanglement_spectrum_debug(state); }
               else { myobservable.compute_entanglement_spectrum(state); }
+            if (print_entanglement_spectrum) {
+              for (int pp=0;pp<myobservable.entanglement_spectrum.size();++pp) {
+                cout << "ES " << pp << " " << myobservable.entanglement_spectrum[pp] << endl;
+              }
+            }
             double S1=myobservable.entang_entropy(1);
             entout << t << " " << S1 << endl;
             cout << "ENTANGLEMENT " << i0 << " " << t << " " << S1 << endl;
