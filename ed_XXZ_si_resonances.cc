@@ -314,10 +314,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       PetscBool debug=PETSC_FALSE;
       PetscOptionsGetBool(NULL, NULL, "-debug", &debug,NULL);
 
-
-      
-
-
       PetscBool compute_weight=PETSC_TRUE;
       
       PetscOptionsGetBool(NULL, NULL, "-compute_weight", &compute_weight,NULL); 
@@ -609,17 +605,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         VecDestroy(&Vec_local);
         */
       }
-      }
+      
+      } // loop over states
 
-    
-/*
-      
-      
-      
-      
-      tcorrout.close();
-      
-*/
     if (myparameters.measure_KL) {KLout.close();}
       if (myparameters.measure_local) { locout.close();}
       if (myparameters.measure_correlations) { corrout.close();}
@@ -694,6 +682,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         rgapout.close();
         enout.close();
       }
+      } 
     } // nconv>0
   }// target
   SlepcFinalize();
