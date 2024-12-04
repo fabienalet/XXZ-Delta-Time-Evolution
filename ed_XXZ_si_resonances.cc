@@ -440,7 +440,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       if (myrank==0) { cout << "*** Measuring on " << eigenstates_to_follow.size() << " eigenstates to follow\n";}
 
       for (std::vector<int>::iterator it=eigenstates_to_follow.begin();it!=eigenstates_to_follow.end();++it) {
-        if (!(ll%100)) { if (myrank==0) { cout << ll < " eigenstates done\n";}
+        if (!(ll%100)) { if (myrank==0) { cout << ll << " eigenstates done\n";}}
         EPSGetEigenpair(eps2, *it, &Er, &Ei, xr, NULL);
 
         if (measure_everything) {
