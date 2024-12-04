@@ -359,7 +359,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         PetscReal sz_cutoff=0.05;
         PetscOptionsGetReal(NULL, NULL, "-sz_cutoff", &sz_cutoff,&sz_cutoff_set); 
         PetscBool sz_product_cutoff_set;
-        PetscReal sz_product_cutoff=sz_cutoff*sz_cutoff;
+        PetscReal sz_product_cutoff=0.25-sz_cutoff*sz_cutoff;
         PetscOptionsGetReal(NULL, NULL, "-sz_product_cutoff", &sz_product_cutoff,&sz_product_cutoff_set); 
        
         if (!(sz_cutoff_set)) { sz_cutoff=sqrt(0.25-sz_product_cutoff);}
@@ -404,9 +404,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           bool prediction_strong_correl_found=PETSC_FALSE;
           if (prediction_strong_correl_pair.size()!=0) {
             prediction_strong_correl_found=PETSC_TRUE;
-         //   if (myrank==0) std::cout << "### Prediction strong correl for Eigenstate with energy " << Er << endl;
+         if(debug)   if (myrank==0) std::cout << "### Prediction strong correl for Eigenstate with energy " << Er << endl;
             for (int ss=0;ss<prediction_strong_correl_pair.size();++ss) {
-          //  if (myrank==0) std::cout << "### Prediction strong correl for pair : " << prediction_strong_correl_pair[ss].first << " " << prediction_strong_correl_pair[ss].second << endl; //}
+          if(debug)  if (myrank==0) std::cout << "### Prediction strong correl for pair : " << prediction_strong_correl_pair[ss].first << " " << prediction_strong_correl_pair[ss].second << endl; //}
           }
           }
         
