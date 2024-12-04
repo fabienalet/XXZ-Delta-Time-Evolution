@@ -339,7 +339,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         }
  
 
-      PetscBool measure_everything=PETSC_TRUE;
+      PetscBool measure_everything=PETSC_FALSE;
       PetscOptionsGetBool(NULL, NULL, "-measure_everything", &measure_everything,NULL); 
 
       PetscBool measure_sigma_indicator=PETSC_TRUE;
@@ -352,27 +352,32 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       PetscOptionsGetBool(NULL, NULL, "-other_measurements", &other_measurements,NULL); 
 
 
-      PetscBool sz_cutoff_set=PETSC_TRUE;
+        PetscBool sz_cutoff_set=PETSC_TRUE;
         PetscReal sz_cutoff=0.05;
         PetscOptionsGetReal(NULL, NULL, "-sz_cutoff", &sz_cutoff,&sz_cutoff_set); 
         PetscBool sz_product_cutoff_set;
         PetscReal sz_product_cutoff=sz_cutoff*sz_cutoff;
         PetscOptionsGetReal(NULL, NULL, "-sz_product_cutoff", &sz_product_cutoff,&sz_product_cutoff_set); 
-        
+       
+        if (!(sz_cutoff_set)) { sz_cutoff=sqrt(sz_product_cutoff);}
+        if (sz_product_cutoff_set) { sz_cutoff_set=PETSC_TRUE;}
+        //if (sz_cutoff_set) { sz_product_cutoff_set=PETSC_TRUE; }
+
         sz_cutoff*=2;
         sz_product_cutoff*=4;
-
+        if (!(sz_product_cutoff_set) && (!(sz_cutoff_set)) ) {
+          if (myrank==0) { cout << "No cutoff set, exiting\n";}
+          exit(0);
+        }
       for (int i = 0; i < nconv; i++) {
         ierr = EPSGetEigenpair(eps2, i, &Er, &Ei, xr, NULL);
         CHKERRQ(ierr);
         energies.push_back(PetscRealPart(Er));
 
-        if (sz_product_cutoff_set) { sz_cutoff_set=PETSC_TRUE;}
-
         std::vector< pair<int,int> > prediction_strong_correl_pair; prediction_strong_correl_pair.resize(0);
         std::vector< int > prediction_site; prediction_site.resize(0);
         std::vector<double> sz(L,0.);
-        if (sz_cutoff_set) {
+     //   if (sz_cutoff_set) || (sz_product) {
         for (int k=0;k<L;++k) {
           MatMult(sigmas[k],xr,use1);
           VecDot(use1,xr,&sz[k]);
@@ -394,12 +399,12 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           bool prediction_strong_correl_found=PETSC_FALSE;
           if (prediction_strong_correl_pair.size()!=0) {
             prediction_strong_correl_found=PETSC_TRUE;
-            //std::cout << "### Prediction strong correl for Eigenstate with energy " << Er << endl;
+            if (myrank==0) std::cout << "### Prediction strong correl for Eigenstate with energy " << Er << endl;
             for (int ss=0;ss<prediction_strong_correl_pair.size();++ss) {
-           // std::cout << "### Prediction strong correl for pair : " << prediction_strong_correl_pair[ss].first << " " << prediction_strong_correl_pair[ss].second << endl;}
+            if (myrank==0) std::cout << "### Prediction strong correl for pair : " << prediction_strong_correl_pair[ss].first << " " << prediction_strong_correl_pair[ss].second << endl;}
           }
 
-        }
+        
 
         if (prediction_site.size()!=0) { eigenstates_to_follow.push_back(i); sites_to_follow.push_back(prediction_site); 
 
@@ -432,7 +437,10 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       }
       
       int ll=0;
+      if (myrank==0) { cout << "*** Measuring on " << eigenstates_to_follow.size() << " eigenstates to follow\n";}
+
       for (std::vector<int>::iterator it=eigenstates_to_follow.begin();it!=eigenstates_to_follow.end();++it) {
+        if (!(ll%100)) { if (myrank==0) { cout << ll < " eigenstates done\n";}
         EPSGetEigenpair(eps2, *it, &Er, &Ei, xr, NULL);
 
         if (measure_everything) {
@@ -682,7 +690,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         rgapout.close();
         enout.close();
       }
-      } 
+  
     } // nconv>0
   }// target
   SlepcFinalize();
