@@ -359,7 +359,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         PetscReal sz_product_cutoff=sz_cutoff*sz_cutoff;
         PetscOptionsGetReal(NULL, NULL, "-sz_product_cutoff", &sz_product_cutoff,&sz_product_cutoff_set); 
        
-        if (!(sz_cutoff_set)) { sz_cutoff=sqrt(sz_product_cutoff);}
+        if (!(sz_cutoff_set)) { sz_cutoff=sqrt(0.25-sz_product_cutoff);}
         if (sz_product_cutoff_set) { sz_cutoff_set=PETSC_TRUE;}
         //if (sz_cutoff_set) { sz_product_cutoff_set=PETSC_TRUE; }
 
