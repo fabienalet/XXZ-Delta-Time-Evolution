@@ -389,14 +389,15 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         
         for (int j=0;j<L;++j)
           { if (fabs(sz[j])<sz_cutoff)
-                { prediction_site.push_back(j);
+                { //prediction_site.push_back(j);
                   //std::cout << j << " passes the deal " << Er << endl;
                 for (int k=j+1;k<L;++k)
                     { if ( (fabs(sz[k])<sz_cutoff) && ( (fabs(sz[k]*sz[j])<(0.25-C_cutoff)) ) )
                       { //std::cout << "together with " << k << " " << Er << endl;
-                        if ((k-j)>min_range) 
-                        {
-                        prediction_strong_correl_pair.push_back(make_pair(j,k));}
+                        if ( ((k-j)>min_range) && ((!(pbc)) || ((j+L-k)>min_range)) )
+                        {  prediction_strong_correl_pair.push_back(make_pair(j,k));
+                          prediction_site.push_back(j); prediction_site.push_back(k);
+                        }
                       }
                     }
                 }
@@ -410,12 +411,17 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           }
           }
         
+        // remove duplicates of sites
+        sort(prediction_site.begin(), prediction_site.end());
+        auto it = unique(prediction_site.begin(), prediction_site.end());
+        prediction_site.erase(it, prediction_site.end());
+
         if (prediction_strong_correl_pair.size()!=0) {
           eigenstates_to_follow.push_back(i);
           energies_to_follow.push_back(Er); 
           pairs_to_follow.push_back(prediction_strong_correl_pair);
           sz_to_follow.push_back(sz);
-          if (prediction_site.size()!=0) { sites_to_follow.push_back(prediction_site);}
+          sites_to_follow.push_back(prediction_site);
         }
       
 
