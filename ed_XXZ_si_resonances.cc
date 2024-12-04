@@ -387,6 +387,10 @@ int ENV_NUM_THREADS=omp_get_num_threads();
          // if (myparameters.measure_local) { locout << k << " " << sz[k] << " " << Er << endl; } // TODO maybe only for special sites ? second loop instead of here ?
         }
         
+        // TODO : get pbc back !
+        PetscBool pbc=PETSC_TRUE;
+        PetscOptionsGetBool(NULL, NULL, "-pbc", &pbc, NULL);
+
         for (int j=0;j<L;++j)
           { if (fabs(sz[j])<sz_cutoff)
                 { //prediction_site.push_back(j);
