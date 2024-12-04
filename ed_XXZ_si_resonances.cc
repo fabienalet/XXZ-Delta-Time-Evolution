@@ -338,6 +338,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         Normalization.resize(L/2+1,0.);
         }
  
+      PetscBool min_range=0;
+      PetscOptionsGetBool(NULL, NULL, "-min_range", &min_range,NULL); 
+
 
       PetscBool measure_everything=PETSC_FALSE;
       PetscOptionsGetBool(NULL, NULL, "-measure_everything", &measure_everything,NULL); 
@@ -389,10 +392,12 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                 { prediction_site.push_back(j);
                   //std::cout << j << " passes the deal " << Er << endl;
                 for (int k=j+1;k<L;++k)
-                    { if ( (fabs(sz[k])<sz_cutoff) && ( (fabs(sz[k]*sz[j])<sz_product_cutoff) ) )
+                    { if ( (fabs(sz[k])<sz_cutoff) && ( (fabs(sz[k]*sz[j])<(0.25-sz_product_cutoff)) ) )
                       { //std::cout << "together with " << k << " " << Er << endl;
-                        
+                        if ((k-j)>min_range) 
+                        {
                         prediction_strong_correl_pair.push_back(make_pair(j,k));}
+                      }
                     }
                 }
           }
