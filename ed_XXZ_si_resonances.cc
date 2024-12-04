@@ -358,17 +358,17 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         PetscBool sz_cutoff_set=PETSC_TRUE;
         PetscReal sz_cutoff=0.05;
         PetscOptionsGetReal(NULL, NULL, "-sz_cutoff", &sz_cutoff,&sz_cutoff_set); 
-        PetscBool sz_product_cutoff_set;
-        PetscReal sz_product_cutoff=0.25-sz_cutoff*sz_cutoff;
-        PetscOptionsGetReal(NULL, NULL, "-sz_product_cutoff", &sz_product_cutoff,&sz_product_cutoff_set); 
+        PetscBool C_cutoff_set;
+        PetscReal C_cutoff=0.25-sz_cutoff*sz_cutoff;
+        PetscOptionsGetReal(NULL, NULL, "-C_cutoff", &C_cutoff,&C_cutoff_set); 
        
-        if (!(sz_cutoff_set)) { sz_cutoff=sqrt(0.25-sz_product_cutoff);}
-        if (sz_product_cutoff_set) { sz_cutoff_set=PETSC_TRUE;}
-        //if (sz_cutoff_set) { sz_product_cutoff_set=PETSC_TRUE; }
+        if (!(sz_cutoff_set)) { sz_cutoff=sqrt(0.25-C_cutoff);}
+        if (C_cutoff_set) { sz_cutoff_set=PETSC_TRUE;}
+        //if (sz_cutoff_set) { C_cutoff_set=PETSC_TRUE; }
 
         sz_cutoff*=2;
-        sz_product_cutoff*=4;
-        if (!(sz_product_cutoff_set) && (!(sz_cutoff_set)) ) {
+        C_cutoff*=4;
+        if (!(C_cutoff_set) && (!(sz_cutoff_set)) ) {
           if (myrank==0) { cout << "No cutoff set, exiting\n";}
           exit(0);
         }
@@ -392,7 +392,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                 { prediction_site.push_back(j);
                   //std::cout << j << " passes the deal " << Er << endl;
                 for (int k=j+1;k<L;++k)
-                    { if ( (fabs(sz[k])<sz_cutoff) && ( (fabs(sz[k]*sz[j])<(0.25-sz_product_cutoff)) ) )
+                    { if ( (fabs(sz[k])<sz_cutoff) && ( (fabs(sz[k]*sz[j])<(0.25-C_cutoff)) ) )
                       { //std::cout << "together with " << k << " " << Er << endl;
                         if ((k-j)>min_range) 
                         {
