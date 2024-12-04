@@ -401,7 +401,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             prediction_strong_correl_found=PETSC_TRUE;
          //   if (myrank==0) std::cout << "### Prediction strong correl for Eigenstate with energy " << Er << endl;
             for (int ss=0;ss<prediction_strong_correl_pair.size();++ss) {
-          //  if (myrank==0) std::cout << "### Prediction strong correl for pair : " << prediction_strong_correl_pair[ss].first << " " << prediction_strong_correl_pair[ss].second << endl;}
+          //  if (myrank==0) std::cout << "### Prediction strong correl for pair : " << prediction_strong_correl_pair[ss].first << " " << prediction_strong_correl_pair[ss].second << endl; //}
           }
 
         
@@ -690,7 +690,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         rgapout.close();
         enout.close();
       }
-  
+      } // loop over nconv
     } // nconv>0
   }// target
   SlepcFinalize();
