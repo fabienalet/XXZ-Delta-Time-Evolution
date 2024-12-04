@@ -403,11 +403,10 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             for (int ss=0;ss<prediction_strong_correl_pair.size();++ss) {
           //  if (myrank==0) std::cout << "### Prediction strong correl for pair : " << prediction_strong_correl_pair[ss].first << " " << prediction_strong_correl_pair[ss].second << endl; //}
           }
-
+          }
         
 
         if (prediction_site.size()!=0) { eigenstates_to_follow.push_back(i); sites_to_follow.push_back(prediction_site); 
-
         energies_to_follow.push_back(Er); sz_to_follow.push_back(sz);
         if (prediction_strong_correl_pair.size()!=0) { pairs_to_follow.push_back(prediction_strong_correl_pair);}
         }
@@ -690,7 +689,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         rgapout.close();
         enout.close();
       }
-      } // loop over nconv
+      
     } // nconv>0
   }// target
   SlepcFinalize();
