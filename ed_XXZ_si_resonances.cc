@@ -338,8 +338,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         Normalization.resize(L/2+1,0.);
         }
  
-      PetscBool min_range=0;
-      PetscOptionsGetBool(NULL, NULL, "-min_range", &min_range,NULL); 
+      PetscInt min_range=0;
+      PetscOptionsGetInt(NULL, NULL, "-min_range", &min_range,NULL); 
 
 
       PetscBool measure_everything=PETSC_FALSE;
@@ -410,10 +410,12 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           }
           }
         
-
-        if (prediction_site.size()!=0) { eigenstates_to_follow.push_back(i); sites_to_follow.push_back(prediction_site); 
-        energies_to_follow.push_back(Er); sz_to_follow.push_back(sz);
-        if (prediction_strong_correl_pair.size()!=0) { pairs_to_follow.push_back(prediction_strong_correl_pair);}
+        if (prediction_strong_correl_pair.size()!=0) {
+          eigenstates_to_follow.push_back(i);
+          energies_to_follow.push_back(Er); 
+          pairs_to_follow.push_back(prediction_strong_correl_pair);
+          sz_to_follow.push_back(sz);
+          if (prediction_site.size()!=0) { sites_to_follow.push_back(prediction_site);}
         }
       
 
