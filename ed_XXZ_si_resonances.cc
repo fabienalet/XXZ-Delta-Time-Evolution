@@ -457,7 +457,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
 
 
-      std::vector< Vec > applications_of_sites_to_follow;
       int ss=sites_to_follow[ll].size();
       std::vector< Vec > applications_of_sites_to_follow(ss);
 
@@ -519,6 +518,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         */
         std::vector<double> sz=sz_to_follow[ll];
         for (int si=0;si<ss;++si) {
+          int k=(int) sites_to_follow[ll][si];
           if (ss>1)  {
           std::vector<double> szkp(ss-si-1);
           for (int pp=si+1;pp<ss;++pp)
@@ -596,8 +596,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             std::vector<double> sigma_indicator(ss,0.);
             for (int si=0;si<ss;++si) {
               VecDot(applications_of_sites_to_follow[si],use1,&sigma_indicator[si]);
-            }
-            for (int si=0;si<s;++si) {
               sigmaout << "Sig " <<  (int) sites_to_follow[ll][si] << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
             }
           }
