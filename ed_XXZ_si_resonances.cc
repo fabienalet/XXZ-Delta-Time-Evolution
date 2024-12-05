@@ -194,8 +194,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
   // Defining sigmas
   std::vector<Mat> sigmas;
   sigmas.resize(L);
-  std::vector<Vec> sigmas_as_Vec;
-  sigmas_as_Vec.resize(L);
+  std::vector<Vec> sigmas_as_vec;
+  sigmas_as_vec.resize(L);
   for (int p=0;p<L;++p) { MatCreateVecs(H, NULL, &sigmas_as_Vec[p]);}
 
   //for (int k=0;k<L;++k) { MatCreateVecs(H, NULL, &sigmas[k]);}
@@ -395,7 +395,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
      //   if (sz_cutoff_set) || (sz_product) {
         for (int k=0;k<L;++k) {
           MatMult(sigmas[k],xr,use1);
-         // VecPointwiseMult(use1,sigmas_asvec[k],xr);
+         // VecPointwiseMult(use1,sigmas_as_vec[k],xr);
           VecDot(use1,xr,&sz[k]);
          // if (myparameters.measure_local) { locout << k << " " << sz[k] << " " << Er << endl; } // TODO maybe only for special sites ? second loop instead of here ?
         }
@@ -447,10 +447,10 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           {  double C; 
           for (int k=0;k<L;++k) {
               MatMult(sigmas[k],xr,use1);
-             // VecPointwiseMult(use1,sigmas_asvec[k],xr);
+             // VecPointwiseMult(use1,sigmas_as_vec[k],xr);
               for (int range=1;range<=(L/2);++range) {
                   MatMult(sigmas[(k+range)%L],use1,use2); // pbc assumed here - TODO : change for obc  
-               //   VecPointwiseMult(use2,sigmas_asvec[(k+range)%L],use1);         
+               //   VecPointwiseMult(use2,sigmas_as_vec[(k+range)%L],use1);         
                   VecDot(use2,xr,&C);
                   C=0.25*fabs(C-sz[k]*sz[(k+range)%L]);
                   if (measure_Cmax) { if (C>Cmax) { E_Cmax=Er; Cmax=C; site1_Cmax=k; site2_Cmax=(k+range)%L;} }
@@ -496,12 +496,12 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         for (int k=0;k<L;++k) {
 //          cout << "Sz " << k << " " << sz[k] << " " <<  << endl;
           MatMult(sigmas[k],xr,use1);
-         // VecPointwiseMult(use1,sigmas_asvec[k],xr);
+         // VecPointwiseMult(use1,sigmas_as_vec[k],xr);
           std::vector<double> szkp(L-k-1);
             for (int pp=k+1;pp<L;++pp)
               { 
                 MatMult(sigmas[pp],use1,use2);
-                //   VecPointwiseMult(use2,sigmas_asvec[pp],use1);       
+                //   VecPointwiseMult(use2,sigmas_as_vec[pp],use1);       
                 VecDot(use2,xr,&szkp[pp-k-1]);
                 if (myparameters.measure_correlations) {
 	              corrout << k+1 << " " << pp+1 << " " << 0.25*(szkp[pp-k-1]-sz[k]*sz[pp]) << " " << Er << endl;
@@ -517,14 +517,14 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         for (int si=0;si<s;++si) {
           int k=(int) sites_to_follow[ll][si];
           MatMult(sigmas[k],xr,use1);
-          // VecPointwiseMult(use1,sigmas_asvec[k],xr);
+          // VecPointwiseMult(use1,sigmas_as_vec[k],xr);
           if (s>1)  {
           std::vector<double> szkp(s-si-1);
           for (int pp=si+1;pp<s;++pp)
               { 
                 int p=(int) sites_to_follow[ll][pp];
                 MatMult(sigmas[p],use1,use2);
-                //   VecPointwiseMult(use2,sigmas_asvec[pp],use1);       
+                //   VecPointwiseMult(use2,sigmas_as_vec[pp],use1);       
                 VecDot(use2,xr,&szkp[pp-si-1]);
                 if (myparameters.measure_correlations) {
 	              corrout << k+1 << " " << p+1 << " " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl;
@@ -615,7 +615,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             for (int si=0;si<s;++si) {
             int k=(int) sites_to_follow[ll][si];
               MatMult(sigmas[k],xr,use2);
-               // VecPointwiseMult(use2,sigmas_asvec[k],xr);
+               // VecPointwiseMult(use2,sigmas_as_vec[k],xr);
               VecDot(use2,use1,&sigma_indicator[si]);
             }
             for (int si=0;si<s;++si) {
