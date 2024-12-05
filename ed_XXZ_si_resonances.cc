@@ -455,9 +455,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       int ll=0;
       if (myrank==0) { cout << "*** Measuring on " << eigenstates_to_follow.size() << " eigenstates to follow\n";}
 
-
-      
-
       for (std::vector<int>::iterator it=eigenstates_to_follow.begin();it!=eigenstates_to_follow.end();++it) {
         if (!(ll%100)) { if (myrank==0) { cout << ll << " eigenstates done\n";}}
         EPSGetEigenpair(eps2, *it, &Er, &Ei, xr, NULL);
@@ -498,7 +495,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                  
         }
         else {  // measure only guessed correlations
-        /*
+        
         int s=sites_to_follow[ll].size();
         std::vector<double> sz=sz_to_follow[ll];
         for (int si=0;si<s;++si) {
@@ -518,7 +515,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           }
         }
         }
-        */
+        
        /*
         std::vector<double> sz=sz_to_follow[ll];
         for (int si=0;si<ss;++si) {
@@ -536,7 +533,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         }
         }
 */
-
 
         double pi; 
         if (myparameters.measure_participation) {
@@ -620,8 +616,8 @@ std::vector<double> sigma_indicator(ss,0.);
           }
        //   } it!=jt
       llj++;
-        }
-        }
+        } // second loop on j
+        } // measure kl or sigma
 
         ll++;
         // other measurements on eigenstate to follow ...
