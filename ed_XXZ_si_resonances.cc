@@ -614,9 +614,24 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             std::vector<double> sigma_indicator(s,0.);
             for (int si=0;si<s;++si) {
             int k=(int) sites_to_follow[ll][si];
+            // HERE !
+            double local_sigma=0.; double ai,bi,sigmai;
+            for (int row_ctr = Istart; row_ctr<Iend;++row_ctr) {
+              VecGetValues( xr, 1, &row_ctr, &ai );
+              VecGetValues( use1, 1, &row_ctr, &bi );
+              VecGetValues( sigmas_as_vec[k], 1, &row_ctr, &sigmai );
+              local_sigma += ai*bi*sigmai;}
+             }
+          double global_sigma=0.;
+          MPI_Reduce(&local_sigma, &global_sigma, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
+          //partout << "S1 " << global_S1 << " " << energies_to_follow[ll] << endl;
+          sigma_indicator[si]=global_sigma;
+
+            // HERE !
+
              // MatMult(sigmas[k],xr,use2);
-                VecPointwiseMult(use2,sigmas_as_vec[k],xr);
-              VecDot(use2,use1,&sigma_indicator[si]);
+            //    VecPointwiseMult(use2,sigmas_as_vec[k],xr);
+             // VecDot(use2,use1,&sigma_indicator[si]);
             }
             for (int si=0;si<s;++si) {
               sigmaout << "Sig " <<  (int) sites_to_follow[ll][si] << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
