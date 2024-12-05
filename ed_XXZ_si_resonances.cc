@@ -470,9 +470,21 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       int ll=0;
       if (myrank==0) { cout << "*** Measuring on " << eigenstates_to_follow.size() << " eigenstates to follow\n";}
 
+      
+
+
+
       for (std::vector<int>::iterator it=eigenstates_to_follow.begin();it!=eigenstates_to_follow.end();++it) {
         if (!(ll%100)) { if (myrank==0) { cout << ll << " eigenstates done\n";}}
         EPSGetEigenpair(eps2, *it, &Er, &Ei, xr, NULL);
+
+
+        std::vector<Petscalar*> local_sigma_k_i(sites_to_follow[ll].size());
+      for (int si=0;si<sites_to_follow[ll].size();++si) { 
+        VecGetArray(sigmas_as_vec[(int) sites_to_follow[ll][si]],&local_sigma_k_i[si]);
+            }
+
+
         /*
       
       int ss=sites_to_follow[ll].size();
@@ -572,9 +584,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           for (std::vector<int>::iterator jt=(it+1);jt!=eigenstates_to_follow.end();++jt) {
         //  if (it!=jt) {
           EPSGetEigenpair(eps2, *jt, &Er2, &Ei, use1, NULL);
-          if (myparameters.measure_KL) {
-          //  if (myparameters.measure_all_KL) {
-
+          if (myparameters.measure_KL) { 
           double pi; double qi;
           double local_KL=0.;
           double local_KL2=0.;
@@ -593,29 +603,44 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           //MPI_AllReduce(&local_KL, &global_KL, 1, MPI_double, MPI_SUM, PETSC_COMM_WORLD);
           // myrank=0
           if (myrank==0) {
-          //KLout << global_KL << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
           KLout << global_KL << " " << global_KL2 << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
           }
-            }
-            // }
+          }
           if (measure_sigma_indicator) {
             if (measure_everything) {
               std::vector<double> sigma_indicator(L,0);
-            for (int k=0;k<L;++k) {
+              for (int k=0;k<L;++k) {
               MatMult(sigmas[k],xr,use2);
               VecDot(use2,use1,&sigma_indicator[k]);
             }
             for (int k=0;k<L;++k) {
               sigmaout << "Sig " <<  k << " " << sigma_indicator[k] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
             }
-          } 
+            } 
           else {
+            PetscScalar *aiv;
+            VecGetArray(xr,&ai);
+            PetscScalar *biv;
+            VecGetArray(use1,&bi);
+            
             int s=sites_to_follow[ll].size();
             std::vector<double> sigma_indicator(s,0.);
+            std::vector<double> local_sigma_indicator(s,0.);
+
             for (int si=0;si<s;++si) {
             int k=(int) sites_to_follow[ll][si];
-            // HERE !
-            double local_sigma=0.; double ai,bi,sigmai;
+            
+            for (int row_ctr = Istart; row_ctr<Iend;++row_ctr) { 
+              local_sigma_indicator[si]+=aiv[row_ctr]*biv[row_ctr]*local_sigma_k_i[si][row_ctr];
+            }
+            double global_sigma=0.;
+            MPI_Reduce(&local_sigma_indicator[si], &global_sigma, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
+            sigma_indicator[si]=global_sigma;
+            }
+        // HERE !
+        /*
+        for (int si=0;si<s;++si) {
+            int k=(int) sites_to_follow[ll][si];
             for (int row_ctr = Istart; row_ctr<Iend;++row_ctr) {
               VecGetValues( xr, 1, &row_ctr, &ai );
               VecGetValues( use1, 1, &row_ctr, &bi );
@@ -624,34 +649,29 @@ int ENV_NUM_THREADS=omp_get_num_threads();
              }
           double global_sigma=0.;
           MPI_Reduce(&local_sigma, &global_sigma, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
-          //partout << "S1 " << global_S1 << " " << energies_to_follow[ll] << endl;
           sigma_indicator[si]=global_sigma;
-
+        }
+        */
             // HERE !
 
              // MatMult(sigmas[k],xr,use2);
             //    VecPointwiseMult(use2,sigmas_as_vec[k],xr);
              // VecDot(use2,use1,&sigma_indicator[si]);
-            }
+            
             for (int si=0;si<s;++si) {
               sigmaout << "Sig " <<  (int) sites_to_follow[ll][si] << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
             }
-            /*
-std::vector<double> sigma_indicator(ss,0.);
-            for (int si=0;si<ss;++si) {
-              VecDot(applications_of_sites_to_follow[si],use1,&sigma_indicator[si]);
-              sigmaout << "Sig " <<  (int) sites_to_follow[ll][si] << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
-            }
-            */
+          }// !measure everything
+          }  // measure_sigma
 
-          }
-
-
-          }
-       //   } it!=jt
+      //   } it!=jt
       llj++;
         } // second loop on j
         } // measure kl or sigma
+
+        for (int si=0;si<sites_to_follow[ll].size();++si) { 
+        VecRestoreArray(sigmas_as_vec[(int) sites_to_follow[ll][si]],&local_sigma_k_i[si]);
+            }
 
         ll++;
         // other measurements on eigenstate to follow ...
