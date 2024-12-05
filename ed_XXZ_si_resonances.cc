@@ -620,7 +620,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               VecGetValues( xr, 1, &row_ctr, &ai );
               VecGetValues( use1, 1, &row_ctr, &bi );
               VecGetValues( sigmas_as_vec[k], 1, &row_ctr, &sigmai );
-              local_sigma += ai*bi*sigmai;}
+              local_sigma += ai*bi*sigmai;
              }
           double global_sigma=0.;
           MPI_Reduce(&local_sigma, &global_sigma, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
