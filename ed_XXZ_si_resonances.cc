@@ -630,7 +630,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             for (int si=0;si<s;++si) {
             int k=(int) sites_to_follow[ll][si];
             
-            for (int row_ctr = Istart; row_ctr<Iend;++row_ctr) { 
+            for (int row_ctr = 0; row_ctr<Iend-Istart;++row_ctr) { 
               local_sigma_indicator[si]+=aiv[row_ctr]*biv[row_ctr]*local_sigma_k_i[si][row_ctr];
             }
             double global_sigma=0.;
