@@ -639,14 +639,21 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             sigma_indicator[si]=global_sigma;
             }
             */
-
+           // first check if there are sites in common
+            bool sites_in_common=0;
+            int s=sites_to_follow[ll].size();
+            for (int si=0;si<s;++si) {
+              auto it = std::find(sites_to_follow[llj].begin(), sites_to_follow[llj].end(),sites_to_follow[ll][si]);
+              if (it != sites_to_follow[llj].end()) { sites_in_common=1; break; }
+            }
+            if (sites_in_common) {
            VecPointwiseMult(use2,use1,xr);
-           int s=sites_to_follow[ll].size();
-           if (jt==(it+1)) cout << "Eigen " << ll << " has ss=" << s << endl;
+           
+         //  if (jt==(it+1)) cout << "Eigen " << ll << " has ss=" << s << endl;
             std::vector<double> sigma_indicator(s,0.);
           for (int si=0;si<s;++si) {
-          //  int k=(int) sites_to_follow[ll][si];
-          //  VecDot(use2,sigmas_as_vec[k],&sigma_indicator[si]);
+            int k=(int) sites_to_follow[ll][si];
+            VecDot(use2,sigmas_as_vec[k],&sigma_indicator[si]);
           }
         // HERE !
         /*
@@ -672,6 +679,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             for (int si=0;si<s;++si) {
               sigmaout << "Sig " <<  (int) sites_to_follow[ll][si] << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
             }
+            } // sites in common
           }// !measure everything
           }  // measure_sigma
 
