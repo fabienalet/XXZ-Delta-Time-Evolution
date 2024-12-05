@@ -479,7 +479,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         EPSGetEigenpair(eps2, *it, &Er, &Ei, xr, NULL);
 
 
-        std::vector<Petscalar*> local_sigma_k_i(sites_to_follow[ll].size());
+        std::vector<PetscScalar*> local_sigma_k_i(sites_to_follow[ll].size());
       for (int si=0;si<sites_to_follow[ll].size();++si) { 
         VecGetArray(sigmas_as_vec[(int) sites_to_follow[ll][si]],&local_sigma_k_i[si]);
             }
@@ -619,9 +619,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             } 
           else {
             PetscScalar *aiv;
-            VecGetArray(xr,&ai);
+            VecGetArray(xr,&aiv);
             PetscScalar *biv;
-            VecGetArray(use1,&bi);
+            VecGetArray(use1,&biv);
             
             int s=sites_to_follow[ll].size();
             std::vector<double> sigma_indicator(s,0.);
