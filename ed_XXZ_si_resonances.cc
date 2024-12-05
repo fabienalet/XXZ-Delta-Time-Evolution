@@ -457,21 +457,22 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
 
 
-      int ss=sites_to_follow[ll].size();
-      std::vector< Vec > applications_of_sites_to_follow(ss);
-
-      if (!(measure_everything)) {
-      for (int si=0;si<ss;++si) { 
-        MatCreateVecs(sigmas[0], NULL, &applications_of_sites_to_follow[si]);
-        int k=(int) sites_to_follow[ll][si];
-        MatMult(sigmas[(int) sites_to_follow[ll][si]],xr,applications_of_sites_to_follow[si]);
-      }
-      }
+      
 
 
       for (std::vector<int>::iterator it=eigenstates_to_follow.begin();it!=eigenstates_to_follow.end();++it) {
         if (!(ll%100)) { if (myrank==0) { cout << ll << " eigenstates done\n";}}
         EPSGetEigenpair(eps2, *it, &Er, &Ei, xr, NULL);
+
+        int ss=sites_to_follow[ll].size();
+        std::vector< Vec > applications_of_sites_to_follow(ss);
+        if (!(measure_everything)) {
+          for (int si=0;si<ss;++si) { 
+          MatCreateVecs(sigmas[0], NULL, &applications_of_sites_to_follow[si]);
+          int k=(int) sites_to_follow[ll][si];
+          MatMult(sigmas[(int) sites_to_follow[ll][si]],xr,applications_of_sites_to_follow[si]);
+        }
+        }
 
         if (measure_everything) {
         std::vector<double> sz=sz_to_follow[ll];
