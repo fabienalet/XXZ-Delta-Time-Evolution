@@ -440,7 +440,17 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           energies_to_follow.push_back(Er); 
           pairs_to_follow.push_back(prediction_strong_correl_pair);
           sz_to_follow.push_back(sz);
-          sites_to_follow.push_back(prediction_site);
+          std::vector<int> new_sites_to_follow;
+          for (int k=0;k<prediction_strong_correl_pair.size();++k) {
+              new_sites_to_follow.push_back(prediction_strong_correl_pair[k].first);
+              new_sites_to_follow.push_back(prediction_strong_correl_pair[k].second);
+          }
+          // remove duplicates of sites
+        sort(new_sites_to_follow.begin(), new_sites_to_follow.end());
+        auto it = unique(new_sites_to_follow.begin(), new_sites_to_follow.end());
+        new_sites_to_follow.erase(it, new_sites_to_follow.end());
+
+          sites_to_follow.push_back(new_sites_to_follow);
         }
       
 
