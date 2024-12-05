@@ -21,6 +21,8 @@ static char help[] =
 #include <map>
 #include <sstream>
 #include <random>
+#include <algorithm>
+#include <iterator>
 #ifdef USE_MKL
 #include <mkl.h>
 #include <mkl_cblas.h>
@@ -640,20 +642,19 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             }
             */
            // first check if there are sites in common
-            bool sites_in_common=0;
-            int s=sites_to_follow[ll].size();
-            for (int si=0;si<s;++si) {
-              auto it = std::find(sites_to_follow[llj].begin(), sites_to_follow[llj].end(),sites_to_follow[ll][si]);
-              if (it != sites_to_follow[llj].end()) { sites_in_common=1; break; }
-            }
-            if (sites_in_common) {
+            std::vector< int > sites_in_common;
+            std::set_intersection(sites_to_follow[llj].begin(), sites_to_follow[llj].end(), 
+                          sites_to_follow[ll].begin(), sites_to_follow[ll].end(),
+                          std::back_inserter(sites_in_common));
+
+            int s=sites_in_common,size();
+            if (s>0) {
            VecPointwiseMult(use2,use1,xr);
            
          //  if (jt==(it+1)) cout << "Eigen " << ll << " has ss=" << s << endl;
             std::vector<double> sigma_indicator(s,0.);
           for (int si=0;si<s;++si) {
-            int k=(int) sites_to_follow[ll][si];
-            VecDot(use2,sigmas_as_vec[k],&sigma_indicator[si]);
+            VecDot(use2,sigmas_as_vec[sites_in_common[si]],&sigma_indicator[si]);
           }
         // HERE !
         /*
@@ -677,7 +678,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
              // VecDot(use2,use1,&sigma_indicator[si]);
             
             for (int si=0;si<s;++si) {
-              sigmaout << "Sig " <<  (int) sites_to_follow[ll][si] << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
+              sigmaout << "Sig " <<  (int) sites_in_common[si] << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
             }
             } // sites in common
           }// !measure everything
