@@ -647,7 +647,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                           sites_to_follow[ll].begin(), sites_to_follow[ll].end(),
                           std::back_inserter(sites_in_common));
 
-            int s=sites_in_common,size();
+            int s=sites_in_common.size();
             if (s>0) {
            VecPointwiseMult(use2,use1,xr);
            
