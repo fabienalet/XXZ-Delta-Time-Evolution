@@ -642,7 +642,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
            VecPointwiseMult(use2,use1,xr);
            int s=sites_to_follow[ll].size();
-           cout << "Eigen " << ll << " has ss=" << s << endl;
+           if (jt==(it+1)) cout << "Eigen " << ll << " has ss=" << s << endl;
             std::vector<double> sigma_indicator(s,0.);
           for (int si=0;si<s;++si) {
           //  int k=(int) sites_to_follow[ll][si];
