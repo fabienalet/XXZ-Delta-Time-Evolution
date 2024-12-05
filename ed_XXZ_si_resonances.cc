@@ -199,6 +199,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
   std::vector<Vec> sigmas_as_vec;
   sigmas_as_vec.resize(L);
   for (int p=0;p<L;++p) { MatCreateVecs(H, NULL, &sigmas_as_vec[p]);}
+  std::vector<Vec> sigmasigma_as_vec;
   int nb_pairs=(L*L/2);
   sigmasigma_as_vec.resize(nb_pairs);
   for (int p=0;p<nb_pairs;++p) { MatCreateVecs(H, NULL, &sigmasigma_as_vec[p]);}
