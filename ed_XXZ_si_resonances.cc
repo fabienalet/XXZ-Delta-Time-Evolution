@@ -478,12 +478,12 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         if (!(ll%100)) { if (myrank==0) { cout << ll << " eigenstates done\n";}}
         EPSGetEigenpair(eps2, *it, &Er, &Ei, xr, NULL);
 
-
+/*
         std::vector<PetscScalar*> local_sigma_k_i(sites_to_follow[ll].size());
       for (int si=0;si<sites_to_follow[ll].size();++si) { 
         VecGetArray(sigmas_as_vec[(int) sites_to_follow[ll][si]],&local_sigma_k_i[si]);
             }
-
+*/
 
         /*
       
@@ -618,6 +618,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             }
             } 
           else {
+            /*
             PetscScalar *aiv;
             VecGetArray(xr,&aiv);
             PetscScalar *biv;
@@ -637,6 +638,13 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             MPI_Reduce(&local_sigma_indicator[si], &global_sigma, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
             sigma_indicator[si]=global_sigma;
             }
+            */
+
+           VecPointwiseMult(use2,use1,xr);
+          for (int si=0;si<s;++si) {
+            int k=(int) sites_to_follow[ll][si];
+            VecDot(use2,sigmas_as_vec[k],&sigma_indicator[si]);
+          }
         // HERE !
         /*
         for (int si=0;si<s;++si) {
