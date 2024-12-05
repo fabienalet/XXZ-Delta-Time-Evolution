@@ -524,27 +524,35 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         // measure KL, and < n | sigma_i | m > with other states
         int llj=0; double Er2;
         if ((myparameters.measure_KL) || (measure_sigma_indicator)) {
-        for (std::vector<int>::iterator jt=eigenstates_to_follow.begin();jt!=eigenstates_to_follow.end();++jt) {
-          if (it!=jt) {
+        //for (std::vector<int>::iterator jt=eigenstates_to_follow.begin();jt!=eigenstates_to_follow.end();++jt) {
+        std::vector<int>::iterator ending=eigenstates_to_follow.end();
+        //if (measure_nearby_eigenstates) { ending=it+}
+          for (std::vector<int>::iterator jt=(it+1);jt!=eigenstates_to_follow.end();++jt) {
+        //  if (it!=jt) {
           EPSGetEigenpair(eps2, *jt, &Er2, &Ei, use1, NULL);
           if (myparameters.measure_KL) {
           //  if (myparameters.measure_all_KL) {
 
           double pi; double qi;
           double local_KL=0.;
+          double local_KL2=0.;
           for (int row_ctr = Istart; row_ctr<Iend;++row_ctr) {
             VecGetValues( xr, 1, &row_ctr, &pi );
             VecGetValues( use1, 1, &row_ctr, &qi );
              if ((pi != 0) && (qi != 0)) {
              local_KL += 2.0 * pi * pi * log(fabs(pi / qi));
+             local_KL2 += 2.0 * qi * qi * log(fabs(qi / pi));
               }
           }
           double global_KL;
+          double global_KL2;
           MPI_Reduce(&local_KL, &global_KL, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
+          MPI_Reduce(&local_KL2, &global_KL2, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
           //MPI_AllReduce(&local_KL, &global_KL, 1, MPI_double, MPI_SUM, PETSC_COMM_WORLD);
           // myrank=0
           if (myrank==0) {
-          KLout << global_KL << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
+          //KLout << global_KL << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
+          KLout << global_KL << " " << global_KL2 << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
           }
             }
             // }
@@ -572,7 +580,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             }
           }
           }
-          }
+       //   } it!=jt
       llj++;
         }
         }
