@@ -643,10 +643,10 @@ int ENV_NUM_THREADS=omp_get_num_threads();
            VecPointwiseMult(use2,use1,xr);
            int s=sites_to_follow[ll].size();
             std::vector<double> sigma_indicator(s,0.);
-          for (int si=0;si<s;++si) {
-            int k=(int) sites_to_follow[ll][si];
+          //for (int si=0;si<s;++si) {
+          //  int k=(int) sites_to_follow[ll][si];
           //  VecDot(use2,sigmas_as_vec[k],&sigma_indicator[si]);
-          }
+          //}
         // HERE !
         /*
         for (int si=0;si<s;++si) {
