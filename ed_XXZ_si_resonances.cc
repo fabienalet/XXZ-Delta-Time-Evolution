@@ -641,6 +641,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             */
 
            VecPointwiseMult(use2,use1,xr);
+           int s=sites_to_follow[ll].size();
+            std::vector<double> sigma_indicator(s,0.);
           for (int si=0;si<s;++si) {
             int k=(int) sites_to_follow[ll][si];
             VecDot(use2,sigmas_as_vec[k],&sigma_indicator[si]);
@@ -676,10 +678,11 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       llj++;
         } // second loop on j
         } // measure kl or sigma
-
+/*
         for (int si=0;si<sites_to_follow[ll].size();++si) { 
         VecRestoreArray(sigmas_as_vec[(int) sites_to_follow[ll][si]],&local_sigma_k_i[si]);
             }
+            */
 
         ll++;
         // other measurements on eigenstate to follow ...
