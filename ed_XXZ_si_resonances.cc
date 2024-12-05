@@ -455,6 +455,21 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       int ll=0;
       if (myrank==0) { cout << "*** Measuring on " << eigenstates_to_follow.size() << " eigenstates to follow\n";}
 
+
+
+      std::vector< Vec > applications_of_sites_to_follow;
+      int ss=sites_to_follow[ll].size();
+      std::vector< Vec > applications_of_sites_to_follow(ss);
+
+      if (!(measure_everything)) {
+      for (int si=0;si<ss;++si) { 
+        MatCreateVecs(sigmas[0], NULL, &applications_of_sites_to_follow[si]);
+        int k=(int) sites_to_follow[ll][si];
+        MatMult(sigmas[(int) sites_to_follow[ll][si]],xr,applications_of_sites_to_follow[si]);
+      }
+      }
+
+
       for (std::vector<int>::iterator it=eigenstates_to_follow.begin();it!=eigenstates_to_follow.end();++it) {
         if (!(ll%100)) { if (myrank==0) { cout << ll << " eigenstates done\n";}}
         EPSGetEigenpair(eps2, *it, &Er, &Ei, xr, NULL);
@@ -481,17 +496,14 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                  
         }
         else {  // measure only guessed correlations
+        /*
         int s=sites_to_follow[ll].size();
         std::vector<double> sz=sz_to_follow[ll];
-
         for (int si=0;si<s;++si) {
           int k=(int) sites_to_follow[ll][si];
           MatMult(sigmas[k],xr,use1);
-          
           if (s>1)  {
-            
           std::vector<double> szkp(s-si-1);
-          
           for (int pp=si+1;pp<s;++pp)
               { 
                 int p=(int) sites_to_follow[ll][pp];
@@ -500,11 +512,24 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                 if (myparameters.measure_correlations) {
 	              corrout << k+1 << " " << p+1 << " " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl;
               }
-
               }
-              
           }
-          
+        }
+        }
+        */
+        std::vector<double> sz=sz_to_follow[ll];
+        for (int si=0;si<ss;++si) {
+          if (ss>1)  {
+          std::vector<double> szkp(ss-si-1);
+          for (int pp=si+1;pp<ss;++pp)
+              { int p=(int) sites_to_follow[ll][pp];
+                MatMult(sigmas[p],applications_of_sites_to_follow[si],use2);
+                VecDot(use2,xr,&szkp[pp-si-1]);
+                if (myparameters.measure_correlations) {
+	              corrout << k+1 << " " << p+1 << " " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl;
+              }
+              }
+          }
         }
         }
 
@@ -568,12 +593,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             }
           } 
           else {
-            int s=sites_to_follow[ll].size();
-            std::vector<double> sigma_indicator(s,0.);
-            for (int si=0;si<s;++si) {
-            int k=(int) sites_to_follow[ll][si];
-              MatMult(sigmas[k],xr,use2);
-              VecDot(use2,use1,&sigma_indicator[si]);
+            std::vector<double> sigma_indicator(ss,0.);
+            for (int si=0;si<ss;++si) {
+              VecDot(applications_of_sites_to_follow[si],use1,&sigma_indicator[si]);
             }
             for (int si=0;si<s;++si) {
               sigmaout << "Sig " <<  (int) sites_to_follow[ll][si] << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
