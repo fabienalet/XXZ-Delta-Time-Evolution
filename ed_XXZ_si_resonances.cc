@@ -199,6 +199,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
   std::vector<Vec> sigmas_as_vec;
   sigmas_as_vec.resize(L);
   for (int p=0;p<L;++p) { MatCreateVecs(H, NULL, &sigmas_as_vec[p]);}
+  int nb_pairs=(L*L/2);
+  sigmasigma_as_vec.resize(nb_pairs);
+  for (int p=0;p<nb_pairs;++p) { MatCreateVecs(H, NULL, &sigmasigma_as_vec[p]);}
 
   //for (int k=0;k<L;++k) { MatCreateVecs(H, NULL, &sigmas[k]);}
   {
@@ -233,6 +236,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
     }
   }
 
+  
+
+
   for (int k = 0; k < L; ++k) {
   MatSetOption(sigmas[k], MAT_SYMMETRIC, PETSC_TRUE);
   MatSetOption(sigmas[k], MAT_SYMMETRY_ETERNAL, PETSC_TRUE);
@@ -240,6 +246,19 @@ int ENV_NUM_THREADS=omp_get_num_threads();
   ierr = MatAssemblyEnd(sigmas[k], MAT_FINAL_ASSEMBLY);
   VecAssemblyBegin(sigmas_as_vec[k]);
   VecAssemblyEnd(sigmas_as_vec[k]);
+  }
+
+  int running_pair=0;
+  for (int k=0;k<L;++k) {
+    for (int range=1;range<=(L/2);++range) { 
+      VecPointwiseMult(sigmasigma_as_vec[running_pair],sigmas_as_vec[k],sigmas_as_vec[(k+range)%L]);
+      running_pair++;
+    }
+  }
+  for (int p=0;p<nb_pairs;++p)
+  {
+  VecAssemblyBegin(sigmasigma_as_vec[p]);
+  VecAssemblyEnd(sigmasigma_as_vec[p]);
   }
   /******************************/
 
@@ -395,10 +414,10 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         std::vector< int > prediction_site; prediction_site.resize(0);
         std::vector<double> sz(L,0.);
      //   if (sz_cutoff_set) || (sz_product) {
+        VecPointwiseMult(use1,xr,xr);
         for (int k=0;k<L;++k) {
          // MatMult(sigmas[k],xr,use1);
-          VecPointwiseMult(use1,sigmas_as_vec[k],xr);
-          VecDot(use1,xr,&sz[k]);
+          VecDot(use1,sigmas_as_vec[k],&sz[k]);
          // if (myparameters.measure_local) { locout << k << " " << sz[k] << " " << Er << endl; } // TODO maybe only for special sites ? second loop instead of here ?
         }
         
@@ -457,13 +476,13 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
             if (compute_weight)
           {  double C; 
+              VecPointwiseMult(use1,xr,xr);
           for (int k=0;k<L;++k) {
-            //  MatMult(sigmas[k],xr,use1);
-              VecPointwiseMult(use1,sigmas_as_vec[k],xr);
               for (int range=1;range<=(L/2);++range) {
                  // MatMult(sigmas[(k+range)%L],use1,use2); // pbc assumed here - TODO : change for obc  
                   VecPointwiseMult(use2,sigmas_as_vec[(k+range)%L],use1);         
-                  VecDot(use2,xr,&C);
+                  VecDot(sigmasigma_as_vec[running_pair],use1,&C);
+                  running_pair++;
                   C=0.25*fabs(C-sz[k]*sz[(k+range)%L]);
                   if (measure_Cmax) { if (C>Cmax) { E_Cmax=Er; Cmax=C; site1_Cmax=k; site2_Cmax=(k+range)%L;} }
                   Normalization[range]+=1.0;
