@@ -478,10 +478,11 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             if (compute_weight)
           {  double C; 
               VecPointwiseMult(use1,xr,xr);
+              int running_pair=0;
           for (int k=0;k<L;++k) {
               for (int range=1;range<=(L/2);++range) {
                  // MatMult(sigmas[(k+range)%L],use1,use2); // pbc assumed here - TODO : change for obc  
-                  VecPointwiseMult(use2,sigmas_as_vec[(k+range)%L],use1);         
+                //  VecPointwiseMult(use2,sigmas_as_vec[(k+range)%L],use1);         
                   VecDot(sigmasigma_as_vec[running_pair],use1,&C);
                   running_pair++;
                   C=0.25*fabs(C-sz[k]*sz[(k+range)%L]);
