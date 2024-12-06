@@ -578,9 +578,10 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         // TODO Only 100 eigenstates ??
 
         std::vector<int>::iterator ending=eigenstates_to_follow.end();
-        if (nne_set) { ending=it+nne;}
+        if (nne_set) { ending=it+2*nne+2;
+        }
         //if (measure_nearby_eigenstates) { ending=it+}
-          for (std::vector<int>::iterator jt=(it+1);jt!=ending;++jt) {
+          for (std::vector<int>::iterator jt=(it+1);jt!=ending,jt!=eigenstates_to_follow.end();++jt) {
           
           EPSGetEigenpair(eps2, *jt, &Er2, &Ei, use1, NULL);
 
