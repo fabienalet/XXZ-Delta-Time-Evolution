@@ -251,6 +251,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
   for (int k=0;k<L;++k) {
     for (int range=1;range<=(L/2);++range) { 
       VecPointwiseMult(sigmasigma_as_vec[running_pair],sigmas_as_vec[k],sigmas_as_vec[(k+range)%L]);
+      if (debug) { if (myrank==0) { cout << "running_pair=" << running_pair << " sites " << k << " " << (k+range)%L << endl;} }
       running_pair++;
     }
   }
@@ -296,12 +297,13 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       if (myparameters.target2==1) { born2+=epsilon;}
       EPSSetInterval(eps2, born1,born2);
       std::stringstream energy_string;
-      energy_string << ".Einf=" << born1 << ".Esup=" << born2 ;
+      energy_string << ".targetinf=" << born1 << ".targetsup=" << born2 ;
       energy_name=energy_string.str();
     }
     if (eps_interval_set) {
       double Ea,Eb;
       std::stringstream energy_string;
+      energy_string.precision(10);
       EPSGetInterval(eps2,&Ea,&Eb);
       double epsilona=(Ea-Eminc)/(Emaxc-Eminc);
       double epsilonb=(Eb-Eminc)/(Emaxc-Eminc);
@@ -534,10 +536,11 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                 // find the paiir number k - p into k -range
                 if (p>(k+L/2)) { //initial_site=p; range=k+L-p; 
                 the_shift=p*L/2+k+L-p;}
-                else { //initial_site=i; range=p-k; 
+                else { //initial_site=k; range=p-k; 
                 the_shift=k*L/2+p-k; }
                 // initial_site*(L/2)+range
                 VecDot(use1,sigmasigma_as_vec[the_shift],&szkp[pp-si-1]);
+                if (debug) { if (myrank==0) { cout << "predicted shift=" << the_shift << " sites " << k << " " << p << endl;} }
                 corrout << k+1 << " " << p+1 << " " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl;         
               }
         }
