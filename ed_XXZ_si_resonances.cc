@@ -251,7 +251,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
   for (int k=0;k<L;++k) {
     for (int range=1;range<=(L/2);++range) { 
       VecPointwiseMult(sigmasigma_as_vec[running_pair],sigmas_as_vec[k],sigmas_as_vec[(k+range)%L]);
-      if (1) { if (myrank==0) { cout << "running_pair=" << running_pair << " sites " << k << " " << (k+range)%L << endl;} }
+   //   if (1) { if (myrank==0) { cout << "running_pair=" << running_pair << " sites " << k << " " << (k+range)%L << endl;} }
       running_pair++;
     }
   }
@@ -535,12 +535,12 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               { int p=(int) sites_to_follow[ll][pp];
                 // find the paiir number k - p into k -range
                 if (p>(k+L/2)) { //initial_site=p; range=k+L-p; 
-                the_shift=p*L/2+k+L-p;}
+                the_shift=p*L/2+k+L-p-1;}
                 else { //initial_site=k; range=p-k; 
-                the_shift=k*L/2+p-k; }
+                the_shift=k*L/2+p-k-1; }
                 // initial_site*(L/2)+range
                 VecDot(use1,sigmasigma_as_vec[the_shift],&szkp[pp-si-1]);
-                if (debug) { if (myrank==0) { cout << "predicted shift=" << the_shift << " sites " << k << " " << p << endl;} }
+                //if (debug) { if (myrank==0) { cout << "predicted shift=" << the_shift << " sites " << k << " " << p << endl;} }
                 corrout << k+1 << " " << p+1 << " " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl;         
               }
         }
