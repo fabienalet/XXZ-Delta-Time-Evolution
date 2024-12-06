@@ -313,7 +313,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       if (myrank==0) {
         cout << Ea << " " << Eb << endl;
       cout << epsilona << " " << epsilonb << endl;
-    cout << energy_string << endl;
+    cout << energy_name << endl;
       }
     }
 
