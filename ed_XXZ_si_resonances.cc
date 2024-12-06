@@ -482,10 +482,11 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               for (int k=0;k<L;++k) 
                 { for (int range=1;range<=(L/2);++range) 
                   { VecDot(sigmasigma_as_vec[running_pair],use1,&C);
-                    running_pair++;
-                    if (i==0) { if (myrank==0) { cout << "Correct correl= @ " << running_pair << " sites " << k << " " << (k+range)%L << 
+                  if (i==0) { if (myrank==0) { cout << "Correct correl= @ " << running_pair << " sites " << k << " " << (k+range)%L << 
                     " with " << C << " sz=" << sz[k] << "," << sz[(k+range)%L] << " ---> " << 0.25*fabs(C-sz[k]*sz[(k+range)%L]) << endl;} }
 
+                    running_pair++;
+                    
                     C=0.25*fabs(C-sz[k]*sz[(k+range)%L]);
                     if (measure_Cmax) {
                       if (C>Cmax[range]) { E_Cmax[range]=Er; Cmax[range]=C; site1_Cmax[range]=k; site2_Cmax[range]=(k+range)%L;} 
@@ -533,7 +534,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         for (int si=0;si<s;++si) {
           int k=(int) sites_to_follow[ll][si];
         //  MatMult(sigmas[k],xr,use1);
-           VecPointwiseMult(use1,sigmas_as_vec[k],xr);
+        //   VecPointwiseMult(use1,sigmas_as_vec[k],xr);
           std::vector<double> szkp(s-si-1);
           for (int pp=si+1;pp<s;++pp)
               { int p=(int) sites_to_follow[ll][pp];
