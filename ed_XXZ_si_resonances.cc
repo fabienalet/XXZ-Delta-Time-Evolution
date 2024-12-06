@@ -501,6 +501,61 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           }
       }
       
+            if (myrank == 0) {
+          if (compute_weight) 
+          { 
+           ofstream weightout;
+           myparameters.init_filename_weight(weightout,energy_name);
+           weightout << "#Weight "; for (int c=0;c<number_of_weight_cutoff_values;++c) { weightout << weight_cutoff[c] << " ";} weightout << endl;
+          for (int range=1;range<=(L/2);++range) {
+            weightout << "#Weight-range " << range << " ";
+            for (int c=0;c<number_of_weight_cutoff_values;++c) { weightout << weight_at_cutoff_at_range[c][range]/Normalization[range] << " ";} weightout << endl;
+          }
+          weightout.close();
+          }
+           
+          if (measure_Cmax) 
+           { ofstream Cmaxout;
+             myparameters.init_filename_Cmax(Cmaxout,energy_name);
+             for (int r=1;r<=L/2;++r) {
+             Cmaxout << r << " " << Cmax[r] << " " << site1_Cmax[r] << " " << site2_Cmax[r] << " " << E_Cmax[r] << endl;
+             }
+            Cmaxout.close();
+           }
+          
+          ofstream enout;
+          ofstream rgapout;
+          //myparameters.init_filenames_energy(enout, rgapout, renorm_target);
+          myparameters.init_filename_energy(enout,energy_name);
+          myparameters.init_filename_rgap(rgapout,energy_name);
+          // as a header add info about the min/max energies
+          enout << "# (Emin, Emax) = " << Eminc << "," << Emaxc << endl;
+          if ((eps_interval_set) || (myparameters.interval_set)) { enout << "# E_interval " << energy_name << endl;}
+          else { enout << "# Etarget = " << target << endl; }
+          enout << "# nconv = " << nconv << endl;
+        
+        std::sort(energies.begin(), energies.end());
+        for (int i = 0; i < nconv; i++) { enout << energies[i] << endl; }
+        
+        for (int r = 1; r < (nconv - 1); ++r) {
+          double e1 = energies[r];
+          double g0 = e1 - energies[r - 1];
+          double g1 = energies[r + 1] - e1;
+          if (g0 > g1) { rgap.push_back(g1 / g0); } else { rgap.push_back(g0 / g1); }
+        }
+        for (int i = 0; i < rgap.size(); ++i) { rgapout << rgap[i] << endl; }
+
+        
+        enout << "### Special energies " << energies_to_follow.size() << " out of " << nconv 
+              << " (= " << ((double) energies_to_follow.size()/nconv)*100 << " %)\n";
+        int ll=0;
+        for (std::vector<double>::iterator it=energies_to_follow.begin();it!=energies_to_follow.end();++it) {
+            enout << *it << endl;
+        }
+        rgapout.close();
+        enout.close();
+      }
+      
       int ll=0;
       if (myrank==0) { cout << "*** Measuring on " << eigenstates_to_follow.size() << " eigenstates to follow\n";}
 
@@ -699,60 +754,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
     if (myparameters.measure_transverse_correlations){ tcorrout.close();}
 
 
-      if (myrank == 0) {
-          if (compute_weight) 
-          { 
-           ofstream weightout;
-           myparameters.init_filename_weight(weightout,energy_name);
-           weightout << "#Weight "; for (int c=0;c<number_of_weight_cutoff_values;++c) { weightout << weight_cutoff[c] << " ";} weightout << endl;
-          for (int range=1;range<=(L/2);++range) {
-            weightout << "#Weight-range " << range << " ";
-            for (int c=0;c<number_of_weight_cutoff_values;++c) { weightout << weight_at_cutoff_at_range[c][range]/Normalization[range] << " ";} weightout << endl;
-          }
-          weightout.close();
-          }
-           
-          if (measure_Cmax) 
-           { ofstream Cmaxout;
-             myparameters.init_filename_Cmax(Cmaxout,energy_name);
-             for (int r=1;r<=L/2;++r) {
-             Cmaxout << r << " " << Cmax[r] << " " << site1_Cmax[r] << " " << site2_Cmax[r] << " " << E_Cmax[r] << endl;
-             }
-            Cmaxout.close();
-           }
-          
-          ofstream enout;
-          ofstream rgapout;
-          //myparameters.init_filenames_energy(enout, rgapout, renorm_target);
-          myparameters.init_filename_energy(enout,energy_name);
-          myparameters.init_filename_rgap(rgapout,energy_name);
-          // as a header add info about the min/max energies
-          enout << "# (Emin, Emax) = " << Eminc << "," << Emaxc << endl;
-          if ((eps_interval_set) || (myparameters.interval_set)) { enout << "# E_interval " << energy_name << endl;}
-          else { enout << "# Etarget = " << target << endl; }
-          enout << "# nconv = " << nconv << endl;
-        
-        std::sort(energies.begin(), energies.end());
-        for (int i = 0; i < nconv; i++) { enout << energies[i] << endl; }
-        
-        for (int r = 1; r < (nconv - 1); ++r) {
-          double e1 = energies[r];
-          double g0 = e1 - energies[r - 1];
-          double g1 = energies[r + 1] - e1;
-          if (g0 > g1) { rgap.push_back(g1 / g0); } else { rgap.push_back(g0 / g1); }
-        }
-        for (int i = 0; i < rgap.size(); ++i) { rgapout << rgap[i] << endl; }
 
-        
-        enout << "### Special energies " << energies_to_follow.size() << " out of " << nconv 
-              << " (= " << ((double) energies_to_follow.size()/nconv)*100 << " %)\n";
-        int ll=0;
-        for (std::vector<double>::iterator it=energies_to_follow.begin();it!=energies_to_follow.end();++it) {
-            enout << *it << endl;
-        }
-        rgapout.close();
-        enout.close();
-      }
       
     } // nconv>0
   }// target
