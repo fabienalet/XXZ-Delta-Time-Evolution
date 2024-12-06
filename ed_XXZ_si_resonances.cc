@@ -482,8 +482,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               for (int k=0;k<L;++k) 
                 { for (int range=1;range<=(L/2);++range) 
                   { VecDot(sigmasigma_as_vec[running_pair],use1,&C);
-                  if (i==0) { if (myrank==0) { cout << "Correct correl= @ " << running_pair << " sites " << k << " " << (k+range)%L << 
-                    " with " << C << " sz=" << sz[k] << "," << sz[(k+range)%L] << " ---> " << 0.25*fabs(C-sz[k]*sz[(k+range)%L]) << endl;} }
+                //  if (i==0) { if (myrank==0) { cout << "Correct correl= @ " << running_pair << " sites " << k << " " << (k+range)%L << 
+                //    " with " << C << " sz=" << sz[k] << "," << sz[(k+range)%L] << " ---> " << 0.25*fabs(C-sz[k]*sz[(k+range)%L]) << endl;} }
 
                     running_pair++;
                     
@@ -512,7 +512,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         {
         std::vector<double> sz=sz_to_follow[ll];
         if (myparameters.measure_local) { 
-        for (int k=0;k<L;++k) { locout << k << " " << sz[k] << " " << Er << endl; } 
+        for (int k=0;k<L;++k) { locout << k+1 << " " << sz[k] << " " << Er << endl; } 
         }
         // TODO OPTIMIZE THIS
         for (int k=0;k<L;++k) {
@@ -521,7 +521,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             for (int pp=k+1;pp<L;++pp)
               { VecPointwiseMult(use2,sigmas_as_vec[pp],use1);       
                 VecDot(use2,xr,&szkp[pp-k-1]);
-                corrout << k+1 << " " << pp+1 << " " << 0.25*(szkp[pp-k-1]-sz[k]*sz[pp]) << " " << Er << endl;
+                if (myrank==0) { corrout << k+1 << " " << pp+1 << " " << 0.25*(szkp[pp-k-1]-sz[k]*sz[pp]) << " " << Er << endl;}
               }
             } 
         }
@@ -533,6 +533,10 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         int initial_site=0; int range=0; int the_shift=0;
         for (int si=0;si<s;++si) {
           int k=(int) sites_to_follow[ll][si];
+          if (myparameters.measure_local) { 
+            if (myrank==0) { locout << k+1 << " " << sz[k] << " " << Er << endl; } 
+            }
+
         //  MatMult(sigmas[k],xr,use1);
         //   VecPointwiseMult(use1,sigmas_as_vec[k],xr);
           std::vector<double> szkp(s-si-1);
@@ -545,9 +549,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                 the_shift=k*L/2+p-k-1; }
                 // initial_site*(L/2)+range
                 VecDot(use1,sigmasigma_as_vec[the_shift],&szkp[pp-si-1]);
-                if (ll==0) { if (myrank==0) { cout << "predicted shift=" << the_shift << " sites " << k << " " << p << 
-                " with " << szkp[pp-si-1] << " sz=" << sz[k] << "," << sz[p] << " --> " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl;} }
-                corrout << k+1 << " " << p+1 << " " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl;         
+               // if (ll==0) { if (myrank==0) { cout << "predicted shift=" << the_shift << " sites " << k << " " << p << 
+                //" with " << szkp[pp-si-1] << " sz=" << sz[k] << "," << sz[p] << " --> " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl;} }
+                if (myrank==0) { corrout << k+1 << " " << p+1 << " " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl; }    
               }
         }
         }
@@ -562,7 +566,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           }
           double global_S1=0.;
           MPI_Reduce(&local_S1, &global_S1, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
-          partout << "S1 " << global_S1 << " " << energies_to_follow[ll] << endl;
+          if (myrank==0) { partout << "S1 " << global_S1 << " " << energies_to_follow[ll] << endl; }
         }
 
         // measure KL, and < n | sigma_i | m > with other states
@@ -601,9 +605,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               std::vector<double> sigma_indicator(L,0);
               VecPointwiseMult(use2,use1,xr);
               for (int k=0;k<L;++k) { VecDot(use2,sigmas_as_vec[k],&sigma_indicator[k]); }
-            for (int k=0;k<L;++k) {
-              sigmaout << "Sig " <<  k << " " << sigma_indicator[k] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
-            }
+              if (myrank==0) {
+            for (int k=0;k<L;++k) { sigmaout << "Sig " <<  k << " " << sigma_indicator[k] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;}
+              }
             } 
           else {
             
