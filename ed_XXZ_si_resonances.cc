@@ -484,7 +484,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                   { VecDot(sigmasigma_as_vec[running_pair],use1,&C);
                     running_pair++;
                     if (1) { if (myrank==0) { cout << "Correct correl= @ " << running_pair << " sites " << k << " " << (k+range)%L << 
-                    " with " << C << " sz=" << sz[k] << "," << sz[(k+range)%L] << endl;} }
+                    " with " << C << " sz=" << sz[k] << "," << sz[(k+range)%L] << " ---> " << 0.25*fabs(C-sz[k]*sz[(k+range)%L]) << endl;} }
 
                     C=0.25*fabs(C-sz[k]*sz[(k+range)%L]);
                     if (measure_Cmax) {
