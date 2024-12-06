@@ -544,7 +544,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                 the_shift=k*L/2+p-k-1; }
                 // initial_site*(L/2)+range
                 VecDot(use1,sigmasigma_as_vec[the_shift],&szkp[pp-si-1]);
-                if (i==0) { if (myrank==0) { cout << "predicted shift=" << the_shift << " sites " << k << " " << p << 
+                if (ll==0) { if (myrank==0) { cout << "predicted shift=" << the_shift << " sites " << k << " " << p << 
                 " with " << szkp[pp-si-1] << " sz=" << sz[k] << "," << sz[p] << " --> " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl;} }
                 corrout << k+1 << " " << p+1 << " " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl;         
               }
