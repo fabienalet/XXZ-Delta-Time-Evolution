@@ -37,23 +37,35 @@ class Parameters {
                                  double target);
   void init_filenames_energy(ofstream& enout, ofstream& rgapout, double target);
 
+  void init_filename_energy(ofstream& enout,string energyname);
+  void init_filename_rgap(ofstream& rgapout,string energyname);
+
   void init_filename_correlations(ofstream& corrout,int inistate);
   void init_filename_correlations(ofstream& corrout);
-  
+  void init_filename_correlations(ofstream& corrout,string energyname);
+
   void init_filename_entanglement(ofstream& entout,int inistate);
   void init_filename_entanglement(ofstream& entout);
+  void init_filename_entanglement(ofstream& f,string energyname);
+
   void init_filename_Cmax(ofstream& entout);
+  void init_filename_Cmax(ofstream& f,string energyname);
   void init_filename_participation(ofstream& partout,int inistate);
   void init_filename_participation(ofstream& partout);
+  void init_filename_participation(ofstream& f,string energyname);
   void init_filename_local(ofstream& locout,int inistate);
   void init_filename_local(ofstream& locout);
+  void init_filename_local(ofstream& f,string energyname);
 
   void init_filename_return(ofstream& retout,int inistate);
   void init_filename_imbalance(ofstream& imbout,int inistate);
   
   void init_filename_weight(ofstream& f);
+  void init_filename_weight(ofstream& f,string energyname);
   void init_filename_KL(ofstream& f);
+  void init_filename_KL(ofstream& f,string energyname);
   void init_filename_sigma(ofstream& f);
+  void init_filename_sigma(ofstream& f,string energyname);
   
 
   std::vector<double> time_points;
@@ -110,6 +122,9 @@ class Parameters {
   PetscBool write_wf;
   PetscBool targets_set;
   std::vector<double> targets;
+  PetscReal target1;
+  PetscReal target2;
+  PetscBool interval_set;
 
   std::string string_from_H;
   std::string string_from_basis;
@@ -133,6 +148,16 @@ void Parameters::init_filename_local(ofstream& fileout)
     fileout.precision(20);
 }
 
+void Parameters::init_filename_local(ofstream& fileout,string energyname)
+{
+  std::stringstream filename;
+    filename << "Loc." << string_from_basis << string_from_H
+                << energyname << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
+
 void Parameters::init_filename_correlations(ofstream& fileout,int init_conf)
 {
   std::stringstream filename;
@@ -151,11 +176,29 @@ void Parameters::init_filename_correlations(ofstream& fileout)
     fileout.precision(20);
 }
 
+void Parameters::init_filename_correlations(ofstream& fileout,string energyname)
+{
+  std::stringstream filename;
+    filename << "Corr." << string_from_basis << string_from_H
+                << energyname << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
 void Parameters::init_filename_sigma(ofstream& fileout)
 {
   std::stringstream filename;
     filename << "Sigma." << string_from_basis << string_from_H
                 << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
+void Parameters::init_filename_sigma(ofstream& fileout,string energyname)
+{
+  std::stringstream filename;
+    filename << "Sigma." << string_from_basis << string_from_H
+                << energyname << ".dat";
     fileout.open((filename.str()).c_str());
     fileout.precision(20);
 }
@@ -179,11 +222,29 @@ void Parameters::init_filename_Cmax(ofstream& fileout)
     fileout.precision(20);
 }
 
+void Parameters::init_filename_Cmax(ofstream& fileout,string energyname)
+{
+  std::stringstream filename;
+    filename << "Cmax." << string_from_basis << string_from_H
+                << energyname << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
 void Parameters::init_filename_entanglement(ofstream& fileout)
 {
   std::stringstream filename;
     filename << "Ent." << string_from_basis << string_from_H
                 << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
+void Parameters::init_filename_entanglement(ofstream& fileout,string energyname)
+{
+  std::stringstream filename;
+    filename << "Ent." << string_from_basis << string_from_H
+                << energyname << ".dat";
     fileout.open((filename.str()).c_str());
     fileout.precision(20);
 }
@@ -202,6 +263,15 @@ void Parameters::init_filename_participation(ofstream& fileout)
   std::stringstream filename;
     filename << "Part." << string_from_basis << string_from_H
                 << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
+void Parameters::init_filename_participation(ofstream& fileout,string energyname)
+{
+  std::stringstream filename;
+    filename << "Part." << string_from_basis << string_from_H
+                << energyname << ".dat";
     fileout.open((filename.str()).c_str());
     fileout.precision(20);
 }
@@ -233,11 +303,29 @@ void Parameters::init_filename_weight(ofstream& fileout)
     fileout.precision(20);
 }
 
+void Parameters::init_filename_weight(ofstream& fileout,string energyname)
+{
+  std::stringstream filename;
+    filename << "Weight." << string_from_basis << string_from_H
+                << energyname << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
 void Parameters::init_filename_KL(ofstream& KLout)
 {
     std::stringstream KLfilename;
     KLfilename << "KL." << string_from_basis
                << string_from_H << ".dat";
+    KLout.open((KLfilename.str()).c_str());
+    KLout.precision(20);
+}
+
+void Parameters::init_filename_KL(ofstream& KLout,string energyname)
+{
+    std::stringstream KLfilename;
+    KLfilename << "KL." << string_from_basis
+               << string_from_H << energyname << ".dat";
     KLout.open((KLfilename.str()).c_str());
     KLout.precision(20);
 }
@@ -611,6 +699,20 @@ void Parameters::init_filenames_energy(ofstream& enout, ofstream& rgapout,
   rgapout.precision(20);
 }
 
+void Parameters::init_filename_energy(ofstream& enout, string energyname) {
+  std::stringstream filename;
+  filename << "Energies." << string_from_basis << string_from_H << energyname << ".dat";
+  enout.open((filename.str()).c_str());
+  enout.precision(20);
+}
+void Parameters::init_filename_rgap(ofstream& rgapout, string energyname) {
+  std::stringstream gapfilename;
+  gapfilename << "Rgap." << string_from_basis << string_from_H << energyname << ".dat";
+  rgapout.open((gapfilename.str()).c_str());
+  rgapout.precision(20);
+}
+
+
 void Parameters::Initialize_timegrid() {
   double b = 1;
   for (int kk = 0; kk <= num_times; ++kk) {
@@ -825,6 +927,18 @@ Parameters::Parameters(int myrank_) {
   } else {
     targets.push_back(0.5);
   }  // default target = 0.5
+
+  target1=-0.01; target2=1.01; 
+  PetscBool target1_set=PETSC_FALSE;
+  PetscBool target2_set=PETSC_FALSE;
+  interval_set=PETSC_FALSE;
+  PetscOptionsGetReal(NULL, NULL, "-targetinf", &target1,&target1_set); 
+  PetscOptionsGetReal(NULL, NULL, "-targetsup", &target2,&target2_set); 
+  if ( (target1_set) && (target2_set) && (target1<target2) )
+  { interval_set=PETSC_TRUE; }
+    // string for energy ?
+  
+
 }
 
 #endif
