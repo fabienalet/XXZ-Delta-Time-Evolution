@@ -541,6 +541,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               }
         }
         }
+        }
         
         // measure participation
         if (myparameters.measure_participation) {
