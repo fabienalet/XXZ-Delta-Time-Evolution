@@ -307,8 +307,14 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       EPSGetInterval(eps2,&Ea,&Eb);
       double epsilona=(Ea-Eminc)/(Emaxc-Eminc);
       double epsilonb=(Eb-Eminc)/(Emaxc-Eminc);
+      
       energy_string << ".targetinf=" << epsilona << ".targetsup=" << epsilonb ;
       energy_name=energy_string.str();
+      if (myrank==0) {
+        cout << Ea << " " << Eb << endl;
+      cout << epsilona << " " << epsilonb << endl;
+    cout << energy_string << endl;
+      }
     }
 
     EPSSetFromOptions(eps2);
