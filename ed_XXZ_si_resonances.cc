@@ -337,6 +337,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       if (myparameters.measure_KL) { myparameters.init_filename_KL(KLout,energy_name);}
       if (myparameters.measure_local) { myparameters.init_filename_local(locout,energy_name);}
       if (myparameters.measure_correlations) { myparameters.init_filename_correlations(corrout,energy_name);}
+      if (myparameters.measure_transverse_correlations) { myparameters.init_filename_transverse_correlations(tcorrout,energy_name);}
       if (myparameters.measure_participation) { myparameters.init_filename_participation(partout,energy_name);}
       if (myparameters.measure_entanglement) { myparameters.init_filename_entanglement(entout,energy_name);}
 
