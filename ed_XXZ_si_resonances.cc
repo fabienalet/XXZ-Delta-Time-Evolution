@@ -478,7 +478,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           {  double C; 
               VecPointwiseMult(use1,xr,xr);
               int running_pair=0;
-              if (1) { if (myrank==0) { "Dping eigenstate " << Er << endl;} }
+              if (1) { if (myrank==0) { cout << "Dping eigenstate " << Er << endl;} }
               for (int k=0;k<L;++k) 
                 { for (int range=1;range<=(L/2);++range) 
                   { VecDot(sigmasigma_as_vec[running_pair],use1,&C);
