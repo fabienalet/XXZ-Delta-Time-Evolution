@@ -276,8 +276,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
     EPSGetST(eps2, &st);
 
     // Get and Set interval from my own parameters ...
-    std::string energy_name;
+    EPSSetFromOptions(eps2);
 
+    std::string energy_name;
     char* eps_interval_string = new char[1000];
     PetscBool eps_interval_set=PETSC_FALSE;
     PetscOptionsGetString(NULL, NULL, "-eps_interval", eps_interval_string, 1000,&eps_interval_set); 
@@ -303,21 +304,16 @@ int ENV_NUM_THREADS=omp_get_num_threads();
     if (eps_interval_set) {
       double Ea,Eb;
       std::stringstream energy_string;
-      energy_string.precision(10);
+      energy_string.precision(6);
       EPSGetInterval(eps2,&Ea,&Eb);
       double epsilona=(Ea-Eminc)/(Emaxc-Eminc);
       double epsilonb=(Eb-Eminc)/(Emaxc-Eminc);
       
       energy_string << ".targetinf=" << epsilona << ".targetsup=" << epsilonb ;
       energy_name=energy_string.str();
-      if (myrank==0) {
-        cout << Ea << " " << Eb << endl;
-      cout << epsilona << " " << epsilonb << endl;
-    cout << energy_name << endl;
-      }
     }
 
-    EPSSetFromOptions(eps2);
+    
     ierr = EPSSolve(eps2);  
 
     PetscInt nconv = 0;
@@ -330,8 +326,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
     MatCreateVecs(H, NULL, &use1);
     MatCreateVecs(H, NULL, &use2);
 
-    std::vector<double> Cmax(L/2,0.); std::vector<double> E_Cmax(L/2,0.); 
-    std::vector<int> site1_Cmax(L/2,-1); std::vector<int> site2_Cmax(L/2,-1);
+    std::vector<double> Cmax(L/2+1,0.); std::vector<double> E_Cmax(L/2+1,0.); 
+    std::vector<int> site1_Cmax(L/2+1,-1); std::vector<int> site2_Cmax(L/2+1,-1);
 
     if (nconv > 0) {
       ofstream entout;
