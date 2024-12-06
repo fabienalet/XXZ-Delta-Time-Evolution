@@ -251,7 +251,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
   for (int k=0;k<L;++k) {
     for (int range=1;range<=(L/2);++range) { 
       VecPointwiseMult(sigmasigma_as_vec[running_pair],sigmas_as_vec[k],sigmas_as_vec[(k+range)%L]);
-      if (debug) { if (myrank==0) { cout << "running_pair=" << running_pair << " sites " << k << " " << (k+range)%L << endl;} }
+      if (1) { if (myrank==0) { cout << "running_pair=" << running_pair << " sites " << k << " " << (k+range)%L << endl;} }
       running_pair++;
     }
   }
