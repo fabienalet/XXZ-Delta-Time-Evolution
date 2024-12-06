@@ -281,7 +281,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
     PetscBool eps_interval_set=PETSC_FALSE;
     PetscOptionsGetString(NULL, NULL, "-eps_interval", eps_interval_string, 1000,&eps_interval_set); 
  
-    if (!(eps_interval_set)) && (!(myparameters.interval_set)) { 
+    if ((!(eps_interval_set)) && (!(myparameters.interval_set))) { 
       EPSSetWhichEigenpairs(eps2, EPS_TARGET_REAL);
       EPSSetTarget(eps2, target);
       std::stringstream energy_string;
@@ -319,8 +319,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
 
     Vec use1,use2;
-    MatCreateVecs(sigmas[0], NULL, &use1);
-    MatCreateVecs(sigmas[0], NULL, &use2);
+    MatCreateVecs(H, NULL, &use1);
+    MatCreateVecs(H, NULL, &use2);
 
     std::vector<double> Cmax(L/2,0.); std::vector<double> E_Cmax(L/2,0.); 
     std::vector<int> site1_Cmax(L/2,-1); std::vector<int> site2_Cmax(L/2,-1);
@@ -397,7 +397,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
       PetscBool measure_sigma_indicator=PETSC_TRUE;
       PetscOptionsGetBool(NULL, NULL, "-measure_sigma", &measure_sigma_indicator,NULL); 
-      if (measure_sigma_indicator) { myparameters.init_filename_sigma(sigmaout,energyname);}
+      if (measure_sigma_indicator) { myparameters.init_filename_sigma(sigmaout,energy_name);}
 
       PetscBool other_measurements=PETSC_FALSE;
       PetscOptionsGetBool(NULL, NULL, "-other_measurements", &other_measurements,NULL); 
@@ -534,7 +534,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                 if (p>(k+L/2)) { //initial_site=p; range=k+L-p; 
                 the_shift=p*L/2+k+L-p;}
                 else { //initial_site=i; range=p-k; 
-                the_shift=i*L/2+p-k; }
+                the_shift=k*L/2+p-k; }
                 // initial_site*(L/2)+range
                 VecDot(use1,sigmasigma_as_vec[the_shift],&szkp[pp-si-1]);
                 corrout << k+1 << " " << p+1 << " " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl;         
@@ -561,7 +561,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         // TODO Only 100 eigenstates ??
 
         std::vector<int>::iterator ending=eigenstates_to_follow.end();
-        if (nne_set) { ending=jt+nne;}
+        if (nne_set) { ending=it+nne;}
         //if (measure_nearby_eigenstates) { ending=it+}
           for (std::vector<int>::iterator jt=(it+1);jt!=ending;++jt) {
           
@@ -589,7 +589,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               // TODO Optimize
               std::vector<double> sigma_indicator(L,0);
               VecPointwiseMult(use2,use1,xr);
-              for (int k=0;k<L;++k) { VecDot(use2,sigmas_as_vec[k],&sigma_indicator[si]); }
+              for (int k=0;k<L;++k) { VecDot(use2,sigmas_as_vec[k],&sigma_indicator[k]); }
             for (int k=0;k<L;++k) {
               sigmaout << "Sig " <<  k << " " << sigma_indicator[k] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
             }
@@ -607,12 +607,11 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             {
               VecPointwiseMult(use2,use1,xr);
               std::vector<double> sigma_indicator(s,0.);
-                for (int si=0;si<s;++si) { VecDot(use2,sigmas_as_vec[sites_in_common[si]],&sigma_indicator[si]); }
-            }
-            for (int si=0;si<s;++si) {
-              sigmaout << "Sig " <<  (int) sites_in_common[si] << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
-            }
-            } // sites in common
+              for (int si=0;si<s;++si) { VecDot(use2,sigmas_as_vec[sites_in_common[si]],&sigma_indicator[si]); }
+              for (int si=0;si<s;++si) {
+                sigmaout << "Sig " <<  (int) sites_in_common[si] << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
+              }
+            } // sites in common > 0
           } // !measure everything
           }  // measure_sigma
 
@@ -686,7 +685,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           if (compute_weight) 
           { 
            ofstream weightout;
-           myparameters.init_filename_weight(weightout,energyname);
+           myparameters.init_filename_weight(weightout,energy_name);
            weightout << "#Weight "; for (int c=0;c<number_of_weight_cutoff_values;++c) { weightout << weight_cutoff[c] << " ";} weightout << endl;
           for (int range=1;range<=(L/2);++range) {
             weightout << "#Weight-range " << range << " ";
@@ -697,7 +696,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
            
           if (measure_Cmax) 
            { ofstream Cmaxout;
-             myparameters.init_filename_Cmax(Cmaxout,energyname);
+             myparameters.init_filename_Cmax(Cmaxout,energy_name);
              for (int r=1;r<=L/2;++r) {
              Cmaxout << r << " " << Cmax[r] << " " << site1_Cmax[r] << " " << site2_Cmax[r] << " " << E_Cmax[r] << endl;
              }
@@ -711,7 +710,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           myparameters.init_filename_rgap(rgapout,energy_name);
           // as a header add info about the min/max energies
           enout << "# (Emin, Emax) = " << Eminc << "," << Emaxc << endl;
-          if ((eps_interval_set) || (myparameters.interval_set)) { enout << "# E_interval " << energyname << endl;}
+          if ((eps_interval_set) || (myparameters.interval_set)) { enout << "# E_interval " << energy_name << endl;}
           else { enout << "# Etarget = " << target << endl; }
           enout << "# nconv = " << nconv << endl;
         
