@@ -478,10 +478,14 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           {  double C; 
               VecPointwiseMult(use1,xr,xr);
               int running_pair=0;
+              if (1) { if (myrank==0) { "Dping eigenstate " << Er << endl;} }
               for (int k=0;k<L;++k) 
                 { for (int range=1;range<=(L/2);++range) 
                   { VecDot(sigmasigma_as_vec[running_pair],use1,&C);
                     running_pair++;
+                    if (1) { if (myrank==0) { cout << "Correct correl= @ " << running_pair << " sites " << k << " " << (k+range)%L << 
+                    " with " << C << " sz=" << sz[k] << "," << sz[(k+range)%L] << endl;} }
+
                     C=0.25*fabs(C-sz[k]*sz[(k+range)%L]);
                     if (measure_Cmax) {
                       if (C>Cmax[range]) { E_Cmax[range]=Er; Cmax[range]=C; site1_Cmax[range]=k; site2_Cmax[range]=(k+range)%L;} 
@@ -540,7 +544,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                 the_shift=k*L/2+p-k-1; }
                 // initial_site*(L/2)+range
                 VecDot(use1,sigmasigma_as_vec[the_shift],&szkp[pp-si-1]);
-                //if (debug) { if (myrank==0) { cout << "predicted shift=" << the_shift << " sites " << k << " " << p << endl;} }
+                if (1) { if (myrank==0) { cout << "predicted shift=" << the_shift << " sites " << k << " " << p << 
+                " with " << szkp[pp-si-1] << " sz=" << sz[k] << "," << sz[p] << endl;} }
                 corrout << k+1 << " " << p+1 << " " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl;         
               }
         }
