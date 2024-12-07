@@ -453,7 +453,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
         VecPointwiseMult(use1,xr,xr);
         for (int k=0;k<L;++k) {
-          VecDot(use1,sigmas_as_vec[k],&sz[k]);
+          VecDot(use1,0.5*sigmas_as_vec[k],&sz[k]);
         }
         
         // TODO : get pbc back !
@@ -608,7 +608,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         {
         std::vector<double> sz=sz_to_follow[ll];
         if (myparameters.measure_local) { 
-        for (int k=0;k<L;++k) { locout << k+1 << " " << sz[k] << " " << Er << endl; } 
+        for (int k=0;k<L;++k) { locout << k+1 << " " << 0.5*sz[k] << " " << Er << endl; } 
         }
         // TODO OPTIMIZE THIS
         for (int k=0;k<L;++k) {
@@ -709,18 +709,45 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           else {
             
            // first check if there are sites in common
-            std::vector< int > sites_in_common;
-            std::set_intersection(sites_to_follow[llj].begin(), sites_to_follow[llj].end(), 
-                          sites_to_follow[ll].begin(), sites_to_follow[ll].end(),
-                          std::back_inserter(sites_in_common));
+            std::vector< std::vector<pair> > pairs_in_common;
+            std::set_intersection(pairs_to_follow[llj].begin(), pairs_to_follow[llj].end(), 
+                          pairs_to_follow[ll].begin(), pairs_to_follow[ll].end(),
+                          std::back_inserter(pairs_in_common));
 
-            int s=sites_in_common.size();
+            if (debug)
+            {
+                std::vector< std::pair<int,int> >::iterator it;
+
+                cout << "Eigenstate " << ll << " (enrgy=) " << energy_to_follow[ll] << " has pairs : "
+                for (it=pairs_to_follow[ll].begin();it!=pairs_to_follow[ll].end();++it)
+                {
+                  cout << "(" << it->first << " " << it->second << ") "
+                }
+                cout << endl;
+                cout << "Eigenstate " << llj << " (enrgy=) " << energy_to_follow[llj] << " has pairs : "
+                for (it=pairs_to_follow[lj].begin();it!=pairs_to_follow[llj].end();++it)
+                {
+                  cout << "(" << it->first << " " << it->second << ") "
+                }
+                cout << endl;
+                cout << "Therefore paris in common are :" 
+                for (it=pairs_in_common.begin();it!=pairs_in_common.end();++it)
+                {
+                  cout << "(" << it->first << " " << it->second << ") "
+                }
+                cout << endl;
+
+            }
+            int s=pairs_in_common.size();
             if (s>0) 
             {
               VecPointwiseMult(use2,use1,xr);
-              std::vector<double> sigma_indicator(s,0.);
-              for (int si=0;si<s;++si) { VecDot(use2,sigmas_as_vec[sites_in_common[si]],&sigma_indicator[si]); }
-              for (int si=0;si<s;++si) {
+              std::vector<double> sigma_indicator(s*2,0.);
+              for (int si=0;si<s;++si) { 
+                VecDot(use2,sigmas_as_vec[pairs_to_follow[si].first],&sigma_indicator[si]); 
+                VecDot(use2,sigmas_as_vec[pairs_to_follow[si].second],&sigma_indicator[si]);
+                }
+              for (int si=0;si<(2*s);++si) {
                 sigmaout << "Sig " <<  (int) sites_in_common[si] << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
               }
             } // sites in common > 0
