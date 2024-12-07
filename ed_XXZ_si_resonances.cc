@@ -316,33 +316,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       energy_name=energy_string.str();
     }
     
-    if (1) {
-      double Ea,Eb;
-     // std::stringstream energy_string;
-      //energy_string.precision(6);
-      EPSGetInterval(eps2,&Ea,&Eb);
-      double epsilona=(Ea-Eminc)/(Emaxc-Eminc);
-      double epsilonb=(Eb-Eminc)/(Emaxc-Eminc);
-      if (myrank==0) {
-        cout << "Interval really set " << Ea << " " << Eb << " " << epsilona << " " << epsilonb << endl;
-      }
-    }
-    EPSSetFromOptions(eps2);
-
-  if (1) {
-       
-      double Ea,Eb;
-     // std::stringstream energy_string;
-      //energy_string.precision(6);
-      EPSGetInterval(eps2,&Ea,&Eb);
-      double epsilona=(Ea-Eminc)/(Emaxc-Eminc);
-      double epsilonb=(Eb-Eminc)/(Emaxc-Eminc);
-      if (myrank==0) {
-        cout << "Second Interval really set " << Ea << " " << Eb << " " << epsilona << " " << epsilonb << endl;
-      }
-    }
-
-    
     ierr = EPSSolve(eps2);  
 
     PetscInt nconv = 0;
