@@ -740,16 +740,18 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             }
             int s=pairs_in_common.size();
             if (s>0) 
-            {
+            { if (debug) { 
+              cout << " OK working with " << s << " paris in common\n";
+            }
               VecPointwiseMult(use2,use1,xr);
               std::vector<double> sigma_indicator(s*2,0.);
               for (int si=0;si<s;++si) { 
                 VecDot(use2,sigmas_as_vec[pairs_in_common[si].first],&sigma_indicator[si]); 
-                VecDot(use2,sigmas_as_vec[pairs_in_common[si].second],&sigma_indicator[si]);
+                VecDot(use2,sigmas_as_vec[pairs_in_common[si].second],&sigma_indicator[s+si]);
                 }
               for (int si=0;si<(s);++si) {
                 sigmaout << "Sig " <<  (int) pairs_in_common[si].first << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
-                sigmaout << "Sig " <<  (int) pairs_in_common[si].second << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
+                sigmaout << "Sig " <<  (int) pairs_in_common[si].second << " " << sigma_indicator[s+si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
               }
             } // sites in common > 0
           } // !measure everything
