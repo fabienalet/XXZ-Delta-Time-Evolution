@@ -725,7 +725,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                 }
                 cout << endl;
                 cout << "Eigenstate " << llj << " (enrgy=) " << energies_to_follow[llj] << " has pairs : ";
-                for (it=pairs_to_follow[lj].begin();it!=pairs_to_follow[llj].end();++it)
+                for (it=pairs_to_follow[llj].begin();it!=pairs_to_follow[llj].end();++it)
                 {
                   cout << "(" << it->first << " " << it->second << ") ";
                 }
@@ -744,11 +744,12 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               VecPointwiseMult(use2,use1,xr);
               std::vector<double> sigma_indicator(s*2,0.);
               for (int si=0;si<s;++si) { 
-                VecDot(use2,sigmas_as_vec[pairs_to_follow[si].first],&sigma_indicator[si]); 
-                VecDot(use2,sigmas_as_vec[pairs_to_follow[si].second],&sigma_indicator[si]);
+                VecDot(use2,sigmas_as_vec[pairs_in_common[si].first],&sigma_indicator[si]); 
+                VecDot(use2,sigmas_as_vec[pairs_in_common[si].second],&sigma_indicator[si]);
                 }
-              for (int si=0;si<(2*s);++si) {
-                sigmaout << "Sig " <<  (int) sites_in_common[si] << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
+              for (int si=0;si<(s);++si) {
+                sigmaout << "Sig " <<  (int) pairs_in_common[si].first << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
+                sigmaout << "Sig " <<  (int) pairs_in_common[si].second << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
               }
             } // sites in common > 0
           } // !measure everything
