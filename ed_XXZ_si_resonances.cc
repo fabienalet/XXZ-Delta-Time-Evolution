@@ -684,8 +684,16 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           for (int llj=ll+1;llj<ending;llj++) {
           
           EPSGetEigenpair(eps2, eigenstates_to_follow[llj], &Er2, &Ei, use1, NULL);
+          // first check if there are sites in common
+            std::vector< std::pair<int,int> > pairs_in_common;
+            std::set_intersection(pairs_to_follow[llj].begin(), pairs_to_follow[llj].end(), 
+                          pairs_to_follow[ll].begin(), pairs_to_follow[ll].end(),
+                          std::back_inserter(pairs_in_common));
+
+            int s=pairs_in_common.size();
 
           if (myparameters.measure_KL) { 
+          //  if (s>0) {
           double pi; double qi; double local_KL=0.; double local_KL2=0.;
           for (int row_ctr = Istart; row_ctr<Iend;++row_ctr) {
             VecGetValues( xr, 1, &row_ctr, &pi );
@@ -700,6 +708,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           MPI_Reduce(&local_KL, &global_KL, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
           MPI_Reduce(&local_KL2, &global_KL2, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
           if (myrank==0) { KLout << global_KL << " " << global_KL2 << " " << energies_to_follow[ll] << " " <<  Er2 << endl; }
+          //  }
           }
 
           if (measure_sigma_indicator) {
@@ -714,56 +723,19 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             } 
           else {
             
-           // first check if there are sites in common
-            std::vector< std::pair<int,int> > pairs_in_common;
-            std::set_intersection(pairs_to_follow[llj].begin(), pairs_to_follow[llj].end(), 
-                          pairs_to_follow[ll].begin(), pairs_to_follow[ll].end(),
-                          std::back_inserter(pairs_in_common));
-
-            if (debug)
-            {
-                std::vector< std::pair<int,int> >::iterator it;
-
-                cout << "Eigenstate " << ll << " (enrgy=) " << energies_to_follow[ll] << " has pairs : ";
-                for (it=pairs_to_follow[ll].begin();it!=pairs_to_follow[ll].end();++it)
-                {
-                  cout << "(" << it->first << " " << it->second << ") ";
-                }
-                cout << endl;
-                cout << "Eigenstate " << llj << " (enrgy=) " << energies_to_follow[llj] << " has pairs : ";
-                for (it=pairs_to_follow[llj].begin();it!=pairs_to_follow[llj].end();++it)
-                {
-                  cout << "(" << it->first << " " << it->second << ") ";
-                }
-                cout << endl;
-                cout << "Therefore paris in common are :";
-                for (it=pairs_in_common.begin();it!=pairs_in_common.end();++it)
-                {
-                  cout << "(" << it->first << " " << it->second << ") ";
-                }
-                cout << endl;
-
-            }
-            int s=pairs_in_common.size();
+           
             if (s>0) 
-            { if (debug) { 
-              cout << " OK working with " << s << " paris in common\n";
-            }
+            { 
               VecPointwiseMult(use2,use1,xr);
               std::vector<double> sigma_indicator(s*2,0.);
               for (int si=0;si<s;++si) { 
                 VecDot(use2,sigmas_as_vec[pairs_in_common[si].first],&sigma_indicator[si]); 
                 VecDot(use2,sigmas_as_vec[pairs_in_common[si].second],&sigma_indicator[s+si]);
-                cout << "Just computed sigma " << pairs_in_common[si].first << "=" << sigma_indicator[si] << endl;
-                cout << "Just computed sigma " << pairs_in_common[si].second << "=" << sigma_indicator[s+si] << endl;
                 
                 }
               for (int si=0;si<(s);++si) {
-                sigmaout << "Sig " <<  (int) pairs_in_common[si].first << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
-                sigmaout << "Sig " <<  (int) pairs_in_common[si].second << " " << sigma_indicator[s+si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
-                cout << "Sig " <<  (int) pairs_in_common[si].first << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
-                cout << "Sig " <<  (int) pairs_in_common[si].second << " " << sigma_indicator[s+si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
-              
+                sigmaout << "Sig " <<  (int) pairs_in_common[si].first+1 << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
+                sigmaout << "Sig " <<  (int) pairs_in_common[si].second+1 << " " << sigma_indicator[s+si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
               }
             } // sites in common > 0
           } // !measure everything
