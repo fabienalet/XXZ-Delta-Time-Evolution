@@ -493,7 +493,11 @@ int ENV_NUM_THREADS=omp_get_num_threads();
              // if (1) { if (myrank==0) { cout << "Dping eigenstate " << Er << endl;} }
               for (int k=0;k<L;++k) 
                 { for (int range=1;range<=(L/2);++range) 
-                  { VecDot(sigmasigma_as_vec[running_pair],use1,&C);
+                  { 
+                    
+                    // do not compute twice for L/2 ...
+                    if ( (range!=L/2) || (k<(L/2)) ) {
+                    VecDot(sigmasigma_as_vec[running_pair],use1,&C);
                 //  if (i==0) { if (myrank==0) { cout << "Correct correl= @ " << running_pair << " sites " << k << " " << (k+range)%L << 
                 //    " with " << C << " sz=" << sz[k] << "," << sz[(k+range)%L] << " ---> " << 0.25*fabs(C-sz[k]*sz[(k+range)%L]) << endl;} }
 
@@ -508,6 +512,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                     Normalization[range]+=1.0;
                     for (int c=0;c<number_of_weight_cutoff_values;c++)
                       { if (C>weight_cutoff[c]) {weight_at_cutoff_at_range[c][range]+=1.0;} else {break;} }
+                    }
                   }
                 }
           }
