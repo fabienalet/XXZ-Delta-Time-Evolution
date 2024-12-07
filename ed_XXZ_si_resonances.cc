@@ -721,19 +721,19 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                 cout << "Eigenstate " << ll << " (enrgy=) " << energies_to_follow[ll] << " has pairs : ";
                 for (it=pairs_to_follow[ll].begin();it!=pairs_to_follow[ll].end();++it)
                 {
-                  cout << "(" << it->first << " " << it->second << ") "
+                  cout << "(" << it->first << " " << it->second << ") ";
                 }
                 cout << endl;
                 cout << "Eigenstate " << llj << " (enrgy=) " << energies_to_follow[llj] << " has pairs : ";
                 for (it=pairs_to_follow[lj].begin();it!=pairs_to_follow[llj].end();++it)
                 {
-                  cout << "(" << it->first << " " << it->second << ") "
+                  cout << "(" << it->first << " " << it->second << ") ";
                 }
                 cout << endl;
                 cout << "Therefore paris in common are :";
                 for (it=pairs_in_common.begin();it!=pairs_in_common.end();++it)
                 {
-                  cout << "(" << it->first << " " << it->second << ") "
+                  cout << "(" << it->first << " " << it->second << ") ";
                 }
                 cout << endl;
 
