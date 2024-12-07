@@ -315,7 +315,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       energy_name=energy_string.str();
     }
     
-    if (eps_interval_set) {
+    if (1) {
       double Ea,Eb;
      // std::stringstream energy_string;
       //energy_string.precision(6);
@@ -328,7 +328,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
     }
     EPSSetFromOptions(eps2);
 
-  if (eps_interval_set) {
+  if (1) {
        
       double Ea,Eb;
      // std::stringstream energy_string;
