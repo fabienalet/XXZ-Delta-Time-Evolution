@@ -316,7 +316,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
     }
     
     if (eps_interval_set) {
-       
       double Ea,Eb;
      // std::stringstream energy_string;
       //energy_string.precision(6);
