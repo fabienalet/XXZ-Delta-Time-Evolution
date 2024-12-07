@@ -290,6 +290,19 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       energy_string << ".target=" << target;
       energy_name=energy_string.str();
     }
+
+    if (eps_interval_set) {
+      double Ea,Eb;
+      std::stringstream energy_string;
+      energy_string.precision(6);
+      EPSGetInterval(eps2,&Ea,&Eb);
+      double epsilona=(Ea-Eminc)/(Emaxc-Eminc);
+      double epsilonb=(Eb-Eminc)/(Emaxc-Eminc);
+      
+      energy_string << ".targetinf=" << epsilona << ".targetsup=" << epsilonb ;
+      energy_name=energy_string.str();
+    }
+
     if (myparameters.interval_set) {
       double born1 = myparameters.target1 * (Emaxc - Eminc) + Eminc;
       double born2 = myparameters.target2 * (Emaxc - Eminc) + Eminc;
@@ -301,16 +314,32 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       energy_string << ".targetinf=" << born1 << ".targetsup=" << born2 ;
       energy_name=energy_string.str();
     }
+    
     if (eps_interval_set) {
+       
       double Ea,Eb;
-      std::stringstream energy_string;
-      energy_string.precision(6);
+     // std::stringstream energy_string;
+      //energy_string.precision(6);
       EPSGetInterval(eps2,&Ea,&Eb);
       double epsilona=(Ea-Eminc)/(Emaxc-Eminc);
       double epsilonb=(Eb-Eminc)/(Emaxc-Eminc);
-      
-      energy_string << ".targetinf=" << epsilona << ".targetsup=" << epsilonb ;
-      energy_name=energy_string.str();
+      if (myrank==0) {
+        cout << "Interval really set " << Ea << " " << Eb << " " << epsilona << " " << epsilonb << endl;
+      }
+    }
+    EPSSetFromOptions(eps2);
+
+  if (eps_interval_set) {
+       
+      double Ea,Eb;
+     // std::stringstream energy_string;
+      //energy_string.precision(6);
+      EPSGetInterval(eps2,&Ea,&Eb);
+      double epsilona=(Ea-Eminc)/(Emaxc-Eminc);
+      double epsilonb=(Eb-Eminc)/(Emaxc-Eminc);
+      if (myrank==0) {
+        cout << "Second Interval really set " << Ea << " " << Eb << " " << epsilona << " " << epsilonb << endl;
+      }
     }
 
     
