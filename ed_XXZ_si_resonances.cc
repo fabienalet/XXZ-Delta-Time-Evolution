@@ -748,10 +748,16 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               for (int si=0;si<s;++si) { 
                 VecDot(use2,sigmas_as_vec[pairs_in_common[si].first],&sigma_indicator[si]); 
                 VecDot(use2,sigmas_as_vec[pairs_in_common[si].second],&sigma_indicator[s+si]);
+                cout << "Just computed sigma " << pairs_in_common[si].first << "=" << sigma_indicator[si] << endl;
+                cout << "Just computed sigma " << pairs_in_common[si].second << "=" << sigma_indicator[s+si] << endl;
+                
                 }
               for (int si=0;si<(s);++si) {
                 sigmaout << "Sig " <<  (int) pairs_in_common[si].first << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
                 sigmaout << "Sig " <<  (int) pairs_in_common[si].second << " " << sigma_indicator[s+si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
+                cout << "Sig " <<  (int) pairs_in_common[si].first << " " << sigma_indicator[si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
+                cout << "Sig " <<  (int) pairs_in_common[si].second << " " << sigma_indicator[s+si] << " " << energies_to_follow[ll] << " " <<  Er2 << endl;
+              
               }
             } // sites in common > 0
           } // !measure everything
