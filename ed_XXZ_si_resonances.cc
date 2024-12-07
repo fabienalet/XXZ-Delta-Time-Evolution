@@ -453,7 +453,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
         VecPointwiseMult(use1,xr,xr);
         for (int k=0;k<L;++k) {
-          VecDot(use1,0.5*sigmas_as_vec[k],&sz[k]);
+          VecDot(use1,sigmas_as_vec[k],&sz[k]);
         }
         
         // TODO : get pbc back !
@@ -709,7 +709,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           else {
             
            // first check if there are sites in common
-            std::vector< std::vector<pair> > pairs_in_common;
+            std::vector< std::pair<int,int> > pairs_in_common;
             std::set_intersection(pairs_to_follow[llj].begin(), pairs_to_follow[llj].end(), 
                           pairs_to_follow[ll].begin(), pairs_to_follow[ll].end(),
                           std::back_inserter(pairs_in_common));
@@ -718,19 +718,19 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             {
                 std::vector< std::pair<int,int> >::iterator it;
 
-                cout << "Eigenstate " << ll << " (enrgy=) " << energy_to_follow[ll] << " has pairs : "
+                cout << "Eigenstate " << ll << " (enrgy=) " << energies_to_follow[ll] << " has pairs : ";
                 for (it=pairs_to_follow[ll].begin();it!=pairs_to_follow[ll].end();++it)
                 {
                   cout << "(" << it->first << " " << it->second << ") "
                 }
                 cout << endl;
-                cout << "Eigenstate " << llj << " (enrgy=) " << energy_to_follow[llj] << " has pairs : "
+                cout << "Eigenstate " << llj << " (enrgy=) " << energies_to_follow[llj] << " has pairs : ";
                 for (it=pairs_to_follow[lj].begin();it!=pairs_to_follow[llj].end();++it)
                 {
                   cout << "(" << it->first << " " << it->second << ") "
                 }
                 cout << endl;
-                cout << "Therefore paris in common are :" 
+                cout << "Therefore paris in common are :";
                 for (it=pairs_in_common.begin();it!=pairs_in_common.end();++it)
                 {
                   cout << "(" << it->first << " " << it->second << ") "
