@@ -293,16 +293,25 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
     if (eps_interval_set) {
       double Ea,Eb;
+      if (myparameters.interval_set) {
+      double born1 = myparameters.target1 * (Emaxc - Eminc) + Eminc;
+      double born2 = myparameters.target2 * (Emaxc - Eminc) + Eminc;
+      double epsilon=1e-2;
+      if (myparameters.target1==0) { born1-=epsilon;}
+      if (myparameters.target2==1) { born2+=epsilon;}
+      EPSSetInterval(eps2, born1,born2);
+      }
+
       std::stringstream energy_string;
       energy_string.precision(6);
       EPSGetInterval(eps2,&Ea,&Eb);
       double epsilona=(Ea-Eminc)/(Emaxc-Eminc);
       double epsilonb=(Eb-Eminc)/(Emaxc-Eminc);
       
-      energy_string << ".targetinf=" << epsilona << ".targetsup=" << epsilonb ;
+      energy_string << ".targetinf=" << epsilona << ".targetsup=" << epsilonb;
       energy_name=energy_string.str();
     }
-
+/*
     if (myparameters.interval_set) {
       double born1 = myparameters.target1 * (Emaxc - Eminc) + Eminc;
       double born2 = myparameters.target2 * (Emaxc - Eminc) + Eminc;
@@ -310,12 +319,12 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       if (myparameters.target1==0) { born1-=epsilon;}
       if (myparameters.target2==1) { born2+=epsilon;}
       EPSSetInterval(eps2, born1,born2);
-      EPSSetWhichEigenpairs(eps2,EPS_ALL);
+     // EPSSetWhichEigenpairs(eps2,EPS_ALL);
       std::stringstream energy_string;
       energy_string << ".targetinf=" << born1 << ".targetsup=" << born2 ;
       energy_name=energy_string.str();
     }
-    
+    */
     ierr = EPSSolve(eps2);  
 
     PetscInt nconv = 0;
@@ -453,6 +462,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                 }
           }
         */
+       /*
         for (int j=0;j<L;++j)
           { for (int k=j+1;k<L;++k)
                     { if (  (fabs(sz[k]*sz[j])<(0.25-C_cutoff)) )
@@ -461,9 +471,37 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                       }
                     }
                 }
+        */
 
+       
+      
+        if (compute_weight)
+          {  double C; 
+              VecPointwiseMult(use1,xr,xr);
+              int running_pair=0;
+             // if (1) { if (myrank==0) { cout << "Dping eigenstate " << Er << endl;} }
+              for (int k=0;k<L;++k) 
+                { for (int range=1;range<=(L/2);++range) 
+                  { VecDot(sigmasigma_as_vec[running_pair],use1,&C);
+                //  if (i==0) { if (myrank==0) { cout << "Correct correl= @ " << running_pair << " sites " << k << " " << (k+range)%L << 
+                //    " with " << C << " sz=" << sz[k] << "," << sz[(k+range)%L] << " ---> " << 0.25*fabs(C-sz[k]*sz[(k+range)%L]) << endl;} }
 
-        bool prediction_strong_correl_found=PETSC_FALSE;
+                    running_pair++;
+                    
+                    C=0.25*fabs(C-sz[k]*sz[(k+range)%L]);
+                    if ( (C>C_cutoff) && (range>=min_range) )
+                          { prediction_strong_correl_pair.push_back(make_pair(j,k)); }
+                    if (measure_Cmax) {
+                      if (C>Cmax[range]) { E_Cmax[range]=Er; Cmax[range]=C; site1_Cmax[range]=k; site2_Cmax[range]=(k+range)%L;} 
+                      }
+                    Normalization[range]+=1.0;
+                    for (int c=0;c<number_of_weight_cutoff_values;c++)
+                      { if (C>weight_cutoff[c]) {weight_at_cutoff_at_range[c][range]+=1.0;} else {break;} }
+                  }
+                }
+          }
+
+          bool prediction_strong_correl_found=PETSC_FALSE;
         if (prediction_strong_correl_pair.size()!=0) {
             prediction_strong_correl_found=PETSC_TRUE;
          if(debug)   if (myrank==0) std::cout << "### Prediction strong correl for Eigenstate with energy " << Er << endl;
@@ -488,31 +526,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           auto it = unique(new_sites_to_follow.begin(), new_sites_to_follow.end());
           new_sites_to_follow.erase(it, new_sites_to_follow.end());
           sites_to_follow.push_back(new_sites_to_follow);
-        }
-      
-        if (compute_weight)
-          {  double C; 
-              VecPointwiseMult(use1,xr,xr);
-              int running_pair=0;
-             // if (1) { if (myrank==0) { cout << "Dping eigenstate " << Er << endl;} }
-              for (int k=0;k<L;++k) 
-                { for (int range=1;range<=(L/2);++range) 
-                  { VecDot(sigmasigma_as_vec[running_pair],use1,&C);
-                //  if (i==0) { if (myrank==0) { cout << "Correct correl= @ " << running_pair << " sites " << k << " " << (k+range)%L << 
-                //    " with " << C << " sz=" << sz[k] << "," << sz[(k+range)%L] << " ---> " << 0.25*fabs(C-sz[k]*sz[(k+range)%L]) << endl;} }
-
-                    running_pair++;
-                    
-                    C=0.25*fabs(C-sz[k]*sz[(k+range)%L]);
-                    if (measure_Cmax) {
-                      if (C>Cmax[range]) { E_Cmax[range]=Er; Cmax[range]=C; site1_Cmax[range]=k; site2_Cmax[range]=(k+range)%L;} 
-                      }
-                    Normalization[range]+=1.0;
-                    for (int c=0;c<number_of_weight_cutoff_values;c++)
-                      { if (C>weight_cutoff[c]) {weight_at_cutoff_at_range[c][range]+=1.0;} else {break;} }
-                  }
-                }
-          }
+        } 
       }
       
             if (myrank == 0) {
