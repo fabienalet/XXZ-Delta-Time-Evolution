@@ -311,6 +311,17 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       energy_string << ".targetinf=" << epsilona << ".targetsup=" << epsilonb;
       energy_name=energy_string.str();
     }
+
+    /*
+121:      Set several MUMPS options, the corresponding command-line options are:
+122:      '-st_mat_mumps_icntl_13 1': turn off ScaLAPACK for matrix inertia
+123:      '-st_mat_mumps_icntl_24 1': detect null pivots in factorization (for the case that a shift is equal to an eigenvalue)
+124:      '-st_mat_mumps_cntl_3 <tol>': a tolerance used for null pivot detection (must be larger than machine epsilon)
+
+126:      Note: depending on the interval, it may be necessary also to increase the workspace:
+127:      '-st_mat_mumps_icntl_14 <percentage>': increase workspace with a percentage (50, 100 or more)
+128:   */
+
 /*
     if (myparameters.interval_set) {
       double born1 = myparameters.target1 * (Emaxc - Eminc) + Eminc;
@@ -428,8 +439,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       if (!(sz_cutoff_set)) { sz_cutoff=sqrt(0.25-C_cutoff);}
       if (C_cutoff_set) { sz_cutoff_set=PETSC_TRUE;}
       
-      sz_cutoff*=2;
-      C_cutoff*=4;
+    //  sz_cutoff*=2;
+     // C_cutoff*=4;
       if (!(C_cutoff_set) && (!(sz_cutoff_set)) ) { if (myrank==0) { cout << "No cutoff set, exiting\n";} exit(0); }
 
       for (int i = 0; i < nconv; i++) 
@@ -489,7 +500,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                     running_pair++;
                     
                     C=0.25*fabs(C-sz[k]*sz[(k+range)%L]);
-                    if ( (C>C_cutoff) && (range>=min_range) )
+                    if ( (C>(C_cutoff) && (range>=min_range) )
                           { prediction_strong_correl_pair.push_back(make_pair(k,(k+range)%L)); }
                     if (measure_Cmax) {
                       if (C>Cmax[range]) { E_Cmax[range]=Er; Cmax[range]=C; site1_Cmax[range]=k; site2_Cmax[range]=(k+range)%L;} 
