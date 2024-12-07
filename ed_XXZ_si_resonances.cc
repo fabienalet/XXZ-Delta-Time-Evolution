@@ -598,7 +598,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
       for (int ll=0;ll<eigenstates_to_follow.size();++ll) {
         if (!(ll%100)) { if (myrank==0) { cout << ll << " eigenstates done\n";}}
-        EPSGetEigenpair(eps2, ll, &Er, &Ei, xr, NULL);
+        EPSGetEigenpair(eps2, eigenstates_to_follow[ll], &Er, &Ei, xr, NULL);
 
         // Measure correlations
         if (myparameters.measure_correlations) {
@@ -677,7 +677,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         //if (measure_nearby_eigenstates) { ending=it+}
           for (int llj=ll+1;llj<ending;llj++) {
           
-          EPSGetEigenpair(eps2, llj, &Er2, &Ei, use1, NULL);
+          EPSGetEigenpair(eps2, eigenstates_to_follow[llj], &Er2, &Ei, use1, NULL);
 
           if (myparameters.measure_KL) { 
           double pi; double qi; double local_KL=0.; double local_KL2=0.;
