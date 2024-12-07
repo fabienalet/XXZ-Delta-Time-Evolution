@@ -500,7 +500,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                     running_pair++;
                     
                     C=0.25*fabs(C-sz[k]*sz[(k+range)%L]);
-                    if ( (C>(C_cutoff) && (range>=min_range) )
+                    if ( (C>C_cutoff) && (range>=min_range) ) 
                           { prediction_strong_correl_pair.push_back(make_pair(k,(k+range)%L)); }
                     if (measure_Cmax) {
                       if (C>Cmax[range]) { E_Cmax[range]=Er; Cmax[range]=C; site1_Cmax[range]=k; site2_Cmax[range]=(k+range)%L;} 
