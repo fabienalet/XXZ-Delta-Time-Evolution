@@ -495,14 +495,15 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                 { for (int range=1;range<=(L/2);++range) 
                   { 
                     
-                    // do not compute twice for L/2 ...
-                    if ( (range!=L/2) || (k<(L/2)) ) {
+                   
+                    
                     VecDot(sigmasigma_as_vec[running_pair],use1,&C);
                 //  if (i==0) { if (myrank==0) { cout << "Correct correl= @ " << running_pair << " sites " << k << " " << (k+range)%L << 
                 //    " with " << C << " sz=" << sz[k] << "," << sz[(k+range)%L] << " ---> " << 0.25*fabs(C-sz[k]*sz[(k+range)%L]) << endl;} }
 
                     running_pair++;
-                    
+                     // do not compute twice for L/2 ...
+                    if ( (range!=L/2) || (k<(L/2)) ) {
                     C=0.25*fabs(C-sz[k]*sz[(k+range)%L]);
                     if ( (C>C_cutoff) && (range>=min_range) ) 
                           { prediction_strong_correl_pair.push_back(make_pair(k,(k+range)%L)); }
