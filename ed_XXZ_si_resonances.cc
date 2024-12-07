@@ -438,6 +438,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         PetscBool pbc=PETSC_TRUE;
         PetscOptionsGetBool(NULL, NULL, "-pbc", &pbc, NULL);
 
+        // TODO NOT GOOD CIRETION with sz_cutoff ...
+        /*
         for (int j=0;j<L;++j)
           { if (fabs(sz[j])<sz_cutoff)
                 { for (int k=j+1;k<L;++k)
@@ -448,6 +450,16 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                     }
                 }
           }
+        */
+        for (int j=0;j<L;++j)
+          { for (int k=j+1;k<L;++k)
+                    { if (  (fabs(sz[k]*sz[j])<(0.25-C_cutoff)) )
+                      { if ( ((k-j)>min_range) && ((!(pbc)) || ((j+L-k)>min_range)) )
+                          { prediction_strong_correl_pair.push_back(make_pair(j,k)); }
+                      }
+                    }
+                }
+
 
         bool prediction_strong_correl_found=PETSC_FALSE;
         if (prediction_strong_correl_pair.size()!=0) {
