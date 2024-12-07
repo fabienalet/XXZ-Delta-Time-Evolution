@@ -310,6 +310,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       if (myparameters.target1==0) { born1-=epsilon;}
       if (myparameters.target2==1) { born2+=epsilon;}
       EPSSetInterval(eps2, born1,born2);
+      EPSSetWhichEigenpairs(eps2,EPS_ALL);
       std::stringstream energy_string;
       energy_string << ".targetinf=" << born1 << ".targetsup=" << born2 ;
       energy_name=energy_string.str();
