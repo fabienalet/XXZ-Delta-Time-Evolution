@@ -587,7 +587,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         
         enout << "### Special energies " << energies_to_follow.size() << " out of " << nconv 
               << " (= " << ((double) energies_to_follow.size()/nconv)*100 << " %)\n";
-        int ll=0;
         for (std::vector<double>::iterator it=energies_to_follow.begin();it!=energies_to_follow.end();++it) {
             enout << *it << endl;
         }
@@ -595,12 +594,11 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         enout.close();
       }
       
-      int ll=0;
       if (myrank==0) { cout << "*** Measuring on " << eigenstates_to_follow.size() << " eigenstates to follow\n";}
 
-      for (std::vector<int>::iterator it=eigenstates_to_follow.begin();it!=eigenstates_to_follow.end();++it) {
+      for (int ll=0;ll<eigenstates_to_follow.size();++ll) {
         if (!(ll%100)) { if (myrank==0) { cout << ll << " eigenstates done\n";}}
-        EPSGetEigenpair(eps2, *it, &Er, &Ei, xr, NULL);
+        EPSGetEigenpair(eps2, ll, &Er, &Ei, xr, NULL);
 
         // Measure correlations
         if (myparameters.measure_correlations) {
@@ -666,18 +664,20 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         }
 
         // measure KL, and < n | sigma_i | m > with other states
-        int llj=0; double Er2;
+        
+        double Er2;
         if ((myparameters.measure_KL) || (measure_sigma_indicator)) {
         //for (std::vector<int>::iterator jt=eigenstates_to_follow.begin();jt!=eigenstates_to_follow.end();++jt) {
         // TODO Only 100 eigenstates ??
 
-        std::vector<int>::iterator ending=eigenstates_to_follow.end();
-        if (nne_set) { ending=it+2*nne+2;
-        }
+
+        int ending=eigenstates_to_follow.size();
+        if (nne_set) { ending=ll+2*nne+2;}
+        if (ending>eigenstates_to_follow.size()) { ending=eigenstates_to_follow.size();}
         //if (measure_nearby_eigenstates) { ending=it+}
-          for (std::vector<int>::iterator jt=(it+1);jt!=ending,jt!=eigenstates_to_follow.end();++jt) {
+          for (int llj=ll+1;llj<ending;llj++) {
           
-          EPSGetEigenpair(eps2, *jt, &Er2, &Ei, use1, NULL);
+          EPSGetEigenpair(eps2, llj, &Er2, &Ei, use1, NULL);
 
           if (myparameters.measure_KL) { 
           double pi; double qi; double local_KL=0.; double local_KL2=0.;
@@ -763,11 +763,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           } // !measure everything
           }  // measure_sigma
 
-      llj++;
-      } // second loop on j
+      } // second loop on llj
     } // measure kl or sigma
 
-    ll++;
      // other measurements on eigenstate to follow ...
     PetscBool other_measurements=PETSC_FALSE;
     if ((myparameters.measure_transverse_correlations) || (myparameters.measure_entanglement)) 
