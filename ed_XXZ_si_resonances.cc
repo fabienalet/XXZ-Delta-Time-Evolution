@@ -551,7 +551,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           { 
            ofstream weightout;
            myparameters.init_filename_weight(weightout,energy_name);
-           weightout << "#Weight "; for (int c=0;c<number_of_weight_cutoff_values;++c) { weightout << weight_cutoff[c] << " ";} weightout << endl;
+           weightout << "#Weight " << nconv << " "; for (int c=0;c<number_of_weight_cutoff_values;++c) { weightout << weight_cutoff[c] << " ";} weightout << endl;
           for (int range=1;range<=(L/2);++range) {
             weightout << "#Weight-range " << range << " ";
             for (int c=0;c<number_of_weight_cutoff_values;++c) { weightout << weight_at_cutoff_at_range[c][range]/Normalization[range] << " ";} weightout << endl;
@@ -693,7 +693,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             int s=pairs_in_common.size();
 
           if (myparameters.measure_KL) { 
-          //  if (s>0) {
+            if (s>0) {
           double pi; double qi; double local_KL=0.; double local_KL2=0.;
           for (int row_ctr = Istart; row_ctr<Iend;++row_ctr) {
             VecGetValues( xr, 1, &row_ctr, &pi );
@@ -708,7 +708,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           MPI_Reduce(&local_KL, &global_KL, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
           MPI_Reduce(&local_KL2, &global_KL2, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
           if (myrank==0) { KLout << global_KL << " " << global_KL2 << " " << energies_to_follow[ll] << " " <<  Er2 << endl; }
-          //  }
+            }
           }
 
           if (measure_sigma_indicator) {
