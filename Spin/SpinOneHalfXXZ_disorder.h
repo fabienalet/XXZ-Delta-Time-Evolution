@@ -159,7 +159,7 @@ void Hamiltonian::get_parameters() {
     }
 
     if (box_field) {
-      PetscBool without_boost_rng;
+      PetscBool without_boost_rng=PETSC_FALSE;
       ierr = PetscOptionsGetBool(NULL, NULL, "-without_boost_rng", &without_boost_rng,
                                  NULL);
 

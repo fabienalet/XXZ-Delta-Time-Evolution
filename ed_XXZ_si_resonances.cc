@@ -369,6 +369,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
   
       std::vector<double> energies;
+      std::vector<double> error_energies;
       std::vector<double> rgap;
       PetscScalar Er, Ei;
       Vec Vec_local;
@@ -383,6 +384,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
       std::vector<int> eigenstates_to_follow;
       std::vector<double> energies_to_follow;
+      std::vector<double> error_energies_to_follow;
       std::vector< std::vector<int> > sites_to_follow;
       std::vector< std::vector<pair<int,int> > > pairs_to_follow;
       std::vector< std::vector<double> > sz_to_follow;
@@ -446,8 +448,10 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       for (int i = 0; i < nconv; i++) 
       {
         EPSGetEigenpair(eps2, i, &Er, &Ei, xr, NULL);
+        double this_error=0.;
+        EPSComputeError(ep2,i, EPS_ERROR_RELATIVE,&this_error);
         energies.push_back(PetscRealPart(Er));
-
+        error_energies.push_back(this_error);
         std::vector< pair<int,int> > prediction_strong_correl_pair; prediction_strong_correl_pair.resize(0);
         std::vector<double> sz(L,0.);
 
@@ -531,6 +535,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         {
           eigenstates_to_follow.push_back(i);
           energies_to_follow.push_back(Er); 
+          error_energies_to_follow.push_back(this_error); 
           pairs_to_follow.push_back(prediction_strong_correl_pair);
           sz_to_follow.push_back(sz);
           std::vector<int> new_sites_to_follow;
@@ -593,9 +598,10 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         
         enout << "### Special energies " << energies_to_follow.size() << " out of " << nconv 
               << " (= " << ((double) energies_to_follow.size()/nconv)*100 << " %)\n";
-        for (std::vector<double>::iterator it=energies_to_follow.begin();it!=energies_to_follow.end();++it) {
-            enout << *it << endl;
+        for (int k=0;k<energies_to_follow.size();++k) {
+          enout << energies_to_follow[k] << " " << error_energies_to_follow[k] << endl;
         }
+        
         rgapout.close();
         enout.close();
       }
@@ -769,7 +775,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             Tij = myobservable.get_SpSm_correlation(state);
             for (int r = 0; r < L; ++r) {
               for (int s = r; s < L; ++s) {
-                tcorrout << r << " " << " " << s << " " << Tij[r][s] << endl;
+                tcorrout << r << " " << " " << s << " " << Tij[r][s] << " " << Er << endl;
             } }
           }
           if (myparameters.measure_entanglement) 
