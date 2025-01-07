@@ -449,7 +449,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       {
         EPSGetEigenpair(eps2, i, &Er, &Ei, xr, NULL);
         double this_error=0.;
-        EPSComputeError(ep2,i, EPS_ERROR_RELATIVE,&this_error);
+        EPSComputeError(eps2,i, EPS_ERROR_RELATIVE,&this_error);
         energies.push_back(PetscRealPart(Er));
         error_energies.push_back(this_error);
         std::vector< pair<int,int> > prediction_strong_correl_pair; prediction_strong_correl_pair.resize(0);
