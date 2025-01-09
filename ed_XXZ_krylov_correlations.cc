@@ -428,7 +428,7 @@ int main(int argc,char **argv)
         for (int k=0;k<L;++k) { VecDot(Psi_t,sigmas_as_vec[k],&sz[k]); }
         if (myparameters.measure_local) { 
           if (myrank==0) {
-          for (int k=0;k<L;++k) { locout << "SZ " << i0 << " " << t << " " << k+1 << " " << sz[k] << std::endl;}
+          for (int k=0;k<L;++k) { locout << "SZ " << i0 << " " << t << " " << k+1 << " " << 0.5*sz[k] << std::endl;}
           }
         }
 
