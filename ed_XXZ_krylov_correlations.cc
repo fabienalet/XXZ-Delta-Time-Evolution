@@ -385,7 +385,6 @@ int main(int argc,char **argv)
        }
       if (myparameters.measure_return) { myparameters.init_filename_return(retout,i0); }
       }
-    cout << "Here\n";
     // Initialise Psi(0) (with the initial state) and Res(0)
     VecSet(Psi_t,0.0);
     VecSetValue(Psi_t,i0,1.0,INSERT_VALUES);
