@@ -93,7 +93,7 @@ void Hamiltonian::get_parameters() {
 
   PetscBool fields_string_set=PETSC_FALSE;
   char* fields_c_string = new char[10000];
-  ierr = PetscOptionsGetString(NULL, NULL, "-fields", fields_c_string, 10000,
+  PetscOptionsGetString(NULL, NULL, "-fields", fields_c_string, 10000,
                                &fields_string_set);  
   if (fields_string_set) {
     field.resize(0);
@@ -110,7 +110,7 @@ void Hamiltonian::get_parameters() {
 
   PetscBool couplings_string_set=PETSC_FALSE;
   char* couplings_c_string = new char[10000];
-  ierr = PetscOptionsGetString(NULL, NULL, "-couplings", couplings_c_string, 10000,
+  PetscOptionsGetString(NULL, NULL, "-couplings", couplings_c_string, 10000,
                                &couplings_string_set);  
   if (couplings_string_set) {
     coupling.resize(0);
@@ -119,10 +119,10 @@ void Hamiltonian::get_parameters() {
     couplingstr.str(couplings_string);
     double ss;
     while (couplingstr >> ss) {
-      couplings.push_back(ss);
+      coupling.push_back(ss);
     }
-    if (!(pbc)) { if (couplings.size()!=(L-1)) { std::cout << "Error !! Too few couplings !!!\n"; exit(0);}}
-    else { if (couplings.size()!=(L)) { std::cout << "Error !! Too few couplings !!!\n"; exit(0);}}
+    if (!(pbc)) { if (coupling.size()!=(L-1)) { std::cout << "Error !! Too few couplings !!!\n"; exit(0);}}
+    else { if (coupling.size()!=(L)) { std::cout << "Error !! Too few couplings !!!\n"; exit(0);}}
     delete[] couplings_c_string;
   } 
 
