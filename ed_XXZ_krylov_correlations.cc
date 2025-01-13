@@ -422,10 +422,17 @@ int main(int argc,char **argv)
       {
         if ( (1) || (myparameters.measure_correlations) ) { // Measure sz-sz connected correlations in parallel (always for this code)
         // Careful I am using Psi_t as a temp vector to store res*res (point-wise)
+        if (myrank==0) { cout << "*** Wathcing res \n";}
+        VecView(res, PETSC_VIEWER_STDOUT_WORLD);
         VecPointwiseMult(Psi_t,res,res);
+        if (myrank==0) { cout << "*** Wathcing res*res \n";}
+        VecView(Psi_t, PETSC_VIEWER_STDOUT_WORLD);
+        if (myrank==0) { cout << "*** Wathcing sz[0] \n";}
+        VecView(sz[0], PETSC_VIEWER_STDOUT_WORLD);
         // First measure sz
         std::vector<double> sz(L,0.);
-        for (int k=0;k<L;++k) { VecDot(Psi_t,sigmas_as_vec[k],&sz[k]); }
+        for (int k=0;k<L;++k) { VecDotRealPart(Psi_t,sigmas_as_vec[k],&sz[k]); }
+        if (myrank==0) { cout << "*** Wathcing dot-real-part= " << sz[0] << " \n";}
         if (myparameters.measure_local) { 
           if (myrank==0) {
           for (int k=0;k<L;++k) { locout << "SZ " << i0 << " " << t << " " << k+1 << " " << 0.5*sz[k] << std::endl;}
@@ -436,10 +443,10 @@ int main(int argc,char **argv)
         double C=0.; int running_pair=0;
         for (int k=0;k<(L/2);++k) { // for L/2 distance only, only need the first L/2 spins
           for (int range=(L/2);range<=(L/2);++range) { // only measure at L/2
-              VecDot(sigmasigma_as_vec[running_pair],Psi_t,&C);
+              VecDotRealPart(sigmasigma_as_vec[running_pair],Psi_t,&C);
               C=0.25*(C-sz[k]*sz[(k+range)%L]);
               running_pair++;
-              if (myrank==0) { corrout << t << " " << k+1 << " " << k+range+2 << " " << C << " " << Er << endl; }
+              if (myrank==0) { corrout << t << " " << k+1 << " " << k+range+2 << " " << C  << endl; }
         }
         }
         }
