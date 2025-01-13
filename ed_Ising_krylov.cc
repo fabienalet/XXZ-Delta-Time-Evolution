@@ -44,7 +44,7 @@ using namespace std;
 
 #include "Spin/Ising.h"
 
-#include "Spin/Spin_observable.h"
+#include "Spin/Spin_observable_fullbasis.h"
 
 #undef __FUNCT__
 #define __FUNCT__ "main"
@@ -446,7 +446,7 @@ int main(int argc,char **argv)
           }
         int k2=L-1;
         for (int range=1;range<(L-1);++range) {
-          VecPointwiseMult(Psi_t,sigmasigma_as_vec[running_pair],res);
+          VecPointwiseMult(Psi_t,sigmaxsigmax_as_vec[running_pair],res);
           VecDotRealPart(Psi_t,res,&C); 
           double C2=0.25*(C-sx[k2]*sx[(k2-range)]);
           if (myrank==0) { corrout << t << " " << k2+1 << " " << k2-range+1 << " " << C << " " << C2 << endl; }
@@ -493,12 +493,14 @@ int main(int argc,char **argv)
             } }
           }
           */
+         /*
           if (myparameters.measure_local) {
             myobservable.compute_local_magnetization(state);
-            Siz = myobservable.sz_local;
+            std::vector<double> Siz = myobservable.sz_local;
             for (int r = 0; r < L; ++r) {
                locout << "SZ " << i0 << " " << t << " " << r << " " << Siz[r] << std::endl;}
             }
+            */
         if (myparameters.measure_imbalance)
             { // TODO CHECK IF IMPROVABLE
             myobservable.compute_local_magnetization(state);

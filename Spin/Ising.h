@@ -206,7 +206,7 @@ void Hamiltonian::create_matrix(PetscInt Istart, PetscInt Iend) {
 	      std::vector<unsigned short int> newconfA=confA;
 	      std::vector<unsigned short int> newconfB=confB;
 	      int j;
-	      double diag=0.;
+	      PetscScalar diag=0.;
 
         for (int r=0;r<L;++r) {
 		    int rb=r; int rb2=(r+1)%L; int rb3=(r+2)%L;

@@ -75,7 +75,7 @@ endif(${ED_USE_MKL})
 add_executable(xxz_krylov ed_XXZ_krylov.cc)
 target_link_libraries(xxz_krylov ${MPILIB} ${LAPACKLIB} slepc petsc)
 
-add_executable(ising_krylov ed_ising_krylov.cc)
+add_executable(ising_krylov ed_Ising_krylov.cc)
 target_link_libraries(ising_krylov ${MPILIB} ${LAPACKLIB} slepc petsc)
 
 add_executable(xxz_krylov_correlations ed_XXZ_krylov_correlations.cc)
