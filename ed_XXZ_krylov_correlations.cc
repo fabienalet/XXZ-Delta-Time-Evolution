@@ -385,7 +385,7 @@ int main(int argc,char **argv)
        }
       if (myparameters.measure_return) { myparameters.init_filename_return(retout,i0); }
       }
-
+    cout << "Here\n";
     // Initialise Psi(0) (with the initial state) and Res(0)
     VecSet(Psi_t,0.0);
     VecSetValue(Psi_t,i0,1.0,INSERT_VALUES);
@@ -432,7 +432,7 @@ int main(int argc,char **argv)
        // if (myrank==0) { cout << "*** Wathcing dot-real-part= " << sz[0] << " \n";}
         if (myparameters.measure_local) { 
           if (myrank==0) {
-          for (int k=0;k<L;++k) { locout << "SZ " << i0 << " " << t << " " << k+1 << " " << 0.5*sz[k] << std::endl;}
+      //    for (int k=0;k<L;++k) { locout << "SZ " << i0 << " " << t << " " << k+1 << " " << 0.5*sz[k] << std::endl;}
           }
         }
 
