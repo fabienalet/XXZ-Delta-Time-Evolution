@@ -37,6 +37,9 @@ class fullbasis {
   int myrank;
   int total_number_of_confs;
 
+  unsigned long int i_allup;
+  unsigned long int i_alldown;
+
   void clean_basis();
   void init();
   unsigned long int index(Conf conf);
@@ -158,6 +161,14 @@ void fullbasis::init() {
         starting_conf[nsa - 1] +
         Confs_in_A[nsa - 1].size() * Confs_in_B[nsa - 1].size();
   }
+
+  
+  std::vector<unsigned short int> allup(L,1);
+  std::vector<unsigned short int> alldown(L,0);
+  i_allup=index(allup);
+  i_alldown=index(alldown);
+
+
   std::stringstream ss;
   ss << "L=" << L;
   string_names = ss.str();

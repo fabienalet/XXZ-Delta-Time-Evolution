@@ -323,11 +323,12 @@ int main(int argc,char **argv)
   }
   else if (myparameters.cdw_start)
   { // TODO CHANGE THAT
+
     if(myrank==0)
     {
-      std::cout << "# Starting from Neel state = " << ineel << endl;
+      std::cout << "# Starting from all up state = " << mybasis.i_allup << endl;
     }
-    init_states.push_back(ineel);
+    init_states.push_back(mybasis.i_allup);
   }
   else
   {
@@ -340,9 +341,9 @@ int main(int argc,char **argv)
     else {
     if(myrank==0)
     {
-      std::cout << "# Nothing specified. Starting from Néel state = " << ineel << endl;
+      std::cout << "# Nothing specified. Starting from all up state = " << mybasis.i_allup << endl;
     }
-    init_states.push_back(ineel);
+    init_states.push_back(mybasis.i_allup);
     }
   }
 
