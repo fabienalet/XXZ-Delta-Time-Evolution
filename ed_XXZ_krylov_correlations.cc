@@ -424,14 +424,19 @@ int main(int argc,char **argv)
         // Careful I am using Psi_t as a temp vector to store res*res (point-wise)
         if (myrank==0) { cout << "*** Wathcing res \n";}
         VecView(res, PETSC_VIEWER_STDOUT_WORLD);
-        VecPointwiseMult(Psi_t,res,res);
-        if (myrank==0) { cout << "*** Wathcing res*res \n";}
-        VecView(Psi_t, PETSC_VIEWER_STDOUT_WORLD);
+        //VecPointwiseMult(Psi_t,res,res);
+       
         if (myrank==0) { cout << "*** Wathcing sz[0] \n";}
         VecView(sigmas_as_vec[0], PETSC_VIEWER_STDOUT_WORLD);
         // First measure sz
         std::vector<double> sz(L,0.);
-        for (int k=0;k<L;++k) { VecDotRealPart(Psi_t,sigmas_as_vec[k],&sz[k]); }
+        for (int k=0;k<L;++k) { 
+          VecPointwiseMult(Psi_t,sigmas_as_vec[k],res);
+      if (k==0) { if (myrank==0) { cout << "*** Wathcing res*sz[0] \n";}
+        VecView(Psi_t, PETSC_VIEWER_STDOUT_WORLD);
+      }
+          VecDotRealpart(Psi_t,res,&sz[k]);  
+          }
         if (myrank==0) { cout << "*** Wathcing dot-real-part= " << sz[0] << " \n";}
         if (myparameters.measure_local) { 
           if (myrank==0) {
