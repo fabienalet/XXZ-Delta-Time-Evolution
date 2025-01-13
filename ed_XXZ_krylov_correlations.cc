@@ -421,23 +421,15 @@ int main(int argc,char **argv)
       if ((t_index%each_measurement)==0)
       {
         if ( (1) || (myparameters.measure_correlations) ) { // Measure sz-sz connected correlations in parallel (always for this code)
-        // Careful I am using Psi_t as a temp vector to store res*res (point-wise)
-        if (myrank==0) { cout << "*** Wathcing res \n";}
-        VecView(res, PETSC_VIEWER_STDOUT_WORLD);
-        //VecPointwiseMult(Psi_t,res,res);
-       
-        if (myrank==0) { cout << "*** Wathcing sz[0] \n";}
-        VecView(sigmas_as_vec[0], PETSC_VIEWER_STDOUT_WORLD);
+        
         // First measure sz
         std::vector<double> sz(L,0.);
         for (int k=0;k<L;++k) { 
+          // Careful I am using Psi_t as a temp vector to store res*sz (point-wise)
           VecPointwiseMult(Psi_t,sigmas_as_vec[k],res);
-      if (k==0) { if (myrank==0) { cout << "*** Wathcing res*sz[0] \n";}
-        VecView(Psi_t, PETSC_VIEWER_STDOUT_WORLD);
-      }
           VecDotRealPart(Psi_t,res,&sz[k]);  
           }
-        if (myrank==0) { cout << "*** Wathcing dot-real-part= " << sz[0] << " \n";}
+       // if (myrank==0) { cout << "*** Wathcing dot-real-part= " << sz[0] << " \n";}
         if (myparameters.measure_local) { 
           if (myrank==0) {
           for (int k=0;k<L;++k) { locout << "SZ " << i0 << " " << t << " " << k+1 << " " << 0.5*sz[k] << std::endl;}
@@ -448,7 +440,11 @@ int main(int argc,char **argv)
         double C=0.; int running_pair=0;
         for (int k=0;k<(L/2);++k) { // for L/2 distance only, only need the first L/2 spins
           for (int range=(L/2);range<=(L/2);++range) { // only measure at L/2
-              VecDotRealPart(sigmasigma_as_vec[running_pair],Psi_t,&C);
+            // Careful I am using Psi_t as a temp vector to store res*sz (point-wise)
+               VecPointwiseMult(Psi_t,sigmasigma_as_vec[running_pair],res);
+               VecDotRealPart(Psi_t,res,&C);  
+          
+          //    VecDotRealPart(sigmasigma_as_vec[running_pair],Psi_t,&C);
               C=0.25*(C-sz[k]*sz[(k+range)%L]);
               running_pair++;
               if (myrank==0) { corrout << t << " " << k+1 << " " << k+range+2 << " " << C  << endl; }
