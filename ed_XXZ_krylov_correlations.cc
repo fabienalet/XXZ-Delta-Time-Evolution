@@ -498,8 +498,10 @@ int main(int argc,char **argv)
           */
         if (myparameters.measure_imbalance)
             { // TODO CHECK IF IMPROVABLE
-            if (!(myparameters.measure_local)) { myobservable.compute_local_magnetization(state);
-            Siz = myobservable.sz_local; }
+           // if (!(myparameters.measure_local)) { 
+            myobservable.compute_local_magnetization(state);
+            Siz = myobservable.sz_local; 
+            //}
               double Imb = myobservable.product_state_imbalance(nsa0, ca0, cb0);
               imbout << t << " " << Imb << endl;
               std::cout << "IMBALANCE " << i0 << " " << t << " " << Imb << std::endl;
