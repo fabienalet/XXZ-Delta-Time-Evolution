@@ -9,7 +9,7 @@ class observable {
   fullbasis *basis_pointer;
 
  public:
-  observable(basis *this_basis_pointer, int this_number_threads);
+  observable(fullbasis *this_basis_pointer, int this_number_threads);
   observable() {}
   ~observable() {}
 
@@ -93,7 +93,7 @@ std::vector<double> observable::eigenvector_largest_coefficients(
   return largest_coeffs;
 }
 
-observable::observable(basis *this_basis_pointer, int this_number_threads) {
+observable::observable(fullbasis *this_basis_pointer, int this_number_threads) {
   number_threads = this_number_threads;
   basis_pointer = this_basis_pointer;
   nconf = basis_pointer->total_number_of_confs;
