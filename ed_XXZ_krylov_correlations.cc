@@ -435,7 +435,7 @@ int main(int argc,char **argv)
       if (k==0) { if (myrank==0) { cout << "*** Wathcing res*sz[0] \n";}
         VecView(Psi_t, PETSC_VIEWER_STDOUT_WORLD);
       }
-          VecDotRealpart(Psi_t,res,&sz[k]);  
+          VecDotRealPart(Psi_t,res,&sz[k]);  
           }
         if (myrank==0) { cout << "*** Wathcing dot-real-part= " << sz[0] << " \n";}
         if (myparameters.measure_local) { 
