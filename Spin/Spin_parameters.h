@@ -921,10 +921,13 @@ Parameters::Parameters(int myrank_) {
     }
     }
     if (special_conf.size()!=L) { std::cout << "Error !! Too few boolean values !!!\n"; exit(0);}
-    double Sz = 0;
-    PetscOptionsGetReal(NULL, NULL, "-Sz", &Sz, NULL);
-    if ((int(2*Sz))!=mysz) { std::cout << "Error !! Not correct Sz !!!\n";  exit(0);}
     
+    PetscBool sz_defined=PETSC_FALSE;
+    double Sz = 0;
+    PetscOptionsGetReal(NULL, NULL, "-Sz", &Sz, &sz_defined);
+    if (sz_defined) {
+    if ((int(2*Sz))!=mysz) { std::cout << "Error !! Not correct Sz !!!\n";  exit(0);}
+    }
     delete[] specialstate_c_string;
     // avoid all other options
     product_state_start=PETSC_FALSE;
@@ -953,8 +956,14 @@ Parameters::Parameters(int myrank_) {
   PetscBool target1_set=PETSC_FALSE;
   PetscBool target2_set=PETSC_FALSE;
   interval_set=PETSC_FALSE;
-  PetscOptionsGetReal(NULL, NULL, "-targetinf", &target1,&target1_set); 
+  PetscOptionsGetReal(NULL, NULL, "-targetinf", &target1,&target1_set);
+  if (!(target1_set)) { 
+  PetscOptionsGetReal(NULL, NULL, "-target1", &target1,&target1_set); 
+  }
   PetscOptionsGetReal(NULL, NULL, "-targetsup", &target2,&target2_set); 
+  if (!(target2_set)) {
+    PetscOptionsGetReal(NULL, NULL, "-target2", &target2,&target2_set); 
+  }
   if ( (target1_set) && (target2_set) && (target1<target2) )
   { interval_set=PETSC_TRUE; }
     // string for energy ?
