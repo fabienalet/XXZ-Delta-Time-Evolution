@@ -137,7 +137,7 @@ void Parameters::init_filename_local(ofstream& fileout,int init_conf)
   std::stringstream filename;
     filename << "Loc." << string_from_basis << string_from_H
                 << ".init_conf=" << init_conf << ".dat";
-                cout << filename << endl;
+                cout << filename.str() << endl;
     fileout.open((filename.str()).c_str());
     fileout.precision(20);
 }
