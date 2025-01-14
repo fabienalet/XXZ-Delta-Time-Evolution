@@ -419,7 +419,7 @@ int main(int argc,char **argv)
       /************** Measurements ************/
       if ((t_index%each_measurement)==0)
       {
-        if ( (myparameters.measure_correlations) ) { // Measure sx-sx connected correlations in parallel 
+        if ( (myparameters.measure_correlations) || (myparameters.measure_local) ) { // Measure sx-sx connected correlations in parallel 
         
         // First measure sz
         std::vector<double> sx(L,0.);
@@ -436,6 +436,7 @@ int main(int argc,char **argv)
         }
 
         // Then measure sx-sx correl
+        if (myparameters.measure_correlations) {
         double C=0.; int running_pair=0;
         int k1=0;
         for (int range=1;range<=(L-1);++range) {
@@ -453,6 +454,7 @@ int main(int argc,char **argv)
           if (myrank==0) { corrout << t << " " << k2+1 << " " << k2-range+1 << " " << C << " " << C2 << endl; }
           running_pair++;
           }
+        }
         }
 
 
