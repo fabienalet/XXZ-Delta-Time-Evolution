@@ -138,7 +138,7 @@ void Hamiltonian::get_parameters() {
 
 
   if (myrank==0) {
-    if (disorder > 0) { out << "# Nominal disorder W = " << disorder << endl; }
+    if (disorder > 0) { std::cout << "# Nominal disorder W = " << disorder << endl; }
   std::cout << "# coupling= { ";  for(int i=0; i<L; i++) { std::cout << coupling[i] << " ";} std::cout <<" }" << endl;
   std::cout << "# field= { ";  for(int i=0; i<L; i++) { std::cout << field[i] << " ";} std::cout <<" }" << endl;
   std::cout << "# g= " << g << endl;
