@@ -546,7 +546,7 @@ int main(int argc,char **argv)
       // put back Res in Psi_t for next time evolution
       VecCopy(res, Psi_t);
     } // end of t_index
-    if (myrank==0) {  entout.close(); imbout.close(); retout.close(); partout.close(); corrout.close(); }
+    if (myrank==0) { locout.close();  entout.close(); imbout.close(); retout.close(); partout.close(); corrout.close(); }
   } // end of io loop over initial states
 
   SlepcFinalize();
