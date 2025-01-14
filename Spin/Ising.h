@@ -72,13 +72,22 @@ void Hamiltonian::get_parameters() {
   PetscOptionsGetReal(NULL,NULL,"-J",&J,NULL);
   PetscOptionsGetReal(NULL,NULL,"-Gamma",&Gamma,NULL);
   PetscOptionsGetReal(NULL,NULL,"-g",&g,NULL);
-  PetscOptionsGetReal(NULL,NULL,"-disorder",&disorder,NULL);
+  
   PetscOptionsGetReal(NULL,NULL,"-W",&disorder,NULL);
+
+  double delta_disorder=1.;
+  PetscBool delta_disorder_set=PETSC_FALSE;
+  PetscOptionsGetReal(NULL,NULL,"-delta",&delta_disorder,&delta_disorder_set);
   PetscOptionsGetBool(NULL,NULL,"-pbc",&pbc,NULL);
   PetscOptionsGetInt(NULL,NULL,"-seed",&seed,NULL);
 
   coupling.resize(L,J);
   field.resize(L,Gamma);
+
+  if (delta_disorder_set) { disorder=exp(delta_disorder/2.);  }
+
+
+  
 
   if (disorder>0)
     {
