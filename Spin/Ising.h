@@ -175,11 +175,11 @@ for (int nsa=0;nsa<basis_pointer->valid_sectors;++nsa) {
          // J_i sx_i sx_i+1 + h_i sz_i + g ( sx_i sx_i+2 + sz_i sz_i+1 )
 	      for (int r=0;r<L;++r) {
 		    int rb=r; int rb2=(r+1)%L; int rb3=(r+2)%L;
-          if (coupling[r]) { // Ferro convention
-            if (config[rb]==config[rb2]) { diag -= (PetscScalar) coupling[r]; } else { diag+= (PetscScalar) coupling[r];} 
+          if (coupling[r]) { // AFerro convention
+            if (config[rb]==config[rb2]) { diag += (PetscScalar) coupling[r]; } else { diag -= (PetscScalar) coupling[r];} 
            }
-        if ((pbc) || ((rb3)>rb)) { // Ferro convention g sx_i sx_i+2
-         if (config[rb]==config[rb3]) { diag -= g; } else { diag += g;}
+        if ((pbc) || ((rb3)>rb)) { // AntiFerro convention g sx_i sx_i+2
+         if (config[rb]==config[rb3]) { diag += g; } else { diag -= g;}
         }
         // now off-diagonal transverse field
         newconfig[rb]=1-config[rb];
@@ -244,11 +244,11 @@ void Hamiltonian::create_matrix(PetscInt Istart, PetscInt Iend) {
 
         for (int r=0;r<L;++r) {
 		    int rb=r; int rb2=(r+1)%L; int rb3=(r+2)%L;
-          if (coupling[r]) { // Ferro convention
-            if (config[rb]==config[rb2]) { diag -= (PetscScalar) coupling[r]; } else { diag+= (PetscScalar) coupling[r];} 
+          if (coupling[r]) { // AFerro convention
+            if (config[rb]==config[rb2]) { diag += (PetscScalar) coupling[r]; } else { diag -= (PetscScalar) coupling[r];} 
            }
-        if ((pbc) || ((rb3)>rb)) { // Ferro convention g sx_i sx_i+2
-         if (config[rb]==config[rb3]) { diag -= g; } else { diag += g;}
+        if ((pbc) || ((rb3)>rb)) { // AFerro convention g sx_i sx_i+2
+         if (config[rb]==config[rb3]) { diag += g; } else { diag -= g;}
         }
         // now off-diagonal transverse field
         newconfig[rb]=1-config[rb];
@@ -259,7 +259,7 @@ void Hamiltonian::create_matrix(PetscInt Istart, PetscInt Iend) {
 		    for (int p=0;p<LB;++p) { newconfB[p]=newconfig[p+LA]; nright+=newconfig[p+LA];}
 		    int new_nsa=basis_pointer->particle_sector[std::make_pair(nleft,nright)]; 
         j=basis_pointer->starting_conf[new_nsa]+basis_pointer->InverseMapA[new_nsa][newconfA]*basis_pointer->Confs_in_B[new_nsa].size()+basis_pointer->InverseMapB[new_nsa][newconfB];
-		    MatSetValue(*pointer_to_H, row_ctr, j, (PetscScalar) -field[r], ADD_VALUES );
+		    MatSetValue(*pointer_to_H, row_ctr, j, (PetscScalar) field[r], ADD_VALUES );
         // now eventually flip the second spin ...
         if ((pbc) || ((rb2)>rb)) {
         newconfig[rb2]=1-config[rb2];
@@ -268,7 +268,7 @@ void Hamiltonian::create_matrix(PetscInt Istart, PetscInt Iend) {
 		    for (int p=0;p<LB;++p) { newconfB[p]=newconfig[p+LA]; nright+=newconfig[p+LA];}
         new_nsa=basis_pointer->particle_sector[std::make_pair(nleft,nright)]; 
         j=basis_pointer->starting_conf[new_nsa]+basis_pointer->InverseMapA[new_nsa][newconfA]*basis_pointer->Confs_in_B[new_nsa].size()+basis_pointer->InverseMapB[new_nsa][newconfB];
-		    MatSetValue(*pointer_to_H, row_ctr, j, (PetscScalar) -g, ADD_VALUES);
+		    MatSetValue(*pointer_to_H, row_ctr, j, (PetscScalar) g, ADD_VALUES);
         newconfig[rb2]=config[rb2];
         }
         newconfig[rb]=config[rb];
