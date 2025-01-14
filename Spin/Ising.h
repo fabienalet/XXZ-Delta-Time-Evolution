@@ -91,9 +91,10 @@ void Hamiltonian::get_parameters() {
 
   if (disorder>0)
     {
+      
       boost::mt19937 generator; generator.seed(seed);
       boost::random::uniform_real_distribution<double> box(0,disorder);
-	    for(int i=0; i<L; i++) { coupling[i] += box(generator); }
+	    for(int i=0; i<L; i++) { coupling[i] = box(generator); }
       boost::mt19937 generator2; generator2.seed(seed+50);
       boost::random::uniform_real_distribution<double> box2(0,1./disorder);
       for(int i=0; i<L; i++) { field[i] = box2(generator2); }
@@ -137,6 +138,7 @@ void Hamiltonian::get_parameters() {
 
 
   if (myrank==0) {
+    if (disorder > 0) { out << "# Nominal disorder W = " << disorder << endl; }
   std::cout << "# coupling= { ";  for(int i=0; i<L; i++) { std::cout << coupling[i] << " ";} std::cout <<" }" << endl;
   std::cout << "# field= { ";  for(int i=0; i<L; i++) { std::cout << field[i] << " ";} std::cout <<" }" << endl;
   std::cout << "# g= " << g << endl;
