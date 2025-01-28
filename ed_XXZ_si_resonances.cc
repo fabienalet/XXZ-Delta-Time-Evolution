@@ -427,6 +427,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       PetscBool measure_everything=PETSC_FALSE;
       PetscOptionsGetBool(NULL, NULL, "-measure_everything", &measure_everything,NULL); 
 
+      PetscBool measure_allocal=PETSC_TRUE;
+      PetscOptionsGetBool(NULL, NULL, "-measure_alllocal", &measure_alllocal,NULL); 
+
       PetscBool measure_sigma_indicator=PETSC_TRUE;
       PetscOptionsGetBool(NULL, NULL, "-measure_sigma", &measure_sigma_indicator,NULL); 
       if (measure_sigma_indicator) { myparameters.init_filename_sigma(sigmaout,energy_name);}
@@ -448,6 +451,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
      // C_cutoff*=4;
       if (!(C_cutoff_set) && (!(sz_cutoff_set)) ) { if (myrank==0) { cout << "No cutoff set, exiting\n";} exit(0); }
 
+        // TODO : get pbc back !
+        PetscBool pbc=PETSC_TRUE;
+        PetscOptionsGetBool(NULL, NULL, "-pbc", &pbc, NULL);
       for (int i = 0; i < nconv; i++) 
       {
         EPSGetEigenpair(eps2, i, &Er, &Ei, xr, NULL);
@@ -459,15 +465,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         std::vector<double> sz(L,0.);
 
         VecPointwiseMult(use1,xr,xr);
-        for (int k=0;k<L;++k) {
-          VecDot(use1,sigmas_as_vec[k],&sz[k]);
-        }
-        
-        // TODO : get pbc back !
-        PetscBool pbc=PETSC_TRUE;
-        PetscOptionsGetBool(NULL, NULL, "-pbc", &pbc, NULL);
-
-        // TODO NOT GOOD CIRETION with sz_cutoff ...
+        for (int k=0;k<L;++k) { VecDot(use1,sigmas_as_vec[k],&sz[k]); }
+           // TODO NOT GOOD CIRETION with sz_cutoff ...
         /*
         for (int j=0;j<L;++j)
           { if (fabs(sz[j])<sz_cutoff)
@@ -647,10 +646,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             } 
             }
           }
-        if (myrank==0) { 
-        for (int pp=0;pp<sz.size();++pp)    {
-          alllocout << pp+1 << " " << 0.5*sz[pp] << " " << Er << endl; 
-        }
+        
         //  MatMult(sigmas[k],xr,use1);
         //   VecPointwiseMult(use1,sigmas_as_vec[k],xr);
           std::vector<double> szkp(s-si-1);
@@ -667,7 +663,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                 //" with " << szkp[pp-si-1] << " sz=" << sz[k] << "," << sz[p] << " --> " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl;} }
                 if (myrank==0) { corrout << k+1 << " " << p+1 << " " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl; }    
               }
-        }
+        if (myrank==0) { for (int pp=0;pp<sz.size();++pp)    { alllocout << pp+1 << " " << 0.5*sz[pp] << " " << Er << endl; } }
         }
         }
         
