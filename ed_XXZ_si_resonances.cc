@@ -427,7 +427,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       PetscBool measure_everything=PETSC_FALSE;
       PetscOptionsGetBool(NULL, NULL, "-measure_everything", &measure_everything,NULL); 
 
-      PetscBool measure_allocal=PETSC_TRUE;
+      PetscBool measure_alllocal=PETSC_TRUE;
       PetscOptionsGetBool(NULL, NULL, "-measure_alllocal", &measure_alllocal,NULL); 
 
       PetscBool measure_sigma_indicator=PETSC_TRUE;
@@ -645,7 +645,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             if (myrank==0) { locout << k+1 << " " << sz[k] << " " << Er << endl; 
             } 
             }
-          }
+
         
         //  MatMult(sigmas[k],xr,use1);
         //   VecPointwiseMult(use1,sigmas_as_vec[k],xr);
@@ -663,6 +663,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                 //" with " << szkp[pp-si-1] << " sz=" << sz[k] << "," << sz[p] << " --> " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl;} }
                 if (myrank==0) { corrout << k+1 << " " << p+1 << " " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl; }    
               }
+        }
+        
         if (myrank==0) { for (int pp=0;pp<sz.size();++pp)    { alllocout << pp+1 << " " << 0.5*sz[pp] << " " << Er << endl; } }
         }
         }
