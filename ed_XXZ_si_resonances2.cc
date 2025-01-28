@@ -407,11 +407,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         double Er2;
         cout << "Entering and searching for " << j_paired[jp] << endl;
         EPSGetEigenpair(eps2, j_paired[jp], &Er2, &Ei, xr2, NULL);
-        cout << "Got " << j_paired[jp] << endl;
-        if (myrank==0) { cout << saved_KLs[jp].first << " " << saved_KLs[jp].second << " " << Er << " " <<  Er2 << " " << i << " " << j_paired[jp];
-        if (j_paired[jp]==j_minKL) { cout << " 1" << endl; } else { cout << " 0" << endl;}
-
-        KLout << saved_KLs[jp].first << " " << saved_KLs[jp].second << " " << Er << " " <<  Er2 << " " << i << " " << j_paired[jp];
+       
+        if (myrank==0) { KLout << saved_KLs[jp].first << " " << saved_KLs[jp].second << " " << Er << " " <<  Er2 << " " << i << " " << j_paired[jp];
         if (j_paired[jp]==j_minKL) { KLout << " 1" << endl; } else { KLout << " 0" << endl;}
           }
         
@@ -421,7 +418,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               VecPointwiseMult(use1,xr2,xr);
               for (int k=0;k<L;++k) { VecDot(use1,sigmas_as_vec[k],&sigma_indicator[k]); }
               if (myrank==0) {
-            for (int k=0;k<L;++k) { sigmaout << "Sig " <<  k << " " << sigma_indicator[k] << " " << Er << " " <<  Er2 << " " << i << " " << j_paired[jp];
+            for (int k=0;k<L;++k) { sigmaout << "Sig " <<  k+1 << " " << sigma_indicator[k] << " " << Er << " " <<  Er2 << " " << i << " " << j_paired[jp];
             if (j_paired[jp]==j_minKL) { sigmaout << " 1" << endl; } else { sigmaout << " 0" << endl;}
               }
             } 
@@ -432,17 +429,16 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         //observables_computed_for_eigenstate[i]=1;
         std::vector<double> sz(L,0.);
           VecPointwiseMult(xr2,xr,xr);
-          for (int k=0;k<L;++k) {
-          VecDot(xr2,sigmas_as_vec[k],&sz[k]);
-          }
+          for (int k=0;k<L;++k) { VecDot(xr2,sigmas_as_vec[k],&sz[k]);}
           if (myparameters.measure_local) { 
             for (int k=0;k<L;++k) { locout << k+1 << " " << 0.5*sz[k] << " " << Er << " " << i << endl; } 
             }      
           if (myparameters.measure_correlations) {
-            double C;
+            double C; int running_pair=0;
            for (int k=0;k<L;++k) 
                 { for (int range=1;range<=(L/2);++range) 
                   { VecDot(sigmasigma_as_vec[running_pair],xr2,&C);
+                    running_pair++;
                     if (myrank==0) { corrout << k+1 << " " << (k+range)%L+1 << " " << 0.25*(C-sz[k]*sz[(k+range)%L]) << " " << Er << " " << i << endl; }    
                   }
                 }
