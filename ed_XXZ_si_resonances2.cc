@@ -376,7 +376,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         energies.push_back(PetscRealPart(Er));
 
         std::vector<int> j_paired; j_paired.resize(0);
-
+        double minKL=1000000; int j_minKL=0; std::vector<int> j_paired; std::vector<std::pair<double,double> saved_KLs;
         for (int j = i+1; j < nconv; j++) 
           { //if (i!=j) {
             double Er2;
@@ -397,7 +397,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
             if (global_KL<minKL) { minKL=global_KL; j_minKL=j;}
             if (global_KL2<minKL) { minKL=global_KL2; j_minKL=j;}
-            if ((global_KL<KL_cutoff) || (global_KL2<KL_cutoff)) { j_paired.push_back(j); saved_KLs.push_back(std::make_pair(global_KL,globalKL2));}
+            if ((global_KL<KL_cutoff) || (global_KL2<KL_cutoff)) { j_paired.push_back(j); saved_KLs.push_back(std::make_pair(global_KL,global_KL2));}
 
             //}
           }
@@ -413,10 +413,10 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         if (measure_sigma_indicator) {
               // TODO Optimize
               std::vector<double> sigma_indicator(L,0);
-              VecPointwiseMult(use2,xr2,xr);
-              for (int k=0;k<L;++k) { VecDot(use2,sigmas_as_vec[k],&sigma_indicator[k]); }
+              VecPointwiseMult(use1,xr2,xr);
+              for (int k=0;k<L;++k) { VecDot(use1,sigmas_as_vec[k],&sigma_indicator[k]); }
               if (myrank==0) {
-            for (int k=0;k<L;++k) { sigmaout << "Sig " <<  k << " " << sigma_indicator[k] << " " << Er << " " <<  Er2 << << i << " " << j_paired[jp];
+            for (int k=0;k<L;++k) { sigmaout << "Sig " <<  k << " " << sigma_indicator[k] << " " << Er << " " <<  Er2 << " " << i << " " << j_paired[jp];
             if (j_paired[jp]==j_minKL) { cout << " 1" << endl; } else { cout << " 0" << endl;}
               }
             } 
@@ -425,6 +425,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       }
       if (j_paired.size()>0) {
         //observables_computed_for_eigenstate[i]=1;
+        std::vector<double> sz(L,0.);
           VecPointwiseMult(xr2,xr,xr);
           for (int k=0;k<L;++k) {
           VecDot(xr2,sigmas_as_vec[k],&sz[k]);
@@ -432,11 +433,12 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           if (myparameters.measure_local) { 
             for (int k=0;k<L;++k) { locout << k+1 << " " << 0.5*sz[k] << " " << Er << " " << i << endl; } 
             }      
-          if (measure_correlations) {
+          if (myparameters.measure_correlations) {
+            double C;
            for (int k=0;k<L;++k) 
                 { for (int range=1;range<=(L/2);++range) 
                   { VecDot(sigmasigma_as_vec[running_pair],xr2,&C);
-                    if (myrank==0) { corrout << k+1 << " " << p+1 << " " << 0.25*(C-sz[k]*sz[(k+range)%L]) << " " << Er << " " << i << endl; }    
+                    if (myrank==0) { corrout << k+1 << " " << (k+range)%L+1 << " " << 0.25*(C-sz[k]*sz[(k+range)%L]) << " " << Er << " " << i << endl; }    
                   }
                 }
           }
