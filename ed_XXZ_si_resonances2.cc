@@ -398,14 +398,14 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             if (global_KL<minKL) { minKL=global_KL; j_minKL=j;}
             if (global_KL2<minKL) { minKL=global_KL2; j_minKL=j;}
             if ((global_KL<KL_cutoff) || (global_KL2<KL_cutoff)) { j_paired.push_back(j); saved_KLs.push_back(std::make_pair(global_KL,global_KL2));}
-          cout << i << " " << j << " " << global_KL << " " << global_KL2 << endl;
+        //  cout << i << " " << j << " " << global_KL << " " << global_KL2 << endl;
             //}
           }
 
 
       for (int jp=0;jp<j_paired.size();++jp) {
         double Er2;
-        cout << "Entering and searching for " << j_paired[jp] << endl;
+        //cout << "Entering and searching for " << j_paired[jp] << endl;
         EPSGetEigenpair(eps2, j_paired[jp], &Er2, &Ei, xr2, NULL);
        
         if (myrank==0) { KLout << saved_KLs[jp].first << " " << saved_KLs[jp].second << " " << Er << " " <<  Er2 << " " << i << " " << j_paired[jp];
