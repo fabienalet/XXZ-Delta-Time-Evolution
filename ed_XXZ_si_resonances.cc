@@ -640,7 +640,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         for (int si=0;si<s;++si) {
           int k=(int) sites_to_follow[ll][si];
           if (myparameters.measure_local) { 
-            if (myrank==0) { locout << k+1 << " " << sz[k] << " " << Er << endl; } 
+            if (myrank==0) { locout << k+1 << " " << 0.5*sz[k] << " " << Er << endl; } 
             }
 
         //  MatMult(sigmas[k],xr,use1);
@@ -775,7 +775,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             Tij = myobservable.get_SpSm_correlation(state);
             for (int r = 0; r < L; ++r) {
               for (int s = r; s < L; ++s) {
-                tcorrout << r << " " << " " << s << " " << Tij[r][s] << " " << Er << endl;
+                tcorrout << r+1 << " " << " " << s+1 << " " << Tij[r][s] << " " << Er << endl;
             } }
           }
           if (myparameters.measure_entanglement) 
