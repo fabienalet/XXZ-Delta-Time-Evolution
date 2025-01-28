@@ -408,7 +408,10 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         cout << "Entering and searching for " << j_paired[jp] << endl;
         EPSGetEigenpair(eps2, j_paired[jp], &Er2, &Ei, xr2, NULL);
         cout << "Got " << j_paired[jp] << endl;
-        if (myrank==0) { KLout << saved_KLs[jp].first << " " << saved_KLs[jp].second << " " << Er << " " <<  Er2 << " " << i << " " << j_paired[jp];
+        if (myrank==0) { cout saved_KLs[jp].first << " " << saved_KLs[jp].second << " " << Er << " " <<  Er2 << " " << i << " " << j_paired[jp];
+        if (j_paired[jp]==j_minKL) { cout << " 1" << endl; } else { cout << " 0" << endl;}
+
+        KLout << saved_KLs[jp].first << " " << saved_KLs[jp].second << " " << Er << " " <<  Er2 << " " << i << " " << j_paired[jp];
         if (j_paired[jp]==j_minKL) { KLout << " 1" << endl; } else { KLout << " 0" << endl;}
           }
         
