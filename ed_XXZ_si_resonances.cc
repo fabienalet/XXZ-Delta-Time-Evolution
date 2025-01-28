@@ -646,11 +646,11 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             if (myrank==0) { locout << k+1 << " " << sz[k] << " " << Er << endl; 
             } 
             }
-          if (myrank==0) { 
-        for (int pp=0;pp<sz.size();++pp)    {
-          alllocout << k+1 << " " << 0.5*sz[k] << " " << Er << endl; 
-        }
           }
+        if (myrank==0) { 
+        for (int pp=0;pp<sz.size();++pp)    {
+          alllocout << pp+1 << " " << 0.5*sz[pp] << " " << Er << endl; 
+        }
         //  MatMult(sigmas[k],xr,use1);
         //   VecPointwiseMult(use1,sigmas_as_vec[k],xr);
           std::vector<double> szkp(s-si-1);
