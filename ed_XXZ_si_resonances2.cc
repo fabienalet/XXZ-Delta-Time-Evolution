@@ -374,7 +374,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       {
         EPSGetEigenpair(eps2, i, &Er, &Ei, xr, NULL);
         energies.push_back(PetscRealPart(Er));
-
+        if (myrank==0) { if (!(i%(nconv/10))) { cout << "Treating i=" << i << endl;} }
         std::vector<int> j_paired; j_paired.resize(0);
         double minKL=1000000; int j_minKL=0; std::vector<std::pair<double,double> > saved_KLs;
         for (int j = i+1; j < nconv; j++) 
