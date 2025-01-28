@@ -89,3 +89,6 @@ target_link_libraries(xxz_si_prod ${MPILIB} ${LAPACKLIB} slepc petsc)
 
 add_executable(xxz_si_resonances ed_XXZ_si_resonances.cc)
 target_link_libraries(xxz_si_resonances ${MPILIB} ${LAPACKLIB} slepc petsc)
+
+add_executable(xxz_si_resonances2 ed_XXZ_si_resonances2.cc)
+target_link_libraries(xxz_si_resonances2 ${MPILIB} ${LAPACKLIB} slepc petsc)
