@@ -376,7 +376,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         energies.push_back(PetscRealPart(Er));
 
         std::vector<int> j_paired; j_paired.resize(0);
-        double minKL=1000000; int j_minKL=0; std::vector<int> j_paired; std::vector<std::pair<double,double> saved_KLs;
+        double minKL=1000000; int j_minKL=0; std::vector<std::pair<double,double> > saved_KLs;
         for (int j = i+1; j < nconv; j++) 
           { //if (i!=j) {
             double Er2;
@@ -452,16 +452,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
           MPI_Reduce(&local_S1, &global_S1, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
           if (myrank==0) { partout << "S1 " << global_S1 << " " << Er << " " << i << endl; }
         }
-
-
-        std::vector< pair<int,int> > prediction_strong_correl_pair; prediction_strong_correl_pair.resize(0);
-        std::vector<double> sz(L,0.);
-
-        VecPointwiseMult(use1,xr,xr);
-        for (int k=0;k<L;++k) {
-          VecDot(use1,sigmas_as_vec[k],&sz[k]);
-        }
-        
 
      // other measurements on eigenstate to follow ...
     PetscBool other_measurements=PETSC_FALSE;
