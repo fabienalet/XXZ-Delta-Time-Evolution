@@ -58,7 +58,7 @@ class Parameters {
   void init_filename_local(ofstream& locout,int inistate);
   void init_filename_local(ofstream& locout);
   void init_filename_local(ofstream& f,string energyname);
-
+  void init_filename_alllocal(ofstream& f,string energyname);
   void init_filename_return(ofstream& retout,int inistate);
   void init_filename_imbalance(ofstream& imbout,int inistate);
   
@@ -155,6 +155,15 @@ void Parameters::init_filename_local(ofstream& fileout,string energyname)
 {
   std::stringstream filename;
     filename << "Loc." << string_from_basis << string_from_H
+                << energyname << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
+void Parameters::init_filename_alllocal(ofstream& fileout,string energyname)
+{
+  std::stringstream filename;
+    filename << "AllLoc." << string_from_basis << string_from_H
                 << energyname << ".dat";
     fileout.open((filename.str()).c_str());
     fileout.precision(20);

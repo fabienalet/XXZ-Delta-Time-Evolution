@@ -354,6 +354,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
     if (nconv > 0) {
       ofstream entout;
       ofstream locout;
+      ofstream alllocout;
       ofstream partout;
       ofstream corrout;
       ofstream tcorrout;
@@ -361,7 +362,9 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       ofstream sigmaout;
 
       if (myparameters.measure_KL) { myparameters.init_filename_KL(KLout,energy_name);}
-      if (myparameters.measure_local) { myparameters.init_filename_local(locout,energy_name);}
+      if (myparameters.measure_local) { myparameters.init_filename_local(locout,energy_name); 
+                                        myparameters.init_filename_alllocal(alllocout,energy_name); 
+      }
       if (myparameters.measure_correlations) { myparameters.init_filename_correlations(corrout,energy_name);}
       if (myparameters.measure_transverse_correlations) { myparameters.init_filename_transverse_correlations(tcorrout,energy_name);}
       if (myparameters.measure_participation) { myparameters.init_filename_participation(partout,energy_name);}
@@ -640,9 +643,14 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         for (int si=0;si<s;++si) {
           int k=(int) sites_to_follow[ll][si];
           if (myparameters.measure_local) { 
-            if (myrank==0) { locout << k+1 << " " << 0.5*sz[k] << " " << Er << endl; } 
+            if (myrank==0) { locout << k+1 << " " << sz[k] << " " << Er << endl; 
+            } 
             }
-
+          if (myrank==0) { 
+        for (int pp=0;pp<sz.size();++pp)    {
+          alllocout << k+1 << " " << 0.5*sz[k] << " " << Er << endl; 
+        }
+          }
         //  MatMult(sigmas[k],xr,use1);
         //   VecPointwiseMult(use1,sigmas_as_vec[k],xr);
           std::vector<double> szkp(s-si-1);
@@ -803,7 +811,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       } // loop over states
 
     if (myparameters.measure_KL) {KLout.close();}
-    if (myparameters.measure_local) { locout.close();}
+    if (myparameters.measure_local) { locout.close(); alllocout.close(); }
     if (myparameters.measure_correlations) { corrout.close();}
     if (myparameters.measure_participation) { partout.close();}
     if (myparameters.measure_entanglement) { entout.close();}
