@@ -373,6 +373,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       PetscReal KL_cutoff=2.0;
       PetscOptionsGetReal(NULL, NULL, "-KL_cutoff", &KL_cutoff,NULL); 
 
+      PetscReal cutoff_nb_KL=100;
+      PetscOptionsGetReal(NULL, NULL, "-cutoff_nb_KL", &cutoff_nb_KL,NULL); 
 
   
 
@@ -400,7 +402,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
         std::vector<int> j_paired; j_paired.resize(0);
         double minKL=1000000; int j_minKL=0; std::vector<std::pair<double,double> > saved_KLs;
-        for (int j = i+1; j < nconv; j++) 
+        for (int j = i+1; j < i+cutoff_nb_KL+1; j++) 
           { //if (i!=j) {
             double Er2;
             EPSGetEigenpair(eps2, j, &Er2, &Ei, xr2, NULL);
