@@ -358,6 +358,10 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       PetscOptionsGetBool(NULL, NULL, "-measure_sigma", &measure_sigma_indicator,NULL); 
       if (measure_sigma_indicator) { myparameters.init_filename_sigma(sigmaout,energy_name);}
 
+      PetscReal sigma_cutoff=0.5;
+      PetscOptionsGetReal(NULL, NULL, "-sigma_cutoff", &sigma_cutoff,NULL); 
+
+
       PetscBool other_measurements=PETSC_FALSE;
       PetscOptionsGetBool(NULL, NULL, "-other_measurements", &other_measurements,NULL); 
 
@@ -433,11 +437,12 @@ int ENV_NUM_THREADS=omp_get_num_threads();
             if (KL1<minKL) { minKL=KL1; j_minKL=j;}
             if (KL2<minKL) { minKL=KL2; j_minKL=j;}
             if ((KL1<KL_cutoff) || (KL2<KL_cutoff)) { j_paired.push_back(j); saved_KLs.push_back(std::make_pair(KL1,KL2));}
-        }
         VecRestoreArray(Vec_local2, &state_j); 
         }
+        VecDestroy(&Vec_local2);
+        }
 
-   VecRestoreArray(Vec_local, &state_i); 
+    VecRestoreArray(Vec_local, &state_i); 
     int jps=j_paired.size();
     MPI_Bcast(&jps, 1, MPI_INT, 0, MPI_COMM_WORLD);
     if (myrank!=0) { j_paired.resize(jps);}
@@ -464,7 +469,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
               if (myrank==0) {
             for (int k=0;k<L;++k) { sigmaout << "Sig " <<  k+1 << " " << sigma_indicator[k] << " " << Er << " " <<  Er2 << " " << i << " " << j_paired[jp];
             if (j_paired[jp]==j_minKL) { sigmaout << " 1"; } else { sigmaout << " 0";}
-            if (nb_large_sigma>2) { sigmaout << " 1 ***;"} sigmaout << endl;
+            if (nb_large_sigma>2) { sigmaout << " 1 ***";} sigmaout << endl;
               }
             } 
         }
