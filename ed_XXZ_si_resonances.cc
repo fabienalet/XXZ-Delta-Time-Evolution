@@ -177,11 +177,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
   MatCreateVecs(H, NULL, &xr);
   
 
-  myparameters.interval_set
-  
-
-
-
   std::vector<double> targets;
   if (myparameters.target_infinite_temperature) {
     PetscScalar E_infinite_temperature;
