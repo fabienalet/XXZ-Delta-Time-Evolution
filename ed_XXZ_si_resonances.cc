@@ -201,7 +201,6 @@ int ENV_NUM_THREADS=omp_get_num_threads();
   }
 
 
-  myparameters.targets.resize(0);
 
   /******************************/
   // Defining sigmas
@@ -275,6 +274,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
   for (double &renorm_target : targets) {  // new setup
     double target = renorm_target * (Emaxc - Eminc) + Eminc;
+    if (special_energy_set) { target=renorm_target;}
     EPS eps2;
     //		EPSInitializePackage();
     ierr = EPSCreate(PETSC_COMM_WORLD, &eps2);
@@ -294,6 +294,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
     PetscBool eps_interval_set=PETSC_FALSE;
     PetscOptionsGetString(NULL, NULL, "-eps_interval", eps_interval_string, 1000,&eps_interval_set); 
  
+    if (special_energy_set) { eps_interval_set=0;}
+
     if ((!(eps_interval_set)) && (!(myparameters.interval_set))) { 
       EPSSetWhichEigenpairs(eps2, EPS_TARGET_REAL);
       EPSSetTarget(eps2, target);
