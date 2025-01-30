@@ -176,6 +176,12 @@ int ENV_NUM_THREADS=omp_get_num_threads();
   Vec xr;
   MatCreateVecs(H, NULL, &xr);
   
+
+  myparameters.interval_set
+  
+
+
+
   std::vector<double> targets;
   if (myparameters.target_infinite_temperature) {
     PetscScalar E_infinite_temperature;
@@ -191,6 +197,16 @@ int ENV_NUM_THREADS=omp_get_num_threads();
     targets = myparameters.targets;
   }
 
+  PetscBool special_energy_set=PETSC_FALSE;
+  PetscReal special_energy=0.;
+  PetscOptionsGetReal(NULL, NULL, "-special_energy", &special_energy,&special_energy_set); 
+  if (special_energy_set) {
+    targets.resize(0); targets.push_back(special_energy);
+    myparameters.interval_set=PETSC_TRUE;
+  }
+
+
+  myparameters.targets.resize(0);
 
   /******************************/
   // Defining sigmas
@@ -664,7 +680,7 @@ int ENV_NUM_THREADS=omp_get_num_threads();
                 if (myrank==0) { corrout << k+1 << " " << p+1 << " " << 0.25*(szkp[pp-si-1]-sz[k]*sz[p]) << " " << Er << endl; }    
               }
         }
-        
+
         if (myrank==0) { for (int pp=0;pp<sz.size();++pp)    { alllocout << pp+1 << " " << 0.5*sz[pp] << " " << Er << endl; } }
         }
         }
