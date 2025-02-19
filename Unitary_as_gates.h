@@ -50,11 +50,12 @@ PetscErrorCode MatMultU(Mat M,Vec x,Vec y)
 {
   PetscErrorCode    ierr;
   MatrixContext     *ctx;
- // Vec               x2;
+  Vec               x2;
   //Vec               x3;
   // First executable line of user provided PETSc routine
   PetscFunctionBeginUser;
   VecSet(y,0.);
+  VecDuplicate(x,&x2);
   ierr = MatShellGetContext(M,(void**)&ctx);CHKERRQ(ierr);
  // std::cout << "MatMult U : step 0\n";
  // VecView(x,PETSC_VIEWER_STDOUT_WORLD); 
@@ -62,28 +63,28 @@ PetscErrorCode MatMultU(Mat M,Vec x,Vec y)
   // assume vector x is in the sigma_z basis
   // first apply all 1-qubit gates (U_plus)
   for (int i=0;i<ctx->Lchain;++i) {
-  MatMult(ctx->U_plus_gates[i], x, y);
-  if (i < (ctx->Lchain - 1)) { VecSwap(y, x); }
+  MatMult(ctx->U_plus_gates[i], x2, y);
+  if (i < (ctx->Lchain - 1)) { VecSwap(y, x2); }
   }
   // result is in y
    // VecView(y,PETSC_VIEWER_STDOUT_WORLD); 
   // Then apply 2 qubits-gate U_2 (diagonal operation in sigma_z basis)
-  VecPointwiseMult(x, y, ctx->Ising_gate);
+  VecPointwiseMult(x2, y, ctx->Ising_gate);
   // result is in x now
 
   // Apply all 1-qubit gates (U_minus)
   for (int i=0;i<ctx->Lchain;++i) {
-  MatMult(ctx->U_minus_gates[i], x, y);
-  if (i < (ctx->Lchain - 1)) { VecSwap(y, x); }
+  MatMult(ctx->U_minus_gates[i], x2, y);
+  if (i < (ctx->Lchain - 1)) { VecSwap(y, x2); }
   }
   // result is in y
    // VecView(y,PETSC_VIEWER_STDOUT_WORLD); 
   // Then apply 2 qubits-gate U_2 (diagonal operation in sigma_z basis)
-  VecPointwiseMult(x, y, ctx->Ising_gate);
+  VecPointwiseMult(x2, y, ctx->Ising_gate);
   // result is in x now
 
   // Do a final swap
-  VecCopy(x, y);
+  VecSwap(x2, y);
   
 PetscFunctionReturn(0);
 }
@@ -281,8 +282,8 @@ PetscErrorCode Unitary_as_gates::init()
   // define multiplication operations
   ierr=MatShellSetOperation(_U,MATOP_MULT,(void(*)())MatMultU);CHKERRQ(ierr);
   // declare matrix to be Hermitian
-  MatSetOption(_U,	MAT_SYMMETRIC, PETSC_TRUE);
-  MatSetOption(_U, MAT_SYMMETRY_ETERNAL, PETSC_TRUE);
+ // MatSetOption(_U,	MAT_SYMMETRIC, PETSC_TRUE);
+ // MatSetOption(_U, MAT_SYMMETRY_ETERNAL, PETSC_TRUE);
   //std::cout << "Diagonal x: \n";
   //VecView(_CTX->Diagonal_Unitary_x,PETSC_VIEWER_STDOUT_WORLD); 
   //std::cout << "Diagonal z: \n";
