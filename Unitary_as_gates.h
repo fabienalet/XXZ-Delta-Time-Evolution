@@ -158,9 +158,9 @@ void Unitary_as_gates::get_parameters() {
   delta_=0.8;
   PetscOptionsGetReal(NULL, NULL, "-delta", &delta_, NULL);
   delta_plus_=delta_;
-  PetscOptionsGetReal(NULL, NULL, "-deltaplus", &deltaplus_, NULL);
+  PetscOptionsGetReal(NULL, NULL, "-deltaplus", &delta_plus_, NULL);
   delta_minus_=delta_;
-  PetscOptionsGetReal(NULL, NULL, "-deltaminus", &deltaminus_, NULL);
+  PetscOptionsGetReal(NULL, NULL, "-deltaminus", &delta_minus_, NULL);
   
   epsilon_=0.05;
   PetscOptionsGetReal(NULL, NULL, "-epsilon", &epsilon_, NULL);
@@ -198,7 +198,7 @@ Unitary_as_gates::~Unitary_as_gates()
   for (int i=0;i<Lchain_;i++)
   { MatDestroy(&_CTX->U_plus_gates[i]);
     MatDestroy(&_CTX->U_minus_gates[i]); }
-  VecDestroy(&_CTX->Ising_gates);
+  VecDestroy(&_CTX->Ising_gate);
   PetscFree(_CTX);
 }
 
@@ -247,11 +247,11 @@ PetscErrorCode Unitary_as_gates::init()
     MatAssemblyEnd(_CTX->U_minus_gates[r],MAT_FINAL_ASSEMBLY);
 
     }
-    
+  }
     if (myrank==0) std::cout << "Done Creating Uplus-Uminus gates ...\n";
 
   // Initialize the diagonal operators along z
-  MatCreateVecs(U_plus_gates[0], NULL, &_CTX->Ising_gate);
+  MatCreateVecs(_CTX->U_plus_gates[0], NULL, &_CTX->Ising_gate);
   //
   for (int i=_Istart;i<_Iend;++i) {
     // bitstring of i = b(i) = 001001 ...
@@ -260,7 +260,7 @@ PetscErrorCode Unitary_as_gates::init()
     // Diagonal x = exp(-i T/2 ( \sum_j J_j sigma_j^x sigma_j^x )
     double ising_energy=0.;
     double nup=0;
-    for (int r=0;r<L;++r) { 
+    for (int r=0;r<Lchain_;++r) { 
       if (b[r]==b[(r+1+Lchain_)%Lchain_]) { ising_energy+=J_coupling[r];} else { ising_energy-=J_coupling[r];} 
       if (b[r]) { nup++;}
       }
