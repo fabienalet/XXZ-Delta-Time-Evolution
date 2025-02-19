@@ -331,8 +331,8 @@ where \delta_{\pm} = \delta.
   
   PetscScalar costp=cos(theta_);
   PetscScalar sintp=sin(theta_);
-  PetscScalar costm=cos(theta_+epsilon_/2.);
-  PetscScalar sintm=sin(theta_+epsilon_/2.);
+  PetscScalar costm=cos(theta_+epsilon_);
+  PetscScalar sintm=sin(theta_+epsilon_);
 
   for (int i=_Istart;i<_Iend;++i) {
     std::bitset<32> b(i);
