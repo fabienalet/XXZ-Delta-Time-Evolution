@@ -56,6 +56,7 @@ PetscErrorCode MatMultU(Mat M,Vec x,Vec y)
   PetscFunctionBeginUser;
   VecSet(y,0.);
   VecDuplicate(x,&x2);
+  VecCopy(x,x2);
   ierr = MatShellGetContext(M,(void**)&ctx);CHKERRQ(ierr);
  // std::cout << "MatMult U : step 0\n";
  // VecView(x,PETSC_VIEWER_STDOUT_WORLD); 
