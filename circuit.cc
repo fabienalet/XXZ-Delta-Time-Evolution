@@ -189,6 +189,7 @@ int main(int argc, char **argv) {
       {
         // Do direct measurement of sigma_z's
         std::vector<double> sz(L,0.);
+        /*
         for (int k=0;k<L;++k) { 
           // Careful I am using Psi_t as a temp vector to store res*sz (point-wise)
           VecPointwiseMult(Psi_t,sigmas_as_vec[k],res);
@@ -198,7 +199,7 @@ int main(int argc, char **argv) {
           for (int pp=0;pp<L;++pp)    
           { std::cout << "TIME " << t << " SZ " << pp << " " << sz[pp] << endl; } 
         }
-
+        */
         /*
         // Will rapatriate the distributed vector res into a local vector
         Vec res_local;
