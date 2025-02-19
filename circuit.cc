@@ -172,8 +172,8 @@ int main(int argc, char **argv) {
     }
     }
     */
-    if (myrank==0) { cout << "Initial vector (time 0)\n";}
-    VecView(Psi_t,PETSC_VIEWER_STDOUT_WORLD);
+   // if (myrank==0) { cout << "Initial vector (time 0)\n";}
+   // VecView(Psi_t,PETSC_VIEWER_STDOUT_WORLD);
     for (int t_index=0;t_index<=num_times;++t_index)
     {  
       if (myrank==0) std::cout << "Doing t=" << t+1 << endl;
@@ -199,7 +199,7 @@ int main(int argc, char **argv) {
           { std::cout << "TIME " << t << " SZ " << pp << " " << sz[pp] << endl; } 
         }
 
-
+        /*
         // Will rapatriate the distributed vector res into a local vector
         Vec res_local;
         // Different strategies depending on MPI-distributed or not
@@ -245,6 +245,7 @@ int main(int argc, char **argv) {
           VecRestoreArray(res_local, &state);
         } // end of 0processor
         VecDestroy(&res_local);
+        */
       } // end measurements
 
       /************** End of  Measurements ***********/
