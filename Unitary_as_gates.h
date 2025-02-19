@@ -306,11 +306,11 @@ U_{-} = R_y ( \pi/2 - \delta_{-}) R_z ( 2\theta + \epsilon) R_y (-(\pi/2 - \delt
 where \delta_{\pm} = \delta.
 */
   // Tover2 ??
-  double angle1=PETSC_PI/2.+delta_plus_;
-  double angle2=-angle1;
-  double angle3=PETSC_PI/2.-delta_minus_;
-  double angle4=-angle3;
-  
+  double phi_plus=PETSC_PI/2.+delta_plus_;
+ // double angle2=-angle1;
+  double phi_minus=PETSC_PI/2.-delta_minus_;
+ // double angle4=-angle3;
+  /*
   PetscScalar cos1_=cos(angle1/2.);
   PetscScalar cos2_=cos(angle2/2.);
   PetscScalar cos3_=cos(angle3/2.);
@@ -328,7 +328,7 @@ where \delta_{\pm} = \delta.
   PetscScalar s3s4=sin3_*sin4_;
   PetscScalar c3s4=cos3_*sin4_;
   PetscScalar c4s3=cos4_*sin3_;
-  
+  */
   PetscScalar costp=cos(theta_);
   PetscScalar sintp=sin(theta_);
   PetscScalar costm=cos(theta_+epsilon_);
@@ -344,14 +344,15 @@ where \delta_{\pm} = \delta.
   //  MatSetValue(_CTX->U_plus_gates[r], i, i, c1c2*(costp-PETSC_i*sintp)-s1s2*(costp+PETSC_i*sintp), ADD_VALUES);
    // MatSetValue(_CTX->U_minus_gates[r], i, i, c3c4*(costm-PETSC_i*sintm)-s3s4*(costm+PETSC_i*sintm), ADD_VALUES);
     // Asmi's notes
-     MatSetValue(_CTX->U_plus_gates[r], i, i, costp+PETSC_i*sintp*cos(PETSC_PI-angle1), ADD_VALUES);
-     MatSetValue(_CTX->U_minus_gates[r], i, i, costm+PETSC_i*sintm*cos(PETSC_PI-angle3), ADD_VALUES);
+
+     MatSetValue(_CTX->U_plus_gates[r], i, i, costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus), ADD_VALUES);
+     MatSetValue(_CTX->U_minus_gates[r], i, i, costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus), ADD_VALUES);
   
    // MatSetValue(_CTX->U_plus_gates[r], i, j, -c1s2*(costp-PETSC_i*sintp)-c2s1*(costp+PETSC_i*sintp), ADD_VALUES);
    // MatSetValue(_CTX->U_minus_gates[r], i, j, -c3s4*(costp-PETSC_i*sintm)-c4s3*(costp+PETSC_i*sintp), ADD_VALUES);
    // Asmi's notes
-    MatSetValue(_CTX->U_plus_gates[r], i, j, PETSC_i*sintp*sin(PETSC_PI-angle1), ADD_VALUES);
-   MatSetValue(_CTX->U_minus_gates[r], i, j, PETSC_i*sintm*sin(PETSC_PI-angle3), ADD_VALUES);
+    MatSetValue(_CTX->U_plus_gates[r], i, j, PETSC_i*sintp*sin(PETSC_PI-phi_plus), ADD_VALUES);
+   MatSetValue(_CTX->U_minus_gates[r], i, j, PETSC_i*sintm*sin(PETSC_PI-phi_minus), ADD_VALUES);
     
     }
 
@@ -359,13 +360,14 @@ where \delta_{\pm} = \delta.
    //   MatSetValue(_CTX->U_plus_gates[r], i, i, -s1s2*(costp-PETSC_i*sintp)+c1c2*(costp+PETSC_i*sintp), ADD_VALUES);
    //   MatSetValue(_CTX->U_minus_gates[r], i, i, -s3s4*(costm-PETSC_i*sintm)+c1c2*(costm+PETSC_i*sintm), ADD_VALUES);
       // Asmi's notes
-     MatSetValue(_CTX->U_plus_gates[r], i, i, costp-PETSC_i*sintp*cos(PETSC_PI-angle1), ADD_VALUES);
-     MatSetValue(_CTX->U_minus_gates[r], i, i, costm-PETSC_i*sintm*cos(PETSC_PI-angle3), ADD_VALUES);
+
+     MatSetValue(_CTX->U_plus_gates[r], i, i, costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus), ADD_VALUES);
+     MatSetValue(_CTX->U_minus_gates[r], i, i, costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus), ADD_VALUES);
     //  MatSetValue(_CTX->U_plus_gates[r], i, j, c2s1*(costp-PETSC_i*sintp)+c1s2*(costp+PETSC_i*sintp), ADD_VALUES);
      // MatSetValue(_CTX->U_minus_gates[r], i, j, c4s3*(costp-PETSC_i*sintp)+c3s4*(costp+PETSC_i*sintp), ADD_VALUES);
       // Asmi's notes
-    MatSetValue(_CTX->U_plus_gates[r], i, j, PETSC_i*sintp*sin(PETSC_PI-angle1), ADD_VALUES);
-   MatSetValue(_CTX->U_minus_gates[r], i, j, PETSC_i*sintm*sin(PETSC_PI-angle3), ADD_VALUES);
+    MatSetValue(_CTX->U_plus_gates[r], i, j, PETSC_i*sintp*sin(PETSC_PI-phi_plus), ADD_VALUES);
+   MatSetValue(_CTX->U_minus_gates[r], i, j, PETSC_i*sintm*sin(PETSC_PI-phi_minus), ADD_VALUES);
     }
   }
   
