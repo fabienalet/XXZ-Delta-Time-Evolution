@@ -95,22 +95,7 @@ int main(int argc, char **argv) {
   }
   for (int p = 0; p < L; ++p) {   VecAssemblyBegin(sigmas_as_vec[p]);   VecAssemblyEnd(sigmas_as_vec[p]);  }
 
-  /**** Initialize Krylov from Slepc *****/
-  
-// MatView(H,PETSC_VIEWER_STDOUT_WORLD);
- // MFNCreate(PETSC_COMM_WORLD,&mfn);
-  //MFNSetOperator(mfn,op->_H);
-
-  //MFNGetFN(mfn,&fct);
-  //FNSetType(fct,FNEXP);
-  //MFNSetTolerances(mfn, 1e-12, PETSC_DEFAULT);
-  //MFNSetFromOptions(mfn);
-
-  /********* Initialize time grid ********/
-  // myparameters.Initialize_timegrid();
-  //  Need to decide when measurements are done
-
-  /***** Loop over initial states ****/
+   /***** Loop over initial states ****/
 
   // list of initial states (each of these consists of one basis vector)
   std::vector<unsigned long int> init_states;
@@ -137,11 +122,12 @@ int main(int argc, char **argv) {
   else {
     // special state 11111 has index nconf-1 ... TOCHECK
     init_states.resize(1); init_states[0]=nconf-1;
+    std::cout << "HERE\n";
   }
   
 
   PetscBool measure_correlations=PETSC_FALSE;
-  PetscBool measure_entanglement=PETSC_TRUE;
+  PetscBool measure_entanglement=PETSC_FALSE;
   PetscBool measure_return=PETSC_TRUE;
   PetscOptionsGetBool(NULL, NULL, "-measure_correlations", &measure_correlations, NULL);
   PetscOptionsGetBool(NULL, NULL, "-measure_entanglement", &measure_entanglement, NULL);
@@ -186,8 +172,8 @@ int main(int argc, char **argv) {
     }
     }
     */
-    //if (myrank==0) { cout << "Initial vector (time 0)\n";}
-    //VecView(Psi_t,PETSC_VIEWER_STDOUT_WORLD);
+    if (myrank==0) { cout << "Initial vector (time 0)\n";}
+    VecView(Psi_t,PETSC_VIEWER_STDOUT_WORLD);
     for (int t_index=0;t_index<=num_times;++t_index)
     {  
       if (myrank==0) std::cout << "Doing t=" << t+1 << endl;
