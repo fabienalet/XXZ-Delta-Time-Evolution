@@ -126,24 +126,16 @@ int main(int argc, char **argv) {
   if (!(num_product_states_set)) {
   PetscOptionsGetInt(NULL, NULL, "-Nsamp",&num_product_states, &num_product_states_set);
   }
-  if if (!(num_product_states_set)) {
-
+  if (!(num_product_states_set)) {
   int seed3=15101976;
   PetscOptionsGetInt(NULL,NULL,"-seed3",&seed3,NULL);CHKERRQ(ierr);
-
-
-
   std::default_random_engine generator(seed3);
   std::uniform_int_distribution<> distribution(0, nconf-1);
   for (int r=0;r<num_product_states;++r) { init_states.push_back(distribution(generator));}
   if (myrank==0) {std::cout << "# " << num_product_states << " random product states initialized with seed3 = " << seed3 << std::endl;}
-  
-  PetscBool special=PETSC_FALSE;
-  PetscOptionsGetBool(NULL, NULL, "-special", &special, NULL);
-  if (special) { init_states.resize(1); init_states[0]=24; }
   }
   else {
-    // special state 11111 has index nconf-1 ...
+    // special state 11111 has index nconf-1 ... TOCHECK
     init_states.resize(1); init_states[0]=nconf-1;
   }
   

@@ -302,9 +302,9 @@ U_{-} = R_y ( \pi/2 - \delta_{-}) R_z ( 2\theta + \epsilon) R_y (-(\pi/2 - \delt
 where \delta_{\pm} = \delta.
 */
   // Tover2 ??
-  double angle1=PI/2.+delta_plus_;
+  double angle1=PETSC_PI/2.+delta_plus_;
   double angle2=-angle1;
-  double angle3=PI/2.-delta_minus_;
+  double angle3=PETSC_PI/2.-delta_minus_;
   double angle4=-angle3;
   
   PetscScalar cos1_=cos(angle1/2.);
