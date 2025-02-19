@@ -154,6 +154,7 @@ void Unitary_as_gates::get_parameters() {
   PetscOptionsGetInt(NULL, NULL, "-L", &Lchain_, NULL);
   J_=1.;
   PetscOptionsGetReal(NULL, NULL, "-J", &J_, NULL);
+  J_coupling.resize(Lchain_,J_);
 
   delta_=0.8;
   PetscOptionsGetReal(NULL, NULL, "-delta", &delta_, NULL);
@@ -179,6 +180,7 @@ void Unitary_as_gates::get_parameters() {
   PetscBool pbc=PETSC_TRUE;
   PetscOptionsGetBool(NULL, NULL, "-pbc", &pbc, NULL);
   
+
   if (myrank == 0) {
     if (delta_plus_!=delta_) { std::cout << "delta+ = " << delta_plus_ << "\n"; }
     if (delta_minus_!=delta_) { std::cout << "delta- = " << delta_minus_ << "\n"; }
