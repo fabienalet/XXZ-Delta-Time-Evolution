@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
   if (!(num_product_states_set)) {
   PetscOptionsGetInt(NULL, NULL, "-Nsamp",&num_product_states, &num_product_states_set);
   }
-  if (!(num_product_states_set)) {
+  if ((num_product_states_set)) {
   int seed3=15101976;
   PetscOptionsGetInt(NULL,NULL,"-seed3",&seed3,NULL);CHKERRQ(ierr);
   std::default_random_engine generator(seed3);
