@@ -72,11 +72,10 @@ int main(int argc, char **argv) {
 
   //Parameters myparameters(myrank);
     Unitary_as_gates *op = new Unitary_as_gates(myrank, mpisize);
+  int L=op->Lchain_;
 
     //  malloc_trim(0);
 
-  /**** Now do time-evolution *****/
-	
   /*****  Get and initialize vectors *****/
 	Vec Psi_t, res;// Vec Psi_t2,res2;
   MatCreateVecs(op->_U, NULL, &Psi_t); 
@@ -87,14 +86,14 @@ int main(int argc, char **argv) {
   std::vector<Vec> sigmas_as_vec; sigmas_as_vec.resize(L);
   for (int p=0;p<L;++p) { MatCreateVecs(op->_U, NULL, &sigmas_as_vec[p]);}
   
-  for (int i=_Istart;i<_Iend;++i) {
+  for (int i=op->_Istart;i<op->_Iend;++i) {
     std::bitset<32> b(i);
     for (int p=0;p<L;++p) { 
       if (b[p]) { VecSetValue(sigmas_as_vec[p],i,1.,INSERT_VALUES);}
       else { VecSetValue(sigmas_as_vec[p],i,-1.,INSERT_VALUES);}
       }
   }
-  for (int p = 0; p < L; ++k) {   VecAssemblyBegin(sigmas_as_vec[p]);   VecAssemblyEnd(sigmas_as_vec[p]);  }
+  for (int p = 0; p < L; ++p) {   VecAssemblyBegin(sigmas_as_vec[p]);   VecAssemblyEnd(sigmas_as_vec[p]);  }
 
   /**** Initialize Krylov from Slepc *****/
   
@@ -115,17 +114,25 @@ int main(int argc, char **argv) {
 
   // list of initial states (each of these consists of one basis vector)
   std::vector<unsigned long int> init_states;
-  // If no number of sample is specified, we start from just 1
   
+  // If no number of sample is specified, we start from just 1111111111
+  
+
+
+  unsigned long int nconf=op->nconf;
   PetscInt num_product_states = 1;
-  PetscOptionsGetInt(NULL, NULL, "-num_product_states",&num_product_states, NULL);  
-  PetscOptionsGetInt(NULL, NULL, "-Nsamp",&num_product_states, NULL);
+  PetscBool num_product_states_set=PETSC_FALSE;
+  PetscOptionsGetInt(NULL, NULL, "-num_product_states",&num_product_states, &num_product_states_set);  
+  if (!(num_product_states_set)) {
+  PetscOptionsGetInt(NULL, NULL, "-Nsamp",&num_product_states, &num_product_states_set);
+  }
+  if if (!(num_product_states_set)) {
+
   int seed3=15101976;
   PetscOptionsGetInt(NULL,NULL,"-seed3",&seed3,NULL);CHKERRQ(ierr);
 
 
 
-  unsigned long int nconf=op->nconf;
   std::default_random_engine generator(seed3);
   std::uniform_int_distribution<> distribution(0, nconf-1);
   for (int r=0;r<num_product_states;++r) { init_states.push_back(distribution(generator));}
@@ -134,7 +141,11 @@ int main(int argc, char **argv) {
   PetscBool special=PETSC_FALSE;
   PetscOptionsGetBool(NULL, NULL, "-special", &special, NULL);
   if (special) { init_states.resize(1); init_states[0]=24; }
-  
+  }
+  else {
+    // special state 11111 has index nconf-1 ...
+    init_states.resize(1); init_states[0]=nconf-1;
+  }
   
 
   PetscBool measure_correlations=PETSC_FALSE;
@@ -200,12 +211,14 @@ int main(int argc, char **argv) {
       {
         // Do direct measurement of sigma_z's
         std::vector<double> sz(L,0.);
-        // use Psi_t to store res*res
-        VecPointwiseMult(Psi_t,res,res);
-        for (int k=0;k<L;++k) { VecDot(Psi_t,sigmas_as_vec[k],&sz[k]); }
+        for (int k=0;k<L;++k) { 
+          // Careful I am using Psi_t as a temp vector to store res*sz (point-wise)
+          VecPointwiseMult(Psi_t,sigmas_as_vec[k],res);
+          VecDotRealPart(Psi_t,res,&sz[k]);  
+          }
         if (myrank==0) { 
-          for (int p=0;pp<L;++pp)    
-          { std::cout << "TIME " << t << " SZ " << p << " " << sz[p] << endl; } 
+          for (int pp=0;pp<L;++pp)    
+          { std::cout << "TIME " << t << " SZ " << pp << " " << sz[pp] << endl; } 
         }
 
 

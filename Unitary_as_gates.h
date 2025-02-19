@@ -301,7 +301,6 @@ and
 U_{-} = R_y ( \pi/2 - \delta_{-}) R_z ( 2\theta + \epsilon) R_y (-(\pi/2 - \delta_{-})))
 where \delta_{\pm} = \delta.
 */
-  double PI=acos()
   // Tover2 ??
   double angle1=PI/2.+delta_plus_;
   double angle2=-angle1;
@@ -338,31 +337,31 @@ where \delta_{\pm} = \delta.
     b.flip(r);
     // maybe don't flip again and reverse the if ...
     if (b[r]) {
-    MatSetValue(_CTX->U_plus_gates[r], i, i, c1c2*(costp-PETSC_I*sintp)-s1s2*(costp+PETSC_I*sintp), ADD_VALUES);
-    MatSetValue(_CTX->U_minus_gates[r], i, i, c3c4*(costm-PETSC_I*sintm)-s3s4*(costm+PETSC_I*sintm), ADD_VALUES);
+    MatSetValue(_CTX->U_plus_gates[r], i, i, c1c2*(costp-PETSC_i*sintp)-s1s2*(costp+PETSC_i*sintp), ADD_VALUES);
+    MatSetValue(_CTX->U_minus_gates[r], i, i, c3c4*(costm-PETSC_i*sintm)-s3s4*(costm+PETSC_i*sintm), ADD_VALUES);
     // Asmi's notes
-    // MatSetValue(_CTX->U_plus_gates[r], i, i, costp+PETSC_I*sintp*cos(PETSC_PI-angle1), ADD_VALUES);
-    // MatSetValue(_CTX->U_minus_gates[r], i, i, costm+PETSC_I*sintm*cos(PETSC_PI-angle3), ADD_VALUES);
+    // MatSetValue(_CTX->U_plus_gates[r], i, i, costp+PETSC_i*sintp*cos(PETSC_PI-angle1), ADD_VALUES);
+    // MatSetValue(_CTX->U_minus_gates[r], i, i, costm+PETSC_i*sintm*cos(PETSC_PI-angle3), ADD_VALUES);
   
-    MatSetValue(_CTX->U_plus_gates[r], i, j, -c1s2*(costp-PETSC_I*sintp)-c2s1*(costp+PETSC_I*sintp), ADD_VALUES);
-    MatSetValue(_CTX->U_minus_gates[r], i, j, -c3s4*(costp-PETSC_I*sintm)-c4s3*(costp+PETSC_I*sintp), ADD_VALUES);
+    MatSetValue(_CTX->U_plus_gates[r], i, j, -c1s2*(costp-PETSC_i*sintp)-c2s1*(costp+PETSC_i*sintp), ADD_VALUES);
+    MatSetValue(_CTX->U_minus_gates[r], i, j, -c3s4*(costp-PETSC_i*sintm)-c4s3*(costp+PETSC_i*sintp), ADD_VALUES);
    // Asmi's notes
-   // MatSetValue(_CTX->U_plus_gates[r], i, j, PETSC_I*sintp*sin(PETSC_PI-angle1), ADD_VALUES);
-   //MatSetValue(_CTX->U_minus_gates[r], i, j, PETSC_I*sintm*sin(PETSC_PI-angle3), ADD_VALUES);
+   // MatSetValue(_CTX->U_plus_gates[r], i, j, PETSC_i*sintp*sin(PETSC_PI-angle1), ADD_VALUES);
+   //MatSetValue(_CTX->U_minus_gates[r], i, j, PETSC_i*sintm*sin(PETSC_PI-angle3), ADD_VALUES);
     
     }
 
     else {
-      MatSetValue(_CTX->U_plus_gates[r], i, i, -s1s2*(costp-PETSC_I*sintp)+c1c2*(costp+PETSC_I*sintp), ADD_VALUES);
-      MatSetValue(_CTX->U_minus_gates[r], i, i, -s3s4*(costm-PETSC_I*sintm)+c1c2*(costm+PETSC_I*sintm), ADD_VALUES);
+      MatSetValue(_CTX->U_plus_gates[r], i, i, -s1s2*(costp-PETSC_i*sintp)+c1c2*(costp+PETSC_i*sintp), ADD_VALUES);
+      MatSetValue(_CTX->U_minus_gates[r], i, i, -s3s4*(costm-PETSC_i*sintm)+c1c2*(costm+PETSC_i*sintm), ADD_VALUES);
       // Asmi's notes
-    // MatSetValue(_CTX->U_plus_gates[r], i, i, costp-PETSC_I*sintp*cos(PETSC_PI-angle1), ADD_VALUES);
-    // MatSetValue(_CTX->U_minus_gates[r], i, i, costm-PETSC_I*sintm*cos(PETSC_PI-angle3), ADD_VALUES);
-      MatSetValue(_CTX->U_plus_gates[r], i, j, c2s1*(costp-PETSC_I*sintp)+c1s2*(costp+PETSC_I*sintp), ADD_VALUES);
-      MatSetValue(_CTX->U_minus_gates[r], i, j, c4s3*(costp-PETSC_I*sintp)+c3s4*(costp+PETSC_I*sintp), ADD_VALUES);
+    // MatSetValue(_CTX->U_plus_gates[r], i, i, costp-PETSC_i*sintp*cos(PETSC_PI-angle1), ADD_VALUES);
+    // MatSetValue(_CTX->U_minus_gates[r], i, i, costm-PETSC_i*sintm*cos(PETSC_PI-angle3), ADD_VALUES);
+      MatSetValue(_CTX->U_plus_gates[r], i, j, c2s1*(costp-PETSC_i*sintp)+c1s2*(costp+PETSC_i*sintp), ADD_VALUES);
+      MatSetValue(_CTX->U_minus_gates[r], i, j, c4s3*(costp-PETSC_i*sintp)+c3s4*(costp+PETSC_i*sintp), ADD_VALUES);
       // Asmi's notes
-   // MatSetValue(_CTX->U_plus_gates[r], i, j, PETSC_I*sintp*sin(PETSC_PI-angle1), ADD_VALUES);
-   //MatSetValue(_CTX->U_minus_gates[r], i, j, PETSC_I*sintm*sin(PETSC_PI-angle3), ADD_VALUES);
+   // MatSetValue(_CTX->U_plus_gates[r], i, j, PETSC_i*sintp*sin(PETSC_PI-angle1), ADD_VALUES);
+   //MatSetValue(_CTX->U_minus_gates[r], i, j, PETSC_i*sintm*sin(PETSC_PI-angle3), ADD_VALUES);
     }
   }
   
@@ -379,8 +378,6 @@ std::tuple<std::vector<PetscInt>, std::vector<PetscInt>> Unitary_as_gates::count
     // now do the bit flip on r
     std::bitset<32> b(i);
     int r2=r;
-      if (other_convention) { r2=Lchain_-r; }
-
     b.flip(r2);
     int j = (int)(b.to_ulong());
     if ((j >= _Iend) or (j < _Istart)) { o_nnz[i - _Istart]++; }
