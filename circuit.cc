@@ -172,7 +172,7 @@ int main(int argc, char **argv) {
     PetscOptionsGetInt(NULL, NULL, "-dt_measurement", &dt_measurement, NULL);  
     PetscOptionsGetInt(NULL, NULL, "-measure_every", &dt_measurement, NULL);
 
-    if (special) { num_times=2;}
+    //if (special) { num_times=2;}
 
     
     int t=0;
