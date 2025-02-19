@@ -63,7 +63,7 @@ PetscErrorCode MatMultU(Mat M,Vec x,Vec y)
   // first apply all 1-qubit gates (U_plus)
   for (int i=0;i<ctx->Lchain;++i) {
   MatMult(ctx->U_plus_gates[i], x, y);
-  if (i < ctx->Lchain - 1) { VecSwap(y, x); }
+  if (i < (ctx->Lchain - 1)) { VecSwap(y, x); }
   }
   // result is in y
    // VecView(y,PETSC_VIEWER_STDOUT_WORLD); 
@@ -74,7 +74,7 @@ PetscErrorCode MatMultU(Mat M,Vec x,Vec y)
   // Apply all 1-qubit gates (U_minus)
   for (int i=0;i<ctx->Lchain;++i) {
   MatMult(ctx->U_minus_gates[i], x, y);
-  if (i < ctx->Lchain - 1) { VecSwap(y, x); }
+  if (i < (ctx->Lchain - 1)) { VecSwap(y, x); }
   }
   // result is in y
    // VecView(y,PETSC_VIEWER_STDOUT_WORLD); 
@@ -83,7 +83,7 @@ PetscErrorCode MatMultU(Mat M,Vec x,Vec y)
   // result is in x now
 
   // Do a final swap
-  VecSwap(y, x);
+  VecCopy(x, y);
   
 PetscFunctionReturn(0);
 }
@@ -264,7 +264,7 @@ PetscErrorCode Unitary_as_gates::init()
     double nup=0;
     for (int r=0;r<Lchain_;++r) { 
       if (b[r]==b[(r+1+Lchain_)%Lchain_]) { ising_energy+=J_coupling[r];} else { ising_energy-=J_coupling[r];} 
-      if (b[r]) { nup++;}
+     // if (b[r]) { nup++;}
       }
     PetscReal angle_ising=-ising_energy;
     PetscScalar matrix_element=cos(angle_ising)+PETSC_i*sin(angle_ising);
