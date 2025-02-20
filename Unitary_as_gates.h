@@ -123,10 +123,10 @@ PetscErrorCode MatMultUminus(Mat M,int r,Vec x,Vec y)
   PetscScalar valii1=costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus);
   PetscScalar valii2=costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus);
   PetscScalar valij=PETSC_i*sintm*sin(PETSC_PI-phi_minus);
-  //cout << "minus : " << valii1 << " " << valii2 << " " << valij << endl;
+  cout << "minus : " << valii1 << " " << valii2 << " " << valij << endl;
  PetscScalar mi,mj;
   for (int i=lo;i<hi;++i) {
-    cout << "rank=" << myrank << " i=" << i << " xloc[i]=" << xloc[i] << endl;
+    if (myrank==1) cout << "rank=" << myrank << " i=" << i << " xloc[i]=" << xloc[i] << endl;
     std::bitset<32> b(i);
     b.flip(r);
     int j = (int)(b.to_ulong());
