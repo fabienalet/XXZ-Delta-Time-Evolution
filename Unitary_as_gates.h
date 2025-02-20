@@ -86,9 +86,9 @@ PetscErrorCode MatMultUplus(Mat M,int r,Vec x,Vec y)
     b.flip(r);
     
     // maybe don't flip again and reverse the if ...
-    if (b[r]) {  mi=xloc[i]*valii1; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
-    else { mi=xloc[i]*valii2; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
-    mj=xloc[i]*valij;
+    if (b[r]) {  mi=xloc[i-lo]*valii1; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
+    else { mi=xloc[i-lo]*valii2; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
+    mj=xloc[i-lo]*valij;
       VecSetValues(y, 1, &j, &mj, ADD_VALUES);
     }
 
@@ -126,17 +126,17 @@ PetscErrorCode MatMultUminus(Mat M,int r,Vec x,Vec y)
   cout << "minus : " << valii1 << " " << valii2 << " " << valij << endl;
  PetscScalar mi,mj;
   for (int i=lo;i<hi;++i) {
-    if (myrank==1) cout << "rank=" << myrank << " i=" << i << " xloc[i]=" << xloc[i] << endl;
+    if (myrank==1) cout << "rank=" << myrank << " i=" << i << " xloc[i]=" << xloc[i-lo] << endl;
     std::bitset<32> b(i);
     b.flip(r);
     int j = (int)(b.to_ulong());
     b.flip(r);
     
     // maybe don't flip again and reverse the if ...
-    if (b[r]) {  mi=xloc[i]*valii1; VecSetValues(y, 1, &i, &mi, ADD_VALUES); }
-    else { mi=xloc[i]*valii2; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
+    if (b[r]) {  mi=xloc[i-lo]*valii1; VecSetValues(y, 1, &i, &mi, ADD_VALUES); }
+    else { mi=xloc[i-lo]*valii2; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
     cout << "myrank " << myrank << " is Adding to y : " << i << " " << mi << endl;
-    mj=xloc[i]*valij;
+    mj=xloc[i-lo]*valij;
       VecSetValues(y, 1, &j, &mj, ADD_VALUES);
       cout << "myrank " << myrank << " is Adding to y : " << j << " " << mj << endl;
     }
