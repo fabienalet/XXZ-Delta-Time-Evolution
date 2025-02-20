@@ -45,6 +45,46 @@ PetscErrorCode VecMultScalar(Vec x, PetscScalar *scalar)
   VecRestoreArray(x,&px);
 }
 
+PetscErrorCode MatMultU(Mat M,Vec x,Vec y)
+{
+  PetscErrorCode    ierr;
+  MatrixContext     *ctx;
+  Vec               x2;
+  //Vec               x3;
+  // First executable line of user provided PETSc routine
+  PetscFunctionBeginUser;
+  VecSet(y,0.);
+  VecDuplicate(x,&x2);
+  VecCopy(x,x2);
+  ierr = MatShellGetContext(M,(void**)&ctx);CHKERRQ(ierr);
+ // std::cout << "MatMult U : step 0\n";
+ // apply 2 qubits-gate U_2 (diagonal operation in sigma_z basis)
+  VecPointwiseMult(y, x, ctx->Ising_gate);
+  // result in y
+  // first apply all 1-qubit gates (U_minus)
+  for (int i=0;i<ctx->Lchain;++i) {
+  MatMult(ctx->U_minus_gates[i], y, x2);
+  if (i < (ctx->Lchain - 1)) { VecSwap(y, x2); }
+  }
+ 
+  // result is in x2
+  // apply 2 qubits-gate U_2 (diagonal operation in sigma_z basis)
+  VecPointwiseMult(y, x2, ctx->Ising_gate);
+  // result in y
+
+ // Apply all 1-qubit gates (U_plus)
+  for (int i=0;i<ctx->Lchain;++i) {
+  MatMult(ctx->U_plus_gates[i], y, x2);
+  if (i < (ctx->Lchain - 1)) { VecSwap(y, x2); }
+  }
+  // result is in x2
+  // Do a final swap
+  VecSwap(x2, y);
+  
+PetscFunctionReturn(0);
+}
+
+/*
 
 PetscErrorCode MatMultU(Mat M,Vec x,Vec y)
 {
@@ -89,7 +129,7 @@ PetscErrorCode MatMultU(Mat M,Vec x,Vec y)
   
 PetscFunctionReturn(0);
 }
-
+*/
 class Unitary_as_gates
 {
   //typedef std::vector<unsigned short int> Conf;
