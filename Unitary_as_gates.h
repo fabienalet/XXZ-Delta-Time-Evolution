@@ -107,7 +107,9 @@ PetscErrorCode MatMultUminus(Mat M,int r,Vec x,Vec y)
   PetscInt lo,hi;
   // First executable line of user provided PETSc routine
   PetscFunctionBeginUser;
-
+  int myrank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+  cout << "Viewing x\n"; VecView(x,PETSC_VIEWER_STDOUT_WORLD); 
   MatShellGetContext(M,(void**)&ctx);CHKERRQ(ierr);
   VecGetOwnershipRange(x, &lo, &hi);
 
@@ -124,22 +126,25 @@ PetscErrorCode MatMultUminus(Mat M,int r,Vec x,Vec y)
   //cout << "minus : " << valii1 << " " << valii2 << " " << valij << endl;
  PetscScalar mi,mj;
   for (int i=lo;i<hi;++i) {
+    cout << "rank=" << myrank << " i=" << i << " xloc[i]=" << xloc[i] << endl;
     std::bitset<32> b(i);
     b.flip(r);
     int j = (int)(b.to_ulong());
     b.flip(r);
     
     // maybe don't flip again and reverse the if ...
-    if (b[r]) {  mi=xloc[i]*valii1; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
+    if (b[r]) {  mi=xloc[i]*valii1; VecSetValues(y, 1, &i, &mi, ADD_VALUES); }
     else { mi=xloc[i]*valii2; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
+    cout << "myrank " << myrank << " is Adding to y : " << i << " " << mi << endl;
     mj=xloc[i]*valij;
       VecSetValues(y, 1, &j, &mj, ADD_VALUES);
+      cout << "myrank " << myrank << " is Adding to y : " << j << " " << mj << endl;
     }
 
   VecRestoreArrayRead(x, &xloc);
   VecAssemblyBegin(y);
   VecAssemblyEnd(y);
-
+  cout << "Viewing y\n"; VecView(y,PETSC_VIEWER_STDOUT_WORLD); 
   PetscFunctionReturn(PETSC_SUCCESS);
 }
 
