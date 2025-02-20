@@ -67,7 +67,7 @@ PetscErrorCode MatMultUplus(Mat M,int r,Vec x,Vec y)
 
   PetscReal costp=cos(ctx->theta_);
   PetscReal sintp=sin(ctx->theta_);
-  PetscReal phi_plus=PETSC_PI/2.-ctx->delta_plus_;
+
   PetscScalar valii1=costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus);
   PetscScalar valii2=costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus);
   PetscScalar valij=PETSC_i*sintp*sin(PETSC_PI-phi_plus);
@@ -530,6 +530,8 @@ where \delta_{\pm} = \delta.
   PetscReal sintp=sin(theta_);
   PetscReal costm=cos(theta_+epsilon_);
   PetscReal sintm=sin(theta_+epsilon_);
+
+  
   cout << "U2 plus : " << costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus) << " " << costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus) << " " << PETSC_i*sintp*sin(PETSC_PI-phi_plus) << endl;
   cout << "U2 minus : " << costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus) << " " << costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus) << " " << PETSC_i*sintm*sin(PETSC_PI-phi_minus) << endl;
   
