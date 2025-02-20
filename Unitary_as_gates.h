@@ -218,7 +218,7 @@ void Unitary_as_gates::get_parameters() {
     delta_=delta_*PETSC_PI/2;
     delta_plus_=delta_plus_*PETSC_PI/2;
     delta_minus_=delta_minus_*PETSC_PI/2;
-    epsilon_=epsilon_*PETSC_PI/2;
+    epsilon_=epsilon_*PETSC_PI;
     theta_=theta_*PETSC_PI;
   }
 
