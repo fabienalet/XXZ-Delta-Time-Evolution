@@ -122,7 +122,7 @@ int main(int argc, char **argv) {
   else {
     // special state 11111 has index nconf-1 ... TOCHECK
     init_states.resize(1); init_states[0]=nconf-1;
-    std::cout << "HERE\n";
+    //std::cout << "HERE\n";
   }
   
 
@@ -162,7 +162,9 @@ int main(int argc, char **argv) {
 
     
     int t=0;
-    /*
+    PetscBool print_basis=PETSC_FALSE;
+  PetscOptionsGetBool(NULL, NULL, "-print_basis", &print_basis, NULL);
+    if (print_basis) {
     if (myrank==0) { std::cout << "Basis is : \n";
     for (int i=0;i<nconf;++i) {
     std::bitset<32> b(i);
@@ -171,7 +173,8 @@ int main(int argc, char **argv) {
     cout << endl;
     }
     }
-    */
+    }
+    
    // if (myrank==0) { cout << "Initial vector (time 0)\n";}
    // VecView(Psi_t,PETSC_VIEWER_STDOUT_WORLD);
     for (int t_index=0;t_index<=num_times;++t_index)
