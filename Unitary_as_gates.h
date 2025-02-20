@@ -216,10 +216,10 @@ void Unitary_as_gates::get_parameters() {
 
 
   if (pi_units) {
-    delta_=delta_*PETSC_PI;
-    delta_plus_=delta_plus_*PETSC_PI;
-    delta_minus_=delta_minus_*PETSC_PI;
-    epsilon_=epsilon_*PETSC_PI;
+    delta_=delta_*PETSC_PI/2;
+    delta_plus_=delta_plus_*PETSC_PI/2;
+    delta_minus_=delta_minus_*PETSC_PI/2;
+    epsilon_=epsilon_*PETSC_PI/2;
     theta_=theta_*PETSC_PI;
   }
 
