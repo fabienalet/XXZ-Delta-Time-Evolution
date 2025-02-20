@@ -260,7 +260,7 @@ int main(int argc, char **argv) {
 
       /************** End of  Measurements ***********/
       // put back Res in Psi_t for next time evolution
-      VecCopy(res, Psi_t);
+      VecSwap(res, Psi_t);
     } // end of t_index
     
   } // end of io loop
