@@ -75,13 +75,14 @@ int main(int argc, char **argv) {
   int L=op->Lchain_;
 
     //  malloc_trim(0);
-
+  cout << "Here 1\n";
   /*****  Get and initialize vectors *****/
 	Vec Psi_t, res;// Vec Psi_t2,res2;
   MatCreateVecs(op->_U, NULL, &Psi_t); 
   MatCreateVecs(op->_U, NULL, &res); 
+  cout << "Here 2\n";
   VecAssemblyBegin(res); VecAssemblyEnd(res);
-
+  cout << "Here 3\n";
   /*****  Initialize vectors for sigma_z for fast measurements *****/
   PetscBool translation_invariant=PETSC_TRUE;
   PetscOptionsGetBool(NULL, NULL, "-translation_invariant", &translation_invariant, NULL);
@@ -98,7 +99,7 @@ int main(int argc, char **argv) {
       }
   }
   for (int p = 0; p < L_for_sigma; ++p) {   VecAssemblyBegin(sigmas_as_vec[p]);   VecAssemblyEnd(sigmas_as_vec[p]);  }
-
+  cout << "Here 4\n";
    /***** Loop over initial states ****/
 
   // list of initial states (each of these consists of one basis vector)
