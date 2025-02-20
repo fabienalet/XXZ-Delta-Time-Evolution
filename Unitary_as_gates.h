@@ -459,7 +459,7 @@ PetscErrorCode Unitary_as_gates::init()
   MatSetOption(_U,	MAT_SYMMETRIC, PETSC_TRUE);
   MatSetOption(_U, MAT_SYMMETRY_ETERNAL, PETSC_TRUE);
 
-  MatCreateVecs(op->_U, NULL, &_CTX->Ising_gate);
+  MatCreateVecs(_U, NULL, &_CTX->Ising_gate);
 
   for (int i=_Istart;i<_Iend;++i) {
     std::bitset<32> b(i);
