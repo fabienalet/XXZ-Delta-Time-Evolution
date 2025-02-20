@@ -144,7 +144,7 @@ PetscErrorCode MatMultUminus(Mat M,int r,Vec x,Vec y)
   VecRestoreArrayRead(x, &xloc);
   VecAssemblyBegin(y);
   VecAssemblyEnd(y);
-  cout << "Viewing y\n"; VecView(y,PETSC_VIEWER_STDOUT_WORLD); 
+  //cout << "Viewing y\n"; VecView(y,PETSC_VIEWER_STDOUT_WORLD); 
   PetscFunctionReturn(PETSC_SUCCESS);
 }
 
