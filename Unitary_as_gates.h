@@ -71,7 +71,7 @@ PetscErrorCode MatMultUplus(Mat M,int r,Vec x,Vec y)
   PetscScalar valii1=costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus);
   PetscScalar valii2=costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus);
   PetscScalar valij=PETSC_i*sintp*sin(PETSC_PI-phi_plus);
-  cout << "plus : " << valii1 << " " << valii2 << " " << valij << endl;
+  //cout << "plus : " << valii1 << " " << valii2 << " " << valij << endl;
   /*
   PetscReal costm=cos(ctx->theta_+ctx->epsilon_);
   PetscReal sintm=sin(ctx->theta_+ctx->epsilon_);
@@ -121,7 +121,7 @@ PetscErrorCode MatMultUminus(Mat M,int r,Vec x,Vec y)
   PetscScalar valii1=costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus);
   PetscScalar valii2=costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus);
   PetscScalar valij=PETSC_i*sintm*sin(PETSC_PI-phi_minus);
-  cout << "minus : " << valii1 << " " << valii2 << " " << valij << endl;
+  //cout << "minus : " << valii1 << " " << valii2 << " " << valij << endl;
  PetscScalar mi,mj;
   for (int i=lo;i<hi;++i) {
     std::bitset<32> b(i);
@@ -181,7 +181,6 @@ PetscErrorCode MatMultU3(Mat M,Vec x,Vec y)
   
 PetscFunctionReturn(0);
 }
-
 
 PetscErrorCode MatMultU2(Mat M,Vec x,Vec y)
 {
@@ -404,11 +403,13 @@ Unitary_as_gates::~Unitary_as_gates()
 PetscErrorCode Unitary_as_gates::init()
 {
   PetscErrorCode ierr;
-  
+  PetscBool U3=PETSC_FALSE;
+  PetscOptionsGetBool(NULL, NULL, "-U3", &U3, NULL);
+
+  if (!(U3)) {
   _CTX->U_plus_gates.resize(Lchain_);
   _CTX->U_minus_gates.resize(Lchain_);
   
-  if (myrank==0) std::cout << "Creating gates ...\n";
   for (int r=0;r<Lchain_;r++)
   { // create gate r
     MatCreate(PETSC_COMM_WORLD,&_CTX->U_plus_gates[r]);
@@ -448,9 +449,14 @@ PetscErrorCode Unitary_as_gates::init()
     }
   }
     if (myrank==0) std::cout << "Done Creating Uplus-Uminus gates ...\n";
-
+  
   // Initialize the diagonal operators along z
   MatCreateVecs(_CTX->U_plus_gates[0], NULL, &_CTX->Ising_gate);
+
+  }
+  else {
+    VecSetSizes(&_CTX->Ising_gate, _Iend-_Istart, nconf);
+  }
   //
   for (int i=_Istart;i<_Iend;++i) {
     // bitstring of i = b(i) = 001001 ...
@@ -473,8 +479,7 @@ PetscErrorCode Unitary_as_gates::init()
   // create shell matrices
   ierr=MatCreateShell(PETSC_COMM_WORLD,PETSC_DECIDE,PETSC_DECIDE,nconf,nconf,(void*)_CTX,&_U);CHKERRQ(ierr);
   // define multiplication operations
-  PetscBool U3=PETSC_FALSE;
-  PetscOptionsGetBool(NULL, NULL, "-U3", &U3, NULL);
+  
   if (U3) {
   ierr=MatShellSetOperation(_U,MATOP_MULT,(void(*)())MatMultU3);CHKERRQ(ierr);
   }
@@ -532,8 +537,8 @@ where \delta_{\pm} = \delta.
   PetscReal sintm=sin(theta_+epsilon_);
 
   
-  cout << "U2 plus : " << costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus) << " " << costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus) << " " << PETSC_i*sintp*sin(PETSC_PI-phi_plus) << endl;
-  cout << "U2 minus : " << costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus) << " " << costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus) << " " << PETSC_i*sintm*sin(PETSC_PI-phi_minus) << endl;
+ // cout << "U2 plus : " << costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus) << " " << costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus) << " " << PETSC_i*sintp*sin(PETSC_PI-phi_plus) << endl;
+ // cout << "U2 minus : " << costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus) << " " << costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus) << " " << PETSC_i*sintm*sin(PETSC_PI-phi_minus) << endl;
   
   for (int i=_Istart;i<_Iend;++i) {
     std::bitset<32> b(i);
