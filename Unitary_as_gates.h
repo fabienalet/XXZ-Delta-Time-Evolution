@@ -62,7 +62,7 @@ PetscErrorCode MatMultUplus(Mat M,int r,Vec x,Vec y)
   MatShellGetContext(M,(void**)&ctx);CHKERRQ(ierr);
   VecGetOwnershipRange(x, &lo, &hi);
 
-  PetscCall(VecGetArrayRead(x, &xloc);
+  PetscCall(VecGetArrayRead(x, &xloc));
   PetscCall(VecSet(y, 0.));
 
   PetscReal costp=cos(ctx->theta_);
