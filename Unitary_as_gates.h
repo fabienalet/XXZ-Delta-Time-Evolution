@@ -449,59 +449,31 @@ PetscErrorCode Unitary_as_gates::init()
     }
   }
     if (myrank==0) std::cout << "Done Creating Uplus-Uminus gates ...\n";
-  
-  // Initialize the diagonal operators along z
-  MatCreateVecs(_CTX->U_plus_gates[0], NULL, &_CTX->Ising_gate);
-
   }
 
   // create shell matrices
   ierr=MatCreateShell(PETSC_COMM_WORLD,PETSC_DECIDE,PETSC_DECIDE,nconf,nconf,(void*)_CTX,&_U);CHKERRQ(ierr);
+  if (U3) { ierr=MatShellSetOperation(_U,MATOP_MULT,(void(*)())MatMultU3);CHKERRQ(ierr); }
+  else { ierr=MatShellSetOperation(_U,MATOP_MULT,(void(*)())MatMultU2);CHKERRQ(ierr);  }
+  // declare matrix to be symmetric
+  MatSetOption(_U,	MAT_SYMMETRIC, PETSC_TRUE);
+  MatSetOption(_U, MAT_SYMMETRY_ETERNAL, PETSC_TRUE);
 
-  else { // TODO CAreful
   MatCreateVecs(op->_U, NULL, &_CTX->Ising_gate);
-    
-  //  VecSetSizes(_CTX->Ising_gate, _Iend-_Istart, nconf);
-  }
-  //
+
   for (int i=_Istart;i<_Iend;++i) {
-    // bitstring of i = b(i) = 001001 ...
-    // count the number of 1's in b(i)
     std::bitset<32> b(i);
-    // Diagonal x = exp(-i T/2 ( \sum_j J_j sigma_j^x sigma_j^x )
     double ising_energy=0.;
     double nup=0;
     for (int r=0;r<Lchain_;++r) { 
       if (b[r]==b[(r+1+Lchain_)%Lchain_]) { ising_energy+=J_coupling[r];} else { ising_energy-=J_coupling[r];} 
-     // if (b[r]) { nup++;}
       }
     PetscReal angle_ising=-ising_energy;
     PetscScalar matrix_element=cos(angle_ising)+PETSC_i*sin(angle_ising);
     VecSetValues(_CTX->Ising_gate, 1, &i, &matrix_element, INSERT_VALUES);
   }
   VecAssemblyBegin(_CTX->Ising_gate); VecAssemblyEnd(_CTX->Ising_gate);
-  
-  // create shell matrices
-  ierr=MatCreateShell(PETSC_COMM_WORLD,PETSC_DECIDE,PETSC_DECIDE,nconf,nconf,(void*)_CTX,&_U);CHKERRQ(ierr);
-  // define multiplication operations
-  
-  if (U3) {
-  ierr=MatShellSetOperation(_U,MATOP_MULT,(void(*)())MatMultU3);CHKERRQ(ierr);
-  }
-  else {
-     ierr=MatShellSetOperation(_U,MATOP_MULT,(void(*)())MatMultU2);CHKERRQ(ierr);
-  }
-  // declare matrix to be symmetric
-  MatSetOption(_U,	MAT_SYMMETRIC, PETSC_TRUE);
-  MatSetOption(_U, MAT_SYMMETRY_ETERNAL, PETSC_TRUE);
-  //std::cout << "Diagonal x: \n";
-  //VecView(_CTX->Diagonal_Unitary_x,PETSC_VIEWER_STDOUT_WORLD); 
-  //std::cout << "Diagonal z: \n";
-  //VecView(_CTX->Diagonal_Unitary_z,PETSC_VIEWER_STDOUT_WORLD); 
-  for (int r=0;r<Lchain_;++r) {
-  //  cout << "Gate " << r << "\n";
- // MatView(_CTX->Hadamard_gates[r], PETSC_VIEWER_STDOUT_WORLD);
-  }
+
 }
 
 
