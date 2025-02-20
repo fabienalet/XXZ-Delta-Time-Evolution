@@ -454,8 +454,14 @@ PetscErrorCode Unitary_as_gates::init()
   MatCreateVecs(_CTX->U_plus_gates[0], NULL, &_CTX->Ising_gate);
 
   }
+
+  // create shell matrices
+  ierr=MatCreateShell(PETSC_COMM_WORLD,PETSC_DECIDE,PETSC_DECIDE,nconf,nconf,(void*)_CTX,&_U);CHKERRQ(ierr);
+
   else { // TODO CAreful
-    VecSetSizes(_CTX->Ising_gate, _Iend-_Istart, nconf);
+  MatCreateVecs(op->_U, NULL, &_CTX->Ising_gate);
+    
+  //  VecSetSizes(_CTX->Ising_gate, _Iend-_Istart, nconf);
   }
   //
   for (int i=_Istart;i<_Iend;++i) {
@@ -475,7 +481,6 @@ PetscErrorCode Unitary_as_gates::init()
   }
   VecAssemblyBegin(_CTX->Ising_gate); VecAssemblyEnd(_CTX->Ising_gate);
   
-  int Lmax=Lchain_; if (!(pbc)) { Lmax=Lchain_-1;}
   // create shell matrices
   ierr=MatCreateShell(PETSC_COMM_WORLD,PETSC_DECIDE,PETSC_DECIDE,nconf,nconf,(void*)_CTX,&_U);CHKERRQ(ierr);
   // define multiplication operations
