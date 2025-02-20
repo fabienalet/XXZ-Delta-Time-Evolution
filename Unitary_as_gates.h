@@ -332,7 +332,7 @@ PetscErrorCode Unitary_as_gates::init()
   // create shell matrices
   ierr=MatCreateShell(PETSC_COMM_WORLD,PETSC_DECIDE,PETSC_DECIDE,nconf,nconf,(void*)_CTX,&_U);CHKERRQ(ierr);
   // define multiplication operations
-  ierr=MatShellSetOperation(_U,MATOP_MULT,(void(*)())MatMultU1);CHKERRQ(ierr);
+  ierr=MatShellSetOperation(_U,MATOP_MULT,(void(*)())MatMultU2);CHKERRQ(ierr);
   // declare matrix to be symmetric
   MatSetOption(_U,	MAT_SYMMETRIC, PETSC_TRUE);
   MatSetOption(_U, MAT_SYMMETRY_ETERNAL, PETSC_TRUE);
