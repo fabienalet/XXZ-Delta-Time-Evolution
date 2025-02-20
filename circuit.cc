@@ -83,17 +83,21 @@ int main(int argc, char **argv) {
   VecAssemblyBegin(res); VecAssemblyEnd(res);
 
   /*****  Initialize vectors for sigma_z for fast measurements *****/
-  std::vector<Vec> sigmas_as_vec; sigmas_as_vec.resize(L);
-  for (int p=0;p<L;++p) { MatCreateVecs(op->_U, NULL, &sigmas_as_vec[p]);}
+  PetscBool translation_invariant=PETSC_TRUE;
+  PetscOptionsGetBool(NULL, NULL, "-translation_invariant", &translation_invariant, NULL);
+  int L_for_sigma=L;
+  if (translation_invariant) {L_for_sigma=1;}
+  std::vector<Vec> sigmas_as_vec; sigmas_as_vec.resize(L_for_sigma);
+  for (int p=0;p<L_for_sigma;++p) { MatCreateVecs(op->_U, NULL, &sigmas_as_vec[p]);}
   
   for (int i=op->_Istart;i<op->_Iend;++i) {
     std::bitset<32> b(i);
-    for (int p=0;p<L;++p) { 
+    for (int p=0;p<L_for_sigma;++p) { 
       if (b[p]) { VecSetValue(sigmas_as_vec[p],i,1.,INSERT_VALUES);}
       else { VecSetValue(sigmas_as_vec[p],i,-1.,INSERT_VALUES);}
       }
   }
-  for (int p = 0; p < L; ++p) {   VecAssemblyBegin(sigmas_as_vec[p]);   VecAssemblyEnd(sigmas_as_vec[p]);  }
+  for (int p = 0; p < L_for_sigma; ++p) {   VecAssemblyBegin(sigmas_as_vec[p]);   VecAssemblyEnd(sigmas_as_vec[p]);  }
 
    /***** Loop over initial states ****/
 
@@ -143,7 +147,7 @@ int main(int argc, char **argv) {
     VecSet(Psi_t,0.0);
     VecSetValue(Psi_t,i0,1.0,INSERT_VALUES);
     VecAssemblyBegin(Psi_t); VecAssemblyEnd(Psi_t);
-    VecAssemblyBegin(res); VecAssemblyEnd(res);
+   // VecAssemblyBegin(res); VecAssemblyEnd(res);
    
     //PetscReal norm;
     //VecNormalize(Psi_t,&norm);
@@ -191,15 +195,15 @@ int main(int argc, char **argv) {
       if ((t%dt_measurement)==0)
       {
         // Do direct measurement of sigma_z's
-        std::vector<double> sz(L,0.);
+        std::vector<double> sz(L_for_sigma,0.);
         
-        for (int k=0;k<L;++k) { 
+        for (int k=0;k<L_for_sigma;++k) { 
           // Careful I am using Psi_t as a temp vector to store res*sz (point-wise)
           VecPointwiseMult(Psi_t,sigmas_as_vec[k],res);
           VecDotRealPart(Psi_t,res,&sz[k]);  
           }
         if (myrank==0) { 
-          for (int pp=0;pp<L;++pp)    
+          for (int pp=0;pp<L_for_sigma;++pp)    
           { std::cout << "TIME " << t << " SZ " << pp << " " << sz[pp] << endl; } 
         }
         
