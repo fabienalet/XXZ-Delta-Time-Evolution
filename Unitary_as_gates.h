@@ -71,6 +71,7 @@ PetscErrorCode MatMultUplus(Mat M,int r,Vec x,Vec y)
   PetscScalar valii1=costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus);
   PetscScalar valii2=costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus);
   PetscScalar valij=PETSC_i*sintp*sin(PETSC_PI-phi_plus);
+  cout << "plus : " << valii1 << " " << valii2 << " " << valij << endl;
   /*
   PetscReal costm=cos(ctx->theta_+ctx->epsilon_);
   PetscReal sintm=sin(ctx->theta_+ctx->epsilon_);
@@ -120,7 +121,7 @@ PetscErrorCode MatMultUminus(Mat M,int r,Vec x,Vec y)
   PetscScalar valii1=costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus);
   PetscScalar valii2=costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus);
   PetscScalar valij=PETSC_i*sintm*sin(PETSC_PI-phi_minus);
-  
+  cout << "minus : " << valii1 << " " << valii2 << " " << valij << endl;
  PetscScalar mi,mj;
   for (int i=lo;i<hi;++i) {
     std::bitset<32> b(i);
@@ -529,7 +530,9 @@ where \delta_{\pm} = \delta.
   PetscReal sintp=sin(theta_);
   PetscReal costm=cos(theta_+epsilon_);
   PetscReal sintm=sin(theta_+epsilon_);
-
+  cout << "U2 plus : " << costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus) << " " << costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus) << " " << PETSC_i*sintp*sin(PETSC_PI-phi_plus) << endl;
+  cout << "U2 minus : " << costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus) << " " << costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus) << " " << PETSC_i*sintm*sin(PETSC_PI-phi_minus) << endl;
+  
   for (int i=_Istart;i<_Iend;++i) {
     std::bitset<32> b(i);
     b.flip(r);
