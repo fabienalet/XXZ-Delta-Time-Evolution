@@ -282,9 +282,9 @@ PetscErrorCode Unitary_as_gates::init()
   ierr=MatCreateShell(PETSC_COMM_WORLD,PETSC_DECIDE,PETSC_DECIDE,nconf,nconf,(void*)_CTX,&_U);CHKERRQ(ierr);
   // define multiplication operations
   ierr=MatShellSetOperation(_U,MATOP_MULT,(void(*)())MatMultU);CHKERRQ(ierr);
-  // declare matrix to be Hermitian
- // MatSetOption(_U,	MAT_SYMMETRIC, PETSC_TRUE);
- // MatSetOption(_U, MAT_SYMMETRY_ETERNAL, PETSC_TRUE);
+  // declare matrix to be symmetric
+  MatSetOption(_U,	MAT_SYMMETRIC, PETSC_TRUE);
+  MatSetOption(_U, MAT_SYMMETRY_ETERNAL, PETSC_TRUE);
   //std::cout << "Diagonal x: \n";
   //VecView(_CTX->Diagonal_Unitary_x,PETSC_VIEWER_STDOUT_WORLD); 
   //std::cout << "Diagonal z: \n";
