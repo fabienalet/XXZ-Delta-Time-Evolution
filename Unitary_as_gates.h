@@ -64,7 +64,7 @@ PetscErrorCode MatMultU(Mat M,Vec x,Vec y)
   // assume vector x is in the sigma_z basis
   // first apply all 1-qubit gates (U_plus)
   for (int i=0;i<ctx->Lchain;++i) {
-  MatMult(ctx->U_plus_gates[i], x2, y);
+  MatMult(ctx->U_minus_gates[i], x2, y);
   if (i < (ctx->Lchain - 1)) { VecSwap(y, x2); }
   }
   // result is in y
@@ -75,7 +75,7 @@ PetscErrorCode MatMultU(Mat M,Vec x,Vec y)
 
   // Apply all 1-qubit gates (U_minus)
   for (int i=0;i<ctx->Lchain;++i) {
-  MatMult(ctx->U_minus_gates[i], x2, y);
+  MatMult(ctx->U_plus_gates[i], x2, y);
   if (i < (ctx->Lchain - 1)) { VecSwap(y, x2); }
   }
   // result is in y
