@@ -59,7 +59,7 @@ PetscErrorCode MatMultU(Mat M,Vec x,Vec y)
   ierr = MatShellGetContext(M,(void**)&ctx);CHKERRQ(ierr);
  // std::cout << "MatMult U : step 0\n";
  // apply 2 qubits-gate U_2 (diagonal operation in sigma_z basis)
-  VecPointwiseMult(y, x, ctx->Ising_gate);
+  VecPointwiseMult(y, x2, ctx->Ising_gate);
   // result in y
   // first apply all 1-qubit gates (U_minus)
   for (int i=0;i<ctx->Lchain;++i) {
