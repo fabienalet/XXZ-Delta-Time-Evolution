@@ -454,8 +454,8 @@ PetscErrorCode Unitary_as_gates::init()
   MatCreateVecs(_CTX->U_plus_gates[0], NULL, &_CTX->Ising_gate);
 
   }
-  else {
-    VecSetSizes(&_CTX->Ising_gate, _Iend-_Istart, nconf);
+  else { // TODO CAreful
+    VecSetSizes(_CTX->Ising_gate, _Iend-_Istart, nconf);
   }
   //
   for (int i=_Istart;i<_Iend;++i) {
