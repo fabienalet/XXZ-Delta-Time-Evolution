@@ -45,7 +45,7 @@ PetscErrorCode VecMultScalar(Vec x, PetscScalar *scalar)
   VecRestoreArray(x,&px);
 }
 
-PetscErrorCode MatMultU(Mat M,Vec x,Vec y)
+PetscErrorCode MatMultU2(Mat M,Vec x,Vec y)
 {
   PetscErrorCode    ierr;
   MatrixContext     *ctx;
@@ -84,9 +84,9 @@ PetscErrorCode MatMultU(Mat M,Vec x,Vec y)
 PetscFunctionReturn(0);
 }
 
-/*
 
-PetscErrorCode MatMultU(Mat M,Vec x,Vec y)
+
+PetscErrorCode MatMultU1(Mat M,Vec x,Vec y)
 {
   PetscErrorCode    ierr;
   MatrixContext     *ctx;
@@ -129,7 +129,6 @@ PetscErrorCode MatMultU(Mat M,Vec x,Vec y)
   
 PetscFunctionReturn(0);
 }
-*/
 class Unitary_as_gates
 {
   //typedef std::vector<unsigned short int> Conf;
@@ -333,7 +332,7 @@ PetscErrorCode Unitary_as_gates::init()
   // create shell matrices
   ierr=MatCreateShell(PETSC_COMM_WORLD,PETSC_DECIDE,PETSC_DECIDE,nconf,nconf,(void*)_CTX,&_U);CHKERRQ(ierr);
   // define multiplication operations
-  ierr=MatShellSetOperation(_U,MATOP_MULT,(void(*)())MatMultU);CHKERRQ(ierr);
+  ierr=MatShellSetOperation(_U,MATOP_MULT,(void(*)())MatMultU1);CHKERRQ(ierr);
   // declare matrix to be symmetric
   MatSetOption(_U,	MAT_SYMMETRIC, PETSC_TRUE);
   MatSetOption(_U, MAT_SYMMETRY_ETERNAL, PETSC_TRUE);
