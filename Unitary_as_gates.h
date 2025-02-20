@@ -78,17 +78,17 @@ PetscErrorCode MatMultUplus(Mat M,int r,Vec x,Vec y)
   PetscScalar valii=costm+PETSC_i*sintp*cos(PETSC_PI-phi_minus);
   PetscScalar valij=PETSC_i*sintm*sin(PETSC_PI-phi_minus);
   */
- PetscScalar mi,mj;
+ PetscScalar mi,mj,xl;
   for (int i=lo;i<hi;++i) {
     std::bitset<32> b(i);
     b.flip(r);
     int j = (int)(b.to_ulong());
     b.flip(r);
-    
+    xl=xloc[i-lo];
     // maybe don't flip again and reverse the if ...
-    if (b[r]) {  mi=xloc[i-lo]*valii1; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
-    else { mi=xloc[i-lo]*valii2; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
-    mj=xloc[i-lo]*valij;
+    if (b[r]) {  mi=xl*valii1; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
+    else { mi=xl*valii2; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
+    mj=xl*valij;
       VecSetValues(y, 1, &j, &mj, ADD_VALUES);
     }
 
@@ -109,7 +109,7 @@ PetscErrorCode MatMultUminus(Mat M,int r,Vec x,Vec y)
   PetscFunctionBeginUser;
   int myrank;
   MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
-  cout << "Viewing x\n"; VecView(x,PETSC_VIEWER_STDOUT_WORLD); 
+ // cout << "Viewing x\n"; VecView(x,PETSC_VIEWER_STDOUT_WORLD); 
   MatShellGetContext(M,(void**)&ctx);CHKERRQ(ierr);
   VecGetOwnershipRange(x, &lo, &hi);
 
@@ -123,22 +123,22 @@ PetscErrorCode MatMultUminus(Mat M,int r,Vec x,Vec y)
   PetscScalar valii1=costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus);
   PetscScalar valii2=costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus);
   PetscScalar valij=PETSC_i*sintm*sin(PETSC_PI-phi_minus);
-  cout << "minus : " << valii1 << " " << valii2 << " " << valij << endl;
- PetscScalar mi,mj;
+ // cout << "minus : " << valii1 << " " << valii2 << " " << valij << endl;
+ PetscScalar mi,mj,xl;
   for (int i=lo;i<hi;++i) {
-    if (myrank==1) cout << "rank=" << myrank << " i=" << i << " xloc[i]=" << xloc[i-lo] << endl;
+  //  if (myrank==1) cout << "rank=" << myrank << " i=" << i << " xloc[i]=" << xloc[i-lo] << endl;
     std::bitset<32> b(i);
     b.flip(r);
     int j = (int)(b.to_ulong());
     b.flip(r);
-    
+    xl=xloc[i-lo];
     // maybe don't flip again and reverse the if ...
-    if (b[r]) {  mi=xloc[i-lo]*valii1; VecSetValues(y, 1, &i, &mi, ADD_VALUES); }
-    else { mi=xloc[i-lo]*valii2; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
-    cout << "myrank " << myrank << " is Adding to y : " << i << " " << mi << endl;
-    mj=xloc[i-lo]*valij;
+    if (b[r]) {  mi=xl*valii1; VecSetValues(y, 1, &i, &mi, ADD_VALUES); }
+    else { mi=xl*valii2; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
+   // cout << "myrank " << myrank << " is Adding to y : " << i << " " << mi << endl;
+    mj=xl*valij;
       VecSetValues(y, 1, &j, &mj, ADD_VALUES);
-      cout << "myrank " << myrank << " is Adding to y : " << j << " " << mj << endl;
+   //   cout << "myrank " << myrank << " is Adding to y : " << j << " " << mj << endl;
     }
 
   VecRestoreArrayRead(x, &xloc);
