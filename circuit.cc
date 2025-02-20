@@ -196,13 +196,13 @@ int main(int argc, char **argv) {
       {
         // Do direct measurement of sigma_z's
         std::vector<double> sz(L_for_sigma,0.);
-        /*
+        
         for (int k=0;k<L_for_sigma;++k) { 
           // Careful I am using Psi_t as a temp vector to store res*sz (point-wise)
           VecPointwiseMult(Psi_t,sigmas_as_vec[k],res);
           VecDotRealPart(Psi_t,res,&sz[k]);  
           }
-          */
+          
         if (myrank==0) { 
           for (int pp=0;pp<L_for_sigma;++pp)    
           { std::cout << "TIME " << t << " SZ " << pp << " " << sz[pp] << endl; } 
