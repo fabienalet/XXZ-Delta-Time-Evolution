@@ -21,6 +21,10 @@ and R_y, R_z are rotations about y and z axis respectively.
 
 struct MatrixContext {
   PetscInt Lchain;
+  PetscReal theta_;
+  PetscReal epsilon_;
+  PetscReal delta_plus_;
+  PetscReal delta_minus_;
   Vec Ising_gate;
   std::vector<Mat> U_plus_gates;
   std::vector<Mat> U_minus_gates;
@@ -44,6 +48,138 @@ PetscErrorCode VecMultScalar(Vec x, PetscScalar *scalar)
   }
   VecRestoreArray(x,&px);
 }
+
+
+PetscErrorCode MatMultUplus(Mat M,int r,Vec x,Vec y)
+{
+  PetscErrorCode    ierr;
+  MatrixContext     *ctx;
+  const PetscScalar *xloc;
+  PetscInt lo,hi;
+  // First executable line of user provided PETSc routine
+  PetscFunctionBeginUser;
+
+  MatShellGetContext(M,(void**)&ctx);CHKERRQ(ierr);
+  VecGetOwnershipRange(x, &lo, &hi);
+
+  PetscCall(VecGetArrayRead(x, &xloc);
+  PetscCall(VecSet(y, 0.));
+
+  PetscReal costp=cos(ctx->theta_);
+  PetscReal sintp=sin(ctx->theta_);
+  PetscReal phi_plus=PETSC_PI/2.-ctx->delta_plus_;
+  PetscScalar valii1=costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus);
+  PetscScalar valii2=costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus);
+  PetscScalar valij=PETSC_i*sintp*sin(PETSC_PI-phi_plus);
+  /*
+  PetscReal costm=cos(ctx->theta_+ctx->epsilon_);
+  PetscReal sintm=sin(ctx->theta_+ctx->epsilon_);
+  PetscScalar valii=costm+PETSC_i*sintp*cos(PETSC_PI-phi_minus);
+  PetscScalar valij=PETSC_i*sintm*sin(PETSC_PI-phi_minus);
+  */
+ PetscScalar mi,mj;
+  for (int i=lo;i<hi;++i) {
+    std::bitset<32> b(i);
+    b.flip(r);
+    int j = (int)(b.to_ulong());
+    b.flip(r);
+    
+    // maybe don't flip again and reverse the if ...
+    if (b[r]) {  mi=xloc[i]*valii1; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
+    else { mi=xloc[i]*valii2; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
+    mj=xloc[i]*valij;
+      VecSetValues(y, 1, &j, &mj, ADD_VALUES);
+    }
+
+  VecRestoreArrayRead(x, &xloc);
+  VecAssemblyBegin(y);
+  VecAssemblyEnd(y);
+
+  PetscFunctionReturn(PETSC_SUCCESS);
+}
+
+PetscErrorCode MatMultUminus(Mat M,int r,Vec x,Vec y)
+{
+  PetscErrorCode    ierr;
+  MatrixContext     *ctx;
+  const PetscScalar *xloc;
+  PetscInt lo,hi;
+  // First executable line of user provided PETSc routine
+  PetscFunctionBeginUser;
+
+  MatShellGetContext(M,(void**)&ctx);CHKERRQ(ierr);
+  VecGetOwnershipRange(x, &lo, &hi);
+
+  PetscCall(VecGetArrayRead(x, &xloc));
+  PetscCall(VecSet(y, 0.));
+
+  PetscReal phi_minus=PETSC_PI/2.-ctx->delta_minus_;
+  
+  PetscReal costm=cos(ctx->theta_+ctx->epsilon_);
+  PetscReal sintm=sin(ctx->theta_+ctx->epsilon_);
+  PetscScalar valii=costm+PETSC_i*sintp*cos(PETSC_PI-phi_minus);
+  PetscScalar valij=PETSC_i*sintm*sin(PETSC_PI-phi_minus);
+  
+ PetscScalar mi,mj;
+  for (int i=lo;i<hi;++i) {
+    std::bitset<32> b(i);
+    b.flip(r);
+    int j = (int)(b.to_ulong());
+    b.flip(r);
+    
+    // maybe don't flip again and reverse the if ...
+    if (b[r]) {  mi=xloc[i]*valii1; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
+    else { mi=xloc[i]*valii2; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
+    mj=xloc[i]*valij;
+      VecSetValues(y, 1, &j, &mj, ADD_VALUES);
+    }
+
+  VecRestoreArrayRead(x, &xloc);
+  VecAssemblyBegin(y);
+  VecAssemblyEnd(y);
+
+  PetscFunctionReturn(PETSC_SUCCESS);
+}
+
+PetscErrorCode MatMultU3(Mat M,Vec x,Vec y)
+{
+  PetscErrorCode    ierr;
+  MatrixContext     *ctx;
+  //Vec               x3;
+  // First executable line of user provided PETSc routine
+  PetscFunctionBeginUser;
+  VecSet(y,0.);
+  VecDuplicate(x,&x2);
+  VecCopy(x,x2);
+  ierr = MatShellGetContext(M,(void**)&ctx);CHKERRQ(ierr);
+ // std::cout << "MatMult U : step 0\n";
+ // apply 2 qubits-gate U_2 (diagonal operation in sigma_z basis)
+  VecPointwiseMult(y, x, ctx->Ising_gate);
+  // result in y
+  // first apply all 1-qubit gates (U_minus)
+  for (int i=0;i<ctx->Lchain;++i) {
+  MatMultUminus(M,i, y, x2);
+  if (i < (ctx->Lchain - 1)) { VecSwap(y, x2); }
+  }
+ 
+  // result is in x2
+  // apply 2 qubits-gate U_2 (diagonal operation in sigma_z basis)
+  VecPointwiseMult(y, x2, ctx->Ising_gate);
+  // result in y
+
+ // Apply all 1-qubit gates (U_plus)
+ for (int i=0;i<ctx->Lchain;++i) {
+  MatMultUplus(M,i, y, x2);
+  if (i < (ctx->Lchain - 1)) { VecSwap(y, x2); }
+  }
+
+  // result is in x2
+  // Do a final swap
+  VecSwap(x2, y);
+  
+PetscFunctionReturn(0);
+}
+
 
 PetscErrorCode MatMultU2(Mat M,Vec x,Vec y)
 {
@@ -179,6 +315,7 @@ Unitary_as_gates::Unitary_as_gates(int _myrank, int mpisize)
 
   _CTX->Lchain=Lchain_;
   
+  
   std::vector<int> local_block_sizes(mpisize,nconf/mpisize);
   for(size_t i=0; i< nconf%mpisize; i++) local_block_sizes[i]++; // distribute evenly
   _Istart = 0;
@@ -186,6 +323,11 @@ Unitary_as_gates::Unitary_as_gates(int _myrank, int mpisize)
   _Iend = _Istart + local_block_sizes[myrank];
 
   init();
+
+  _CTX->epsilon_=epsilon_;
+  _CTX->theta_=theta_;
+  _CTX->delta_plus_=delta_plus_;
+  _CTX->delta_minus_=delta_minus_;
 
 }
 
@@ -332,7 +474,7 @@ PetscErrorCode Unitary_as_gates::init()
   // create shell matrices
   ierr=MatCreateShell(PETSC_COMM_WORLD,PETSC_DECIDE,PETSC_DECIDE,nconf,nconf,(void*)_CTX,&_U);CHKERRQ(ierr);
   // define multiplication operations
-  ierr=MatShellSetOperation(_U,MATOP_MULT,(void(*)())MatMultU2);CHKERRQ(ierr);
+  ierr=MatShellSetOperation(_U,MATOP_MULT,(void(*)())MatMultU3);CHKERRQ(ierr);
   // declare matrix to be symmetric
   MatSetOption(_U,	MAT_SYMMETRIC, PETSC_TRUE);
   MatSetOption(_U, MAT_SYMMETRY_ETERNAL, PETSC_TRUE);
