@@ -192,6 +192,9 @@ Unitary_as_gates::Unitary_as_gates(int _myrank, int mpisize)
 
 void Unitary_as_gates::get_parameters() {
   
+  PetscBool pi_units=PETSC_FALSE;
+  PetscOptionsGetBool(NULL, NULL, "-pi", &pi_units, NULL);
+
   Lchain_=12;
   PetscOptionsGetInt(NULL, NULL, "-L", &Lchain_, NULL);
   J_=1.;
@@ -210,7 +213,16 @@ void Unitary_as_gates::get_parameters() {
   
   theta_=0.2;
   PetscOptionsGetReal(NULL, NULL, "-theta", &theta_, NULL);
-  
+
+
+  if (pi_units) {
+    delta_=delta_*PETSC_PI/2;
+    delta_plus_=delta_plus_*PETSC_PI/2;
+    delta_minus_=delta_minus_*PETSC_PI/2;
+    epsilon_=epsilon_*PETSC_PI;
+    theta_=theta_*PETSC_PI;
+  }
+
   
   Tover2_=1.;
   PetscOptionsGetReal(NULL, NULL, "-Tover2", &Tover2_, NULL);
