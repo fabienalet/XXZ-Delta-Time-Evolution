@@ -117,7 +117,8 @@ PetscErrorCode MatMultUminus(Mat M,int r,Vec x,Vec y)
   
   PetscReal costm=cos(ctx->theta_+ctx->epsilon_);
   PetscReal sintm=sin(ctx->theta_+ctx->epsilon_);
-  PetscScalar valii=costm+PETSC_i*sintp*cos(PETSC_PI-phi_minus);
+  PetscScalar valii1=costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus);
+  PetscScalar valii2=costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus);
   PetscScalar valij=PETSC_i*sintm*sin(PETSC_PI-phi_minus);
   
  PetscScalar mi,mj;
@@ -145,7 +146,7 @@ PetscErrorCode MatMultU3(Mat M,Vec x,Vec y)
 {
   PetscErrorCode    ierr;
   MatrixContext     *ctx;
-  //Vec               x3;
+  Vec               x2;
   // First executable line of user provided PETSc routine
   PetscFunctionBeginUser;
   VecSet(y,0.);
@@ -498,11 +499,9 @@ and
 U_{-} = R_y ( \pi/2 - \delta_{-}) R_z ( 2\theta + \epsilon) R_y (-(\pi/2 - \delta_{-})))
 where \delta_{\pm} = \delta.
 */
-  // Tover2 ??
-  double phi_plus=PETSC_PI/2.+delta_plus_;
- // double angle2=-angle1;
-  double phi_minus=PETSC_PI/2.-delta_minus_;
- // double angle4=-angle3;
+  PetscReal phi_plus=PETSC_PI/2.+delta_plus_;
+ PetscReal phi_minus=PETSC_PI/2.-delta_minus_;
+ 
   /*
   PetscScalar cos1_=cos(angle1/2.);
   PetscScalar cos2_=cos(angle2/2.);
@@ -522,10 +521,10 @@ where \delta_{\pm} = \delta.
   PetscScalar c3s4=cos3_*sin4_;
   PetscScalar c4s3=cos4_*sin3_;
   */
-  PetscScalar costp=cos(theta_);
-  PetscScalar sintp=sin(theta_);
-  PetscScalar costm=cos(theta_+epsilon_);
-  PetscScalar sintm=sin(theta_+epsilon_);
+  PetscReal costp=cos(theta_);
+  PetscReal sintp=sin(theta_);
+  PetscReal costm=cos(theta_+epsilon_);
+  PetscReal sintm=sin(theta_+epsilon_);
 
   for (int i=_Istart;i<_Iend;++i) {
     std::bitset<32> b(i);
