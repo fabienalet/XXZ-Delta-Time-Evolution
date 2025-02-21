@@ -493,9 +493,12 @@ and
 U_{-} = R_y ( \pi/2 - \delta_{-}) R_z ( 2\theta + \epsilon) R_y (-(\pi/2 - \delta_{-})))
 where \delta_{\pm} = \delta.
 */
+/*
   PetscReal phi_plus=PETSC_PI/2.+delta_plus_;
  PetscReal phi_minus=PETSC_PI/2.-delta_minus_;
- 
+ */
+  PetscReal phi_plus=PETSC_PI/4.+delta_plus_/2.;
+ PetscReal phi_minus=PETSC_PI/4.-delta_minus_/2.;
   /*
   PetscScalar cos1_=cos(angle1/2.);
   PetscScalar cos2_=cos(angle2/2.);
@@ -515,11 +518,16 @@ where \delta_{\pm} = \delta.
   PetscScalar c3s4=cos3_*sin4_;
   PetscScalar c4s3=cos4_*sin3_;
   */
+  PetscReal costp=cos(theta_/2);
+  PetscReal sintp=sin(theta_/2);
+  PetscReal costm=cos(theta_/2+epsilon_/2);
+  PetscReal sintm=sin(theta_/2+epsilon_/2);
+  /*
   PetscReal costp=cos(theta_);
   PetscReal sintp=sin(theta_);
   PetscReal costm=cos(theta_+epsilon_);
   PetscReal sintm=sin(theta_+epsilon_);
-
+  */
   
  // cout << "U2 plus : " << costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus) << " " << costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus) << " " << PETSC_i*sintp*sin(PETSC_PI-phi_plus) << endl;
  // cout << "U2 minus : " << costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus) << " " << costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus) << " " << PETSC_i*sintm*sin(PETSC_PI-phi_minus) << endl;
