@@ -493,10 +493,10 @@ and
 U_{-} = R_y ( \pi/2 - \delta_{-}) R_z ( 2\theta + \epsilon) R_y (-(\pi/2 - \delta_{-})))
 where \delta_{\pm} = \delta.
 */
-/*
+
   PetscReal phi_plus=PETSC_PI/2.+delta_plus_;
  PetscReal phi_minus=PETSC_PI/2.-delta_minus_;
- */
+ 
   /*
   PetscScalar cos1_=cos(angle1/2.);
   PetscScalar cos2_=cos(angle2/2.);
