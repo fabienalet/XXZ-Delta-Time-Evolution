@@ -84,21 +84,23 @@ int main(int argc, char **argv) {
   VecAssemblyBegin(res); VecAssemblyEnd(res);
   cout << "Here 3\n";
   /*****  Initialize vectors for sigma_z for fast measurements *****/
-  PetscBool translation_invariant=PETSC_TRUE;
-  PetscOptionsGetBool(NULL, NULL, "-translation_invariant", &translation_invariant, NULL);
+  PetscBool pbc=PETSC_FALSE;
+  PetscOptionsGetBool(NULL, NULL, "-pbc", &pbc, NULL);
   int L_for_sigma=L;
-  if (translation_invariant) {L_for_sigma=1;}
-  std::vector<Vec> sigmas_as_vec; sigmas_as_vec.resize(L_for_sigma);
-  for (int p=0;p<L_for_sigma;++p) { MatCreateVecs(op->_U, NULL, &sigmas_as_vec[p]);}
+  if (pbc) {L_for_sigma=1;}
+  Vec sigmas_as_vec; 
+  MatCreateVecs(op->_U, NULL, &sigmas_as_vec;}
   
+  PetscScalar val;
   for (int i=op->_Istart;i<op->_Iend;++i) {
     std::bitset<32> b(i);
+    val=0.;
     for (int p=0;p<L_for_sigma;++p) { 
-      if (b[p]) { VecSetValue(sigmas_as_vec[p],i,1.,INSERT_VALUES);}
-      else { VecSetValue(sigmas_as_vec[p],i,-1.,INSERT_VALUES);}
+      if (b[p]) { val+=1;} else { val-=1.; }
       }
+   VecSetValue(sigmas_as_vec,i,&val,INSERT_VALUES);   
   }
-  for (int p = 0; p < L_for_sigma; ++p) {   VecAssemblyBegin(sigmas_as_vec[p]);   VecAssemblyEnd(sigmas_as_vec[p]);  }
+  VecAssemblyBegin(sigmas_as_vec);   VecAssemblyEnd(sigmas_as_vec); 
   cout << "Here 4\n";
    /***** Loop over initial states ****/
 
@@ -196,18 +198,12 @@ int main(int argc, char **argv) {
       if ((t%dt_measurement)==0)
       {
         // Do direct measurement of sigma_z's
-        std::vector<double> sz(L_for_sigma,0.);
-        
-        for (int k=0;k<L_for_sigma;++k) { 
-          // Careful I am using Psi_t as a temp vector to store res*sz (point-wise)
-          VecPointwiseMult(Psi_t,sigmas_as_vec[k],res);
-          VecDotRealPart(Psi_t,res,&sz[k]);  
-          }
-          
-        if (myrank==0) { 
-          for (int pp=0;pp<L_for_sigma;++pp)    
-          { std::cout << "TIME " << t << " SZ " << pp << " " << sz[pp] << endl; } 
-        }
+        // std::vector<double> sz(L_for_sigma,0.);
+        double sz;
+        // Careful I am using Psi_t as a temp vector to store res*res (point-wise)
+        VecPointwiseMult(Psi_t,res,res);
+        VecDotRealPart(Psi_t,sigmas_as_vec,&sz);  
+        if (myrank==0) { std::cout << "TIME " << t << " SZ " << sz << endl; }
         
         /*
         // Will rapatriate the distributed vector res into a local vector

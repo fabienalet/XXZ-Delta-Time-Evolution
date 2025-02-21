@@ -378,7 +378,7 @@ void Unitary_as_gates::get_parameters() {
   PetscOptionsGetReal(NULL, NULL, "-T", &T_, &T_defined);
   if (T_defined) { Tover2_=0.5*T_;}
 
-  PetscBool pbc=PETSC_TRUE;
+  PetscBool pbc=PETSC_FALSE;
   PetscOptionsGetBool(NULL, NULL, "-pbc", &pbc, NULL);
   
 
@@ -465,12 +465,14 @@ PetscErrorCode Unitary_as_gates::init()
   MatSetOption(_U, MAT_SYMMETRY_ETERNAL, PETSC_TRUE);
 
   MatCreateVecs(_U, NULL, &_CTX->Ising_gate);
-
+  PetscInt Lmax=Lchain_-1;
+  if (pbc) { Lmax=Lchain_;}
   for (int i=_Istart;i<_Iend;++i) {
     std::bitset<32> b(i);
     double ising_energy=0.;
     double nup=0;
-    for (int r=0;r<Lchain_;++r) { 
+    
+    for (int r=0;r<Lmax;++r) { 
       if (b[r]==b[(r+1+Lchain_)%Lchain_]) { ising_energy+=J_coupling[r];} else { ising_energy-=J_coupling[r];} 
       }
     PetscReal angle_ising=-ising_energy;
