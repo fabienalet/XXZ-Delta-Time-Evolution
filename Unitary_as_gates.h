@@ -493,10 +493,10 @@ and
 U_{-} = R_y ( \pi/2 - \delta_{-}) R_z ( 2\theta + \epsilon) R_y (-(\pi/2 - \delta_{-})))
 where \delta_{\pm} = \delta.
 */
-
+/*
   PetscReal phi_plus=PETSC_PI/2.+delta_plus_;
  PetscReal phi_minus=PETSC_PI/2.-delta_minus_;
- 
+ */
   /*
   PetscScalar cos1_=cos(angle1/2.);
   PetscScalar cos2_=cos(angle2/2.);
@@ -530,7 +530,7 @@ where \delta_{\pm} = \delta.
     std::bitset<32> b(i);
     b.flip(r);
     int j = (int)(b.to_ulong());
-    b.flip(r);
+    //b.flip(r);
     // maybe don't flip again and reverse the if ...
     if (b[r]) {
   //  MatSetValue(_CTX->U_plus_gates[r], i, i, c1c2*(costp-PETSC_i*sintp)-s1s2*(costp+PETSC_i*sintp), ADD_VALUES);
