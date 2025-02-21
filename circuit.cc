@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
     for (int p=0;p<L_for_sigma;++p) { 
       if (b[p]) { val+=1;} else { val-=1.; }
       }
-   VecSetValue(sigmas_as_vec,i,&val,INSERT_VALUES);   
+   VecSetValue(sigmas_as_vec,i,val,INSERT_VALUES);   
   }
   VecAssemblyBegin(sigmas_as_vec);   VecAssemblyEnd(sigmas_as_vec); 
   cout << "Here 4\n";
