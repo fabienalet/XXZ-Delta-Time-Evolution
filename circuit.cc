@@ -89,7 +89,7 @@ int main(int argc, char **argv) {
   int L_for_sigma=L;
   if (pbc) {L_for_sigma=1;}
   Vec sigmas_as_vec; 
-  MatCreateVecs(op->_U, NULL, &sigmas_as_vec;}
+  MatCreateVecs(op->_U, NULL, &sigmas_as_vec);
   
   PetscScalar val;
   for (int i=op->_Istart;i<op->_Iend;++i) {
