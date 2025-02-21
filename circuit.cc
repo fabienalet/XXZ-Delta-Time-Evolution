@@ -91,7 +91,7 @@ int main(int argc, char **argv) {
   Vec sigmas_as_vec; 
   MatCreateVecs(op->_U, NULL, &sigmas_as_vec);
   
-  PetscScalar val;
+  PetscScalar val=0.;
   for (int i=op->_Istart;i<op->_Iend;++i) {
     std::bitset<32> b(i);
     val=0.;
@@ -201,8 +201,8 @@ int main(int argc, char **argv) {
         // std::vector<double> sz(L_for_sigma,0.);
         double sz;
         // Careful I am using Psi_t as a temp vector to store res*res (point-wise)
-        VecPointwiseMult(Psi_t,res,res);
-        VecDotRealPart(Psi_t,sigmas_as_vec,&sz);  
+        VecPointwiseMult(Psi_t,sigmas_as_vec,res);
+        VecDotRealPart(Psi_t,res,&sz);  
         if (myrank==0) { std::cout << "TIME " << t << " SZ " << sz << endl; }
         
         /*
