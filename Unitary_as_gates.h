@@ -520,10 +520,10 @@ where \delta_{\pm} = \delta.
   PetscScalar c4s3=cos4_*sin3_;
   */
   
-  PetscReal costp=cos(theta_+epsilon_);
-  PetscReal sintp=sin(theta_+epsilon_);
-  PetscReal costm=cos(theta_); //+epsilon_);
-  PetscReal sintm=sin(theta_); //+epsilon_);
+  PetscReal costp=cos(theta_);
+  PetscReal sintp=sin(theta_);
+  PetscReal costm=cos(theta_+epsilon_); //+epsilon_);
+  PetscReal sintm=sin(theta_+epsilon_); //+epsilon_);
   
   
  // cout << "U2 plus : " << costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus) << " " << costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus) << " " << PETSC_i*sintp*sin(PETSC_PI-phi_plus) << endl;
@@ -533,7 +533,7 @@ where \delta_{\pm} = \delta.
     std::bitset<32> b(i);
     b.flip(r);
     int j = (int)(b.to_ulong());
-    //b.flip(r);
+    b.flip(r);
     // maybe don't flip again and reverse the if ...
     if (b[r]) {
   //  MatSetValue(_CTX->U_plus_gates[r], i, i, c1c2*(costp-PETSC_i*sintp)-s1s2*(costp+PETSC_i*sintp), ADD_VALUES);
