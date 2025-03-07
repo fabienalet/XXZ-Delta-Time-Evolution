@@ -474,6 +474,7 @@ PetscErrorCode Unitary_as_gates::init()
     double nup=0;
     
     for (int r=0;r<Lmax;++r) { 
+      cout << r << " " << Lmax << endl;
       if (b[r]==b[(r+1+Lchain_)%Lchain_]) { ising_energy+=J_coupling[r];} else { ising_energy-=J_coupling[r];} 
       }
     PetscReal angle_ising=ising_energy;
