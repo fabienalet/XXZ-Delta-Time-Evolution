@@ -533,7 +533,7 @@ where \delta_{\pm} = \delta.
     std::bitset<32> b(i);
     b.flip(r);
     int j = (int)(b.to_ulong());
-    //b.flip(r);
+    b.flip(r);
     // maybe don't flip again and reverse the if ...
     if (b[r]) {
   //  MatSetValue(_CTX->U_plus_gates[r], i, i, c1c2*(costp-PETSC_i*sintp)-s1s2*(costp+PETSC_i*sintp), ADD_VALUES);
