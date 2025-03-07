@@ -49,7 +49,7 @@ PetscErrorCode VecMultScalar(Vec x, PetscScalar *scalar)
   VecRestoreArray(x,&px);
 }
 
-
+   
 PetscErrorCode MatMultUplus(Mat M,int r,Vec x,Vec y)
 {
   PetscErrorCode    ierr;
@@ -65,12 +65,12 @@ PetscErrorCode MatMultUplus(Mat M,int r,Vec x,Vec y)
   PetscCall(VecGetArrayRead(x, &xloc));
   PetscCall(VecSet(y, 0.));
 
-  PetscReal costp=cos(ctx->theta_);
-  PetscReal sintp=sin(ctx->theta_);
+  PetscReal costp=cos(ctx->theta_+ctx->epsilon_);
+  PetscReal sintp=sin(ctx->theta_+ctx->epsilon_);
   PetscReal phi_plus=PETSC_PI/2.+ctx->delta_plus_;
   PetscScalar valii1=costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus);
   PetscScalar valii2=costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus);
-  PetscScalar valij=PETSC_i*sintp*sin(PETSC_PI-phi_plus);
+  PetscScalar valij=-PETSC_i*sintp*sin(PETSC_PI-phi_plus);
   //cout << "plus : " << valii1 << " " << valii2 << " " << valij << endl;
   /*
   PetscReal costm=cos(ctx->theta_+ctx->epsilon_);
@@ -83,7 +83,7 @@ PetscErrorCode MatMultUplus(Mat M,int r,Vec x,Vec y)
     std::bitset<32> b(i);
     b.flip(r);
     int j = (int)(b.to_ulong());
-    b.flip(r);
+   // b.flip(r);
     xl=xloc[i-lo];
     // maybe don't flip again and reverse the if ...
     if (b[r]) {  mi=xl*valii1; VecSetValues(y, 1, &i, &mi, ADD_VALUES);}
@@ -118,11 +118,11 @@ PetscErrorCode MatMultUminus(Mat M,int r,Vec x,Vec y)
 
   PetscReal phi_minus=PETSC_PI/2.-ctx->delta_minus_;
   
-  PetscReal costm=cos(ctx->theta_+ctx->epsilon_);
-  PetscReal sintm=sin(ctx->theta_+ctx->epsilon_);
+  PetscReal costm=cos(ctx->theta_);
+  PetscReal sintm=sin(ctx->theta_);
   PetscScalar valii1=costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus);
   PetscScalar valii2=costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus);
-  PetscScalar valij=PETSC_i*sintm*sin(PETSC_PI-phi_minus);
+  PetscScalar valij=-PETSC_i*sintm*sin(PETSC_PI-phi_minus);
  // cout << "minus : " << valii1 << " " << valii2 << " " << valij << endl;
  PetscScalar mi,mj,xl;
   for (int i=lo;i<hi;++i) {
@@ -130,7 +130,7 @@ PetscErrorCode MatMultUminus(Mat M,int r,Vec x,Vec y)
     std::bitset<32> b(i);
     b.flip(r);
     int j = (int)(b.to_ulong());
-    b.flip(r);
+   // b.flip(r);
     xl=xloc[i-lo];
     // maybe don't flip again and reverse the if ...
     if (b[r]) {  mi=xl*valii1; VecSetValues(y, 1, &i, &mi, ADD_VALUES); }
@@ -535,22 +535,22 @@ where \delta_{\pm} = \delta.
     int j = (int)(b.to_ulong());
     //b.flip(r);
     // maybe don't flip again and reverse the if ...
-    if (b[r]) {
+    if (b[r]) { // in fact this means bit 1 hence spin down ...
   //  MatSetValue(_CTX->U_plus_gates[r], i, i, c1c2*(costp-PETSC_i*sintp)-s1s2*(costp+PETSC_i*sintp), ADD_VALUES);
    // MatSetValue(_CTX->U_minus_gates[r], i, i, c3c4*(costm-PETSC_i*sintm)-s3s4*(costm+PETSC_i*sintm), ADD_VALUES);
     // Asmi's notes
 
      MatSetValue(_CTX->U_plus_gates[r], i, i, costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus), INSERT_VALUES);
      MatSetValue(_CTX->U_minus_gates[r], i, i, costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus), INSERT_VALUES);
-      cout << "U+_11=" << costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus) << endl;
-      cout << "U-_11=" << costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus) << endl;
+     // cout << "U+_11=" << costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus) << endl;
+      //cout << "U-_11=" << costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus) << endl;
    // MatSetValue(_CTX->U_plus_gates[r], i, j, -c1s2*(costp-PETSC_i*sintp)-c2s1*(costp+PETSC_i*sintp), ADD_VALUES);
    // MatSetValue(_CTX->U_minus_gates[r], i, j, -c3s4*(costp-PETSC_i*sintm)-c4s3*(costp+PETSC_i*sintp), ADD_VALUES);
    // Asmi's notes
     MatSetValue(_CTX->U_plus_gates[r], i, j, -PETSC_i*sintp*sin(PETSC_PI-phi_plus), INSERT_VALUES);
-    cout << "U+_10=" << -PETSC_i*sintp*sin(PETSC_PI-phi_plus) << endl;
+    //cout << "U+_10=" << -PETSC_i*sintp*sin(PETSC_PI-phi_plus) << endl;
    MatSetValue(_CTX->U_minus_gates[r], i, j, -PETSC_i*sintm*sin(PETSC_PI-phi_minus), INSERT_VALUES);
-   cout << "U-_10=" << -PETSC_i*sintm*sin(PETSC_PI-phi_minus) << endl;
+  // cout << "U-_10=" << -PETSC_i*sintm*sin(PETSC_PI-phi_minus) << endl;
     
     }
 
@@ -560,17 +560,17 @@ where \delta_{\pm} = \delta.
       // Asmi's notes
 
      MatSetValue(_CTX->U_plus_gates[r], i, i, costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus), INSERT_VALUES);
-     cout << "U+_00=" << costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus) << endl;
+    // cout << "U+_00=" << costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus) << endl;
      MatSetValue(_CTX->U_minus_gates[r], i, i, costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus), INSERT_VALUES);
-     cout << "U-_00=" << costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus) << endl;
+     //cout << "U-_00=" << costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus) << endl;
     //  MatSetValue(_CTX->U_plus_gates[r], i, j, c2s1*(costp-PETSC_i*sintp)+c1s2*(costp+PETSC_i*sintp), ADD_VALUES);
      // MatSetValue(_CTX->U_minus_gates[r], i, j, c4s3*(costp-PETSC_i*sintp)+c3s4*(costp+PETSC_i*sintp), ADD_VALUES);
       // Asmi's notes
     MatSetValue(_CTX->U_plus_gates[r], i, j, -PETSC_i*sintp*sin(PETSC_PI-phi_plus), INSERT_VALUES);
 
-    cout << "U+_01=" << -PETSC_i*sintp*sin(PETSC_PI-phi_plus) << endl;
+   // cout << "U+_01=" << -PETSC_i*sintp*sin(PETSC_PI-phi_plus) << endl;
    MatSetValue(_CTX->U_minus_gates[r], i, j, -PETSC_i*sintm*sin(PETSC_PI-phi_minus), INSERT_VALUES);
-   cout << "U-_01=" << -PETSC_i*sintm*sin(PETSC_PI-phi_minus) << endl;
+   //cout << "U-_01=" << -PETSC_i*sintm*sin(PETSC_PI-phi_minus) << endl;
     }
   }
   
