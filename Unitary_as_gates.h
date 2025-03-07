@@ -544,9 +544,9 @@ where \delta_{\pm} = \delta.
    // MatSetValue(_CTX->U_plus_gates[r], i, j, -c1s2*(costp-PETSC_i*sintp)-c2s1*(costp+PETSC_i*sintp), ADD_VALUES);
    // MatSetValue(_CTX->U_minus_gates[r], i, j, -c3s4*(costp-PETSC_i*sintm)-c4s3*(costp+PETSC_i*sintp), ADD_VALUES);
    // Asmi's notes
-    MatSetValue(_CTX->U_plus_gates[r], i, j, PETSC_i*sintp*sin(PETSC_PI-phi_plus), INSERT_VALUES);
-    cout << "U+_10=" << PETSC_i*sintp*sin(PETSC_PI-phi_plus) << endl;
-   MatSetValue(_CTX->U_minus_gates[r], i, j, PETSC_i*sintm*sin(PETSC_PI-phi_minus), INSERT_VALUES);
+    MatSetValue(_CTX->U_plus_gates[r], i, j, -PETSC_i*sintp*sin(PETSC_PI-phi_plus), INSERT_VALUES);
+    cout << "U+_10=" << -PETSC_i*sintp*sin(PETSC_PI-phi_plus) << endl;
+   MatSetValue(_CTX->U_minus_gates[r], i, j, -PETSC_i*sintm*sin(PETSC_PI-phi_minus), INSERT_VALUES);
     
     }
 
@@ -561,10 +561,10 @@ where \delta_{\pm} = \delta.
     //  MatSetValue(_CTX->U_plus_gates[r], i, j, c2s1*(costp-PETSC_i*sintp)+c1s2*(costp+PETSC_i*sintp), ADD_VALUES);
      // MatSetValue(_CTX->U_minus_gates[r], i, j, c4s3*(costp-PETSC_i*sintp)+c3s4*(costp+PETSC_i*sintp), ADD_VALUES);
       // Asmi's notes
-    MatSetValue(_CTX->U_plus_gates[r], i, j, PETSC_i*sintp*sin(PETSC_PI-phi_plus), INSERT_VALUES);
+    MatSetValue(_CTX->U_plus_gates[r], i, j, -PETSC_i*sintp*sin(PETSC_PI-phi_plus), INSERT_VALUES);
 
-    cout << "U+_01=" << PETSC_i*sintp*sin(PETSC_PI-phi_plus) << endl;
-   MatSetValue(_CTX->U_minus_gates[r], i, j, PETSC_i*sintm*sin(PETSC_PI-phi_minus), INSERT_VALUES);
+    cout << "U+_01=" << -PETSC_i*sintp*sin(PETSC_PI-phi_plus) << endl;
+   MatSetValue(_CTX->U_minus_gates[r], i, j, -PETSC_i*sintm*sin(PETSC_PI-phi_minus), INSERT_VALUES);
     }
   }
   
