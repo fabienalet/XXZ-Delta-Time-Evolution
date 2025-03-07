@@ -128,7 +128,7 @@ int main(int argc, char **argv) {
   }
   else {
     // special state 11111 has index nconf-1 ... TOCHECK
-    init_states.resize(1); init_states[0]=nconf-1;
+    init_states.resize(1); init_states[0]=0; //nconf-1;
     //std::cout << "HERE\n";
   }
   
@@ -203,6 +203,7 @@ int main(int argc, char **argv) {
         // Careful I am using Psi_t as a temp vector to store res*res (point-wise)
         VecPointwiseMult(Psi_t,sigmas_as_vec,res);
         VecDotRealPart(Psi_t,res,&sz);  
+        if (!(pbc)) { sz/=L;}
         if (myrank==0) { std::cout << "TIME " << t << " SZ " << sz << endl; }
         
         /*
