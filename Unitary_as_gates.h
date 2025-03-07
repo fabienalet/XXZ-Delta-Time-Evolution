@@ -520,10 +520,10 @@ where \delta_{\pm} = \delta.
   PetscScalar c4s3=cos4_*sin3_;
   */
   
-  PetscReal costp=cos(theta_);
-  PetscReal sintp=sin(theta_);
-  PetscReal costm=cos(theta_+epsilon_);
-  PetscReal sintm=sin(theta_+epsilon_);
+  PetscReal costp=cos(theta_+epsilon_);
+  PetscReal sintp=sin(theta_+epsilon_);
+  PetscReal costm=cos(theta_); //+epsilon_);
+  PetscReal sintm=sin(theta_); //+epsilon_);
   
   
  // cout << "U2 plus : " << costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus) << " " << costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus) << " " << PETSC_i*sintp*sin(PETSC_PI-phi_plus) << endl;
