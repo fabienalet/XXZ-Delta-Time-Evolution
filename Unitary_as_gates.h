@@ -479,6 +479,7 @@ PetscErrorCode Unitary_as_gates::init()
     PetscReal angle_ising=-ising_energy;
     PetscScalar matrix_element=cos(angle_ising)+PETSC_i*sin(angle_ising);
     VecSetValues(_CTX->Ising_gate, 1, &i, &matrix_element, INSERT_VALUES);
+    cout << "me=" << matrix_element << endl;
   }
   VecAssemblyBegin(_CTX->Ising_gate); VecAssemblyEnd(_CTX->Ising_gate);
 
