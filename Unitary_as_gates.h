@@ -378,7 +378,7 @@ void Unitary_as_gates::get_parameters() {
   PetscOptionsGetReal(NULL, NULL, "-T", &T_, &T_defined);
   if (T_defined) { Tover2_=0.5*T_;}
 
-  PetscBool pbc=PETSC_FALSE;
+  pbc=PETSC_FALSE;
   PetscOptionsGetBool(NULL, NULL, "-pbc", &pbc, NULL);
   
 
