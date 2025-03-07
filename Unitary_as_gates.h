@@ -533,15 +533,15 @@ where \delta_{\pm} = \delta.
     std::bitset<32> b(i);
     b.flip(r);
     int j = (int)(b.to_ulong());
-    //b.flip(r);
+    b.flip(r);
     // maybe don't flip again and reverse the if ...
     if (b[r]) {
   //  MatSetValue(_CTX->U_plus_gates[r], i, i, c1c2*(costp-PETSC_i*sintp)-s1s2*(costp+PETSC_i*sintp), ADD_VALUES);
    // MatSetValue(_CTX->U_minus_gates[r], i, i, c3c4*(costm-PETSC_i*sintm)-s3s4*(costm+PETSC_i*sintm), ADD_VALUES);
     // Asmi's notes
 
-     MatSetValue(_CTX->U_plus_gates[r], i, i, costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus), INSERT_VALUES);
-     MatSetValue(_CTX->U_minus_gates[r], i, i, costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus), INSERT_VALUES);
+     MatSetValue(_CTX->U_plus_gates[r], i, i, costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus), INSERT_VALUES);
+     MatSetValue(_CTX->U_minus_gates[r], i, i, costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus), INSERT_VALUES);
       cout << "U+_11=" << costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus) << endl;
       cout << "U-_11=" << costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus) << endl;
    // MatSetValue(_CTX->U_plus_gates[r], i, j, -c1s2*(costp-PETSC_i*sintp)-c2s1*(costp+PETSC_i*sintp), ADD_VALUES);
@@ -559,9 +559,9 @@ where \delta_{\pm} = \delta.
    //   MatSetValue(_CTX->U_minus_gates[r], i, i, -s3s4*(costm-PETSC_i*sintm)+c1c2*(costm+PETSC_i*sintm), ADD_VALUES);
       // Asmi's notes
 
-     MatSetValue(_CTX->U_plus_gates[r], i, i, costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus), INSERT_VALUES);
+     MatSetValue(_CTX->U_plus_gates[r], i, i, costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus), INSERT_VALUES);
      cout << "U+_00=" << costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus) << endl;
-     MatSetValue(_CTX->U_minus_gates[r], i, i, costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus), INSERT_VALUES);
+     MatSetValue(_CTX->U_minus_gates[r], i, i, costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus), INSERT_VALUES);
      cout << "U-_00=" << costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus) << endl;
     //  MatSetValue(_CTX->U_plus_gates[r], i, j, c2s1*(costp-PETSC_i*sintp)+c1s2*(costp+PETSC_i*sintp), ADD_VALUES);
      // MatSetValue(_CTX->U_minus_gates[r], i, j, c4s3*(costp-PETSC_i*sintp)+c3s4*(costp+PETSC_i*sintp), ADD_VALUES);
