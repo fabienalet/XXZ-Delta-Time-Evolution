@@ -128,7 +128,7 @@ int main(int argc, char **argv) {
   }
   else {
     // special state 11111 has index nconf-1 ... TOCHECK
-    init_states.resize(1); init_states[0]=0; //nconf-1;
+    init_states.resize(1); init_states[0]=nconf-1; //nconf-1;
     //std::cout << "HERE\n";
   }
   
