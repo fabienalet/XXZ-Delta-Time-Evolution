@@ -206,8 +206,9 @@ int main(int argc, char **argv) {
         if (!(pbc)) { sz/=L;}
         if (myrank==0) { std::cout << "TIME " << t << " SZ " << sz << endl; }
         
-        /*
+        
         // Will rapatriate the distributed vector res into a local vector
+        if (measure_entanglement) {
         Vec res_local;
         // Different strategies depending on MPI-distributed or not
         // only 1 mpi proc
@@ -252,7 +253,8 @@ int main(int argc, char **argv) {
           VecRestoreArray(res_local, &state);
         } // end of 0processor
         VecDestroy(&res_local);
-        */
+      }
+       
       } // end measurements
 
       /************** End of  Measurements ***********/
