@@ -412,6 +412,7 @@ PetscErrorCode Unitary_as_gates::init()
   PetscOptionsGetBool(NULL, NULL, "-U3", &U3, NULL);
 
   if (!(U3)) {
+    cout << "This\n";
   _CTX->U_plus_gates.resize(Lchain_);
   _CTX->U_minus_gates.resize(Lchain_);
   
