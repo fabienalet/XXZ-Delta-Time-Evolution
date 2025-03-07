@@ -467,23 +467,20 @@ PetscErrorCode Unitary_as_gates::init()
 
   MatCreateVecs(_U, NULL, &_CTX->Ising_gate);
   PetscInt Lmax=Lchain_-1;
-  cout << "pbc1 " << pbc << " " << Lmax << endl;
   if (pbc) { Lmax=Lchain_;}
-  cout << "pbc2 " << pbc << " " << Lmax << endl;
   for (int i=_Istart;i<_Iend;++i) {
     std::bitset<32> b(i);
     double ising_energy=0.;
     double nup=0;
     
     for (int r=0;r<Lmax;++r) { 
-      cout << r << " " << Lmax << endl;
       if (b[r]==b[(r+1+Lchain_)%Lchain_]) { ising_energy+=J_coupling[r];} else { ising_energy-=J_coupling[r];} 
       }
     PetscReal angle_ising=ising_energy;
 
     PetscScalar matrix_element=cos(angle_ising)+PETSC_i*sin(angle_ising);
     VecSetValues(_CTX->Ising_gate, 1, &i, &matrix_element, INSERT_VALUES);
-    cout << "ange= " << angle_ising << " me=" << matrix_element << endl;
+    cout << "angle= " << angle_ising << " me=" << matrix_element << endl;
   }
   VecAssemblyBegin(_CTX->Ising_gate); VecAssemblyEnd(_CTX->Ising_gate);
 
@@ -543,8 +540,8 @@ where \delta_{\pm} = \delta.
    // MatSetValue(_CTX->U_minus_gates[r], i, i, c3c4*(costm-PETSC_i*sintm)-s3s4*(costm+PETSC_i*sintm), ADD_VALUES);
     // Asmi's notes
 
-     MatSetValue(_CTX->U_plus_gates[r], i, i, costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus), INSERT_VALUES);
-     MatSetValue(_CTX->U_minus_gates[r], i, i, costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus), INSERT_VALUES);
+     MatSetValue(_CTX->U_plus_gates[r], i, i, costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus), INSERT_VALUES);
+     MatSetValue(_CTX->U_minus_gates[r], i, i, costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus), INSERT_VALUES);
       cout << "U+_11=" << costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus) << endl;
       cout << "U-_11=" << costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus) << endl;
    // MatSetValue(_CTX->U_plus_gates[r], i, j, -c1s2*(costp-PETSC_i*sintp)-c2s1*(costp+PETSC_i*sintp), ADD_VALUES);
@@ -562,9 +559,9 @@ where \delta_{\pm} = \delta.
    //   MatSetValue(_CTX->U_minus_gates[r], i, i, -s3s4*(costm-PETSC_i*sintm)+c1c2*(costm+PETSC_i*sintm), ADD_VALUES);
       // Asmi's notes
 
-     MatSetValue(_CTX->U_plus_gates[r], i, i, costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus), INSERT_VALUES);
+     MatSetValue(_CTX->U_plus_gates[r], i, i, costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus), INSERT_VALUES);
      cout << "U+_00=" << costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus) << endl;
-     MatSetValue(_CTX->U_minus_gates[r], i, i, costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus), INSERT_VALUES);
+     MatSetValue(_CTX->U_minus_gates[r], i, i, costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus), INSERT_VALUES);
      cout << "U-_00=" << costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus) << endl;
     //  MatSetValue(_CTX->U_plus_gates[r], i, j, c2s1*(costp-PETSC_i*sintp)+c1s2*(costp+PETSC_i*sintp), ADD_VALUES);
      // MatSetValue(_CTX->U_minus_gates[r], i, j, c4s3*(costp-PETSC_i*sintp)+c3s4*(costp+PETSC_i*sintp), ADD_VALUES);
