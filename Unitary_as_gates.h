@@ -412,7 +412,7 @@ PetscErrorCode Unitary_as_gates::init()
   PetscOptionsGetBool(NULL, NULL, "-U3", &U3, NULL);
 
   if (!(U3)) {
-    cout << "This\n";
+    
   _CTX->U_plus_gates.resize(Lchain_);
   _CTX->U_minus_gates.resize(Lchain_);
   
@@ -467,7 +467,9 @@ PetscErrorCode Unitary_as_gates::init()
 
   MatCreateVecs(_U, NULL, &_CTX->Ising_gate);
   PetscInt Lmax=Lchain_-1;
+  cout << "pbc1 " << pbc << " " << Lmax << endl;
   if (pbc) { Lmax=Lchain_;}
+  cout << "pbc2 " << pbc << " " << Lmax << endl;
   for (int i=_Istart;i<_Iend;++i) {
     std::bitset<32> b(i);
     double ising_energy=0.;
