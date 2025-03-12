@@ -20,7 +20,7 @@ and R_y, R_z are rotations about y and z axis respectively.
   */
 
 struct MatrixContext {
-  PetscInt Lchain;
+  int Lchain;
   PetscReal theta_;
   PetscReal epsilon_;
   PetscReal delta_plus_;
@@ -79,10 +79,10 @@ PetscErrorCode MatMultUplus(Mat M,int r,Vec x,Vec y)
   PetscScalar valij=PETSC_i*sintm*sin(PETSC_PI-phi_minus);
   */
  PetscScalar mi,mj,xl;
-  for (int i=lo;i<hi;++i) {
+  for (PetscInt i=lo;i<hi;++i) {
     std::bitset<32> b(i);
     b.flip(r);
-    int j = (int)(b.to_ulong());
+    PetscInt j = (PetscInt)(b.to_ulong());
    // b.flip(r);
     xl=xloc[i-lo];
     // maybe don't flip again and reverse the if ...
@@ -125,11 +125,11 @@ PetscErrorCode MatMultUminus(Mat M,int r,Vec x,Vec y)
   PetscScalar valij=-PETSC_i*sintm*sin(PETSC_PI-phi_minus);
  // cout << "minus : " << valii1 << " " << valii2 << " " << valij << endl;
  PetscScalar mi,mj,xl;
-  for (int i=lo;i<hi;++i) {
+  for (PetscInt i=lo;i<hi;++i) {
   //  if (myrank==1) cout << "rank=" << myrank << " i=" << i << " xloc[i]=" << xloc[i-lo] << endl;
     std::bitset<32> b(i);
     b.flip(r);
-    int j = (int)(b.to_ulong());
+    PetscInt j = (PetscInt)(b.to_ulong());
    // b.flip(r);
     xl=xloc[i-lo];
     // maybe don't flip again and reverse the if ...
@@ -466,9 +466,9 @@ PetscErrorCode Unitary_as_gates::init()
   MatSetOption(_U, MAT_SYMMETRY_ETERNAL, PETSC_TRUE);
 
   MatCreateVecs(_U, NULL, &_CTX->Ising_gate);
-  PetscInt Lmax=Lchain_-1;
+  int Lmax=Lchain_-1;
   if (pbc) { Lmax=Lchain_;}
-  for (int i=_Istart;i<_Iend;++i) {
+  for (PetscInt i=_Istart;i<_Iend;++i) {
     std::bitset<32> b(i);
     double ising_energy=0.;
     double nup=0;
