@@ -343,7 +343,9 @@ void Unitary_as_gates::get_parameters() {
   PetscOptionsGetBool(NULL, NULL, "-pi", &pi_units, NULL);
 
   Lchain_=12;
-  PetscOptionsGetInt(NULL, NULL, "-L", &Lchain_, NULL);
+  PetscInt LL;
+  PetscOptionsGetInt(NULL, NULL, "-L", &LL, NULL);
+  Lchain_=(int) LL;
   J_=1.;
   PetscOptionsGetReal(NULL, NULL, "-J", &J_, NULL);
   J_coupling.resize(Lchain_,J_);
