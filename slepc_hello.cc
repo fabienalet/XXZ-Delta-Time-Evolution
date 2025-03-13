@@ -6,7 +6,8 @@ static char help[] =
 // #define PETSC_USE_COMPLEX
 // #include <complex>
 #include <omp.h>
-#include <slepceps.h>
+//#include <slepceps.h>
+#include <petscksp.h>
 
 #include <fstream>
 #include <iostream>
