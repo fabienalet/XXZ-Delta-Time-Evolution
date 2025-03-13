@@ -83,6 +83,11 @@ PetscErrorCode MatMultUplus(Mat M,int r,Vec x,Vec y)
     std::bitset<32> b(i);
     b.flip(r);
     PetscInt j = (PetscInt)(b.to_ulong());
+    if (j<0) { 
+      cout << "Error myrank " << myrank << " is putting j=" << j << " from bitflip of " << i << endl;
+      cout << "bits are bitsj=" << b << " bitsi=" << b.flip(r) << endl;
+      exit(0); 
+    }
    // b.flip(r);
     xl=xloc[i-lo];
     // maybe don't flip again and reverse the if ...
@@ -130,6 +135,12 @@ PetscErrorCode MatMultUminus(Mat M,int r,Vec x,Vec y)
     std::bitset<32> b(i);
     b.flip(r);
     PetscInt j = (PetscInt)(b.to_ulong());
+    if (j<0) { 
+      cout << "Error myrank " << myrank << " is putting j=" << j << " from bitflip of " << i << endl;
+      cout << "bits are bitsj=" << b << " bitsi=" << b.flip(r) << endl;
+      exit(0); 
+    }
+
    // b.flip(r);
     xl=xloc[i-lo];
     // maybe don't flip again and reverse the if ...
@@ -282,14 +293,14 @@ public:
   PetscErrorCode set_gate_values(int r);
   PetscErrorCode change_disorder();
   
-  int _Istart;
-  int _Iend;
+  PetscInt _Istart;
+  PetscInt _Iend;
 
   Mat _U;
   MatrixContext *_CTX;
 
   int Lchain_;
-  unsigned long int nconf;
+  PetscInt nconf;
 
   PetscReal epsilon_;
   PetscReal delta_;
@@ -322,10 +333,10 @@ Unitary_as_gates::Unitary_as_gates(int _myrank, int mpisize)
   _CTX->Lchain=Lchain_;
   
   
-  std::vector<int> local_block_sizes(mpisize,nconf/mpisize);
-  for(size_t i=0; i< nconf%mpisize; i++) local_block_sizes[i]++; // distribute evenly
+  std::vector<PetscInt> local_block_sizes(mpisize,nconf/mpisize);
+  for(PetscInt i=0; i< nconf%mpisize; i++) local_block_sizes[i]++; // distribute evenly
   _Istart = 0;
-  for (size_t i=0; i<myrank; i++) _Istart += local_block_sizes[i];
+  for (PetscInt i=0; i<myrank; i++) _Istart += local_block_sizes[i];
   _Iend = _Istart + local_block_sizes[myrank];
 
   init();
@@ -531,10 +542,10 @@ where \delta_{\pm} = \delta.
  // cout << "U2 plus : " << costp+PETSC_i*sintp*cos(PETSC_PI-phi_plus) << " " << costp-PETSC_i*sintp*cos(PETSC_PI-phi_plus) << " " << PETSC_i*sintp*sin(PETSC_PI-phi_plus) << endl;
  // cout << "U2 minus : " << costm+PETSC_i*sintm*cos(PETSC_PI-phi_minus) << " " << costm-PETSC_i*sintm*cos(PETSC_PI-phi_minus) << " " << PETSC_i*sintm*sin(PETSC_PI-phi_minus) << endl;
   
-  for (int i=_Istart;i<_Iend;++i) {
+  for (PetscInt i=_Istart;i<_Iend;++i) {
     std::bitset<32> b(i);
     b.flip(r);
-    int j = (int)(b.to_ulong());
+    PetscInt j = (int)(b.to_ulong());
     //b.flip(r);
     // maybe don't flip again and reverse the if ...
     if (b[r]) { // in fact this means bit 1 hence spin down ...
@@ -583,14 +594,14 @@ std::tuple<std::vector<PetscInt>, std::vector<PetscInt>> Unitary_as_gates::count
   std::vector<PetscInt> d_nnz (_Iend-_Istart, 0); // list of diagonal (ie internal to the current block) elements
   std::vector<PetscInt> o_nnz (_Iend-_Istart, 0); // list of off-diagonal elements
 
-  for (int i=_Istart;i<_Iend;++i) {
+  for (PetscInt i=_Istart;i<_Iend;++i) {
     // there will be one diagonal element for sure
       d_nnz[i - _Istart]++;
     // now do the bit flip on r
     std::bitset<32> b(i);
     int r2=r;
     b.flip(r2);
-    int j = (int)(b.to_ulong());
+    PetscInt j = (PetscInt)(b.to_ulong());
     if ((j >= _Iend) or (j < _Istart)) { o_nnz[i - _Istart]++; }
       else { d_nnz[i - _Istart]++;}
   }
