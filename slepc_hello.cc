@@ -7,32 +7,9 @@ static char help[] =
 // #include <complex>
 #include <omp.h>
 #include <slepceps.h>
-#include <boost/dynamic_bitset.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
-#include <boost/random/uniform_real_distribution.hpp>
+
 #include <fstream>
 #include <iostream>
-#include <map>
-#include <sstream>
-#include <random>
-#ifdef USE_MKL
-#include <mkl.h>
-#include <mkl_cblas.h>
-#include <mkl_lapack.h>
-#else
-typedef struct __MKL_Complex16 {
-  double real;
-  double imag;
-} MKL_Complex16;
-typedef int MKL_INT;
-typedef MKL_Complex16 lapack_complex_double;
-#include <cblas.h>
-#include <lapacke.h>
-#endif
-
-double PI = acos(-1.);
 using namespace std;
 /*
 #include "Spin/Spin_basis.h"
