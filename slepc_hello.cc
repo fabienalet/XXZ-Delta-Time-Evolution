@@ -98,6 +98,7 @@ int main(int argc, char **argv) {
     std::cout << "Hamiltonian matrix assembly done." << std::endl;
   }
 */
-  SlepcFinalize();
+  // SlepcFinalize();
+  PetscFinalize();
   return 0;
 }
