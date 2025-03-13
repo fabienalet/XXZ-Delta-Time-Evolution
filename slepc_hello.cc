@@ -54,14 +54,15 @@ using namespace std;
 int main(int argc, char **argv) {
   cout.precision(20);
   SlepcInitialize(&argc, &argv, "slepc.options", help);
-
-  int ENV_NUM_THREADS=omp_get_num_threads();
-  // For parallelization between nodes (MPI)
   int myrank, mpisize;
   MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
   MPI_Comm_size(MPI_COMM_WORLD, &mpisize);
+  cout << "myrank=" << myrank << " says hello\n";
+/*
+  int ENV_NUM_THREADS=omp_get_num_threads();
+  // For parallelization between nodes (MPI)
+  
 
-  /***** Petsc / Slepc data structure ***/
   Mat H;
   EPS eps;
   EPSType type;
@@ -72,8 +73,7 @@ int main(int argc, char **argv) {
   double Sz = 0;
   ierr = PetscOptionsGetReal(NULL, NULL, "-Sz", &Sz, NULL);
   CHKERRQ(ierr);
-  cout << "myrank=" << myrank << " says hello\n";
-  /*
+  
   Parameters myparameters(myrank);
   int L = myparameters.L;
   basis mybasis(L, Sz, myrank, number_of_states);
