@@ -84,6 +84,9 @@ target_link_libraries(xxz_krylov_correlations ${MPILIB} ${LAPACKLIB} slepc petsc
 add_executable(circuit circuit.cc)
 target_link_libraries(circuit ${MPILIB} ${LAPACKLIB} petsc)
 
+add_executable(circuit_new circuit_new.cc)
+target_link_libraries(circuit_new ${MPILIB} ${LAPACKLIB} petsc)
+
 add_executable(xxz_si_test ed_XXZ_si_test.cc)
 target_link_libraries(xxz_si_test ${MPILIB} ${LAPACKLIB} slepc petsc)
 
