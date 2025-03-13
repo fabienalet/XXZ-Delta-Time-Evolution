@@ -1,10 +1,6 @@
 static char help[] =
     "Shift-Invert ED for XXZ chain with Fibonnaci fields \n (C) Fabien Alet "
-    "2017. \n\n"
-    "The command line options are:\n"
-    "  -L <L>, where <L> = size of the chain [default 6]\n"
-    "  ( .... Description not complete ....) \n"
-    "\n";
+      "\n";
 
 // #define PETSC_DESIRE_COMPLEX
 // #define PETSC_USE_COMPLEX
@@ -32,14 +28,13 @@ typedef struct __MKL_Complex16 {
 } MKL_Complex16;
 typedef int MKL_INT;
 typedef MKL_Complex16 lapack_complex_double;
-
 #include <cblas.h>
 #include <lapacke.h>
 #endif
 
 double PI = acos(-1.);
 using namespace std;
-
+/*
 #include "Spin/Spin_basis.h"
 
 #include "Spin/Spin_parameters.h"
@@ -47,17 +42,17 @@ using namespace std;
 #include "Spin/SpinOneHalfXXZ_disorder.h"
 
 #include "Spin/Spin_observable.h"
-
+*/
 #undef __FUNCT__
 #define __FUNCT__ "main"
 
 int main(int argc, char **argv) {
   cout.precision(20);
-  //SlepcInitialize(&argc, &argv, "slepc.options", help);
+  SlepcInitialize(&argc, &argv, "slepc.options", help);
   int myrank, mpisize;
-  //MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
-  //MPI_Comm_size(MPI_COMM_WORLD, &mpisize);
-  //cout << "myrank=" << myrank << " says hello\n";
+  MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+  MPI_Comm_size(MPI_COMM_WORLD, &mpisize);
+  cout << "myrank=" << myrank << " says hello\n";
   cout << "I say hello\n";
 /*
   int ENV_NUM_THREADS=omp_get_num_threads();
