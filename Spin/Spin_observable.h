@@ -882,7 +882,7 @@ void observable::compute_entanglement_spectrum_debug(PetscScalar *state) {
 #ifdef USE_MKL
         dsyevd(&jobz, &uplo, &sizeA, &psi_mat[0], &lda, &local_entanglement_spectrum[0], &work[0], &lwork, &iwork[0], &liwork, &info);
 #else
-        LAPACKE_dsyevd(LAPACK_ROW_MAJOR, 'N', 'U', (lapack_int) sizeA, &psi_mat[0], (lapack_int) lda, &local_entanglement_spectrum[0], &work[0]);
+        LAPACKE_dsyevd(LAPACK_ROW_MAJOR, 'N', 'U', (lapack_int) sizeA, &psi_mat[0], (lapack_int) lda, &local_entanglement_spectrum[0]);
 #endif
 #endif        
         for (int rr = 0; rr < local_entanglement_spectrum.size(); ++rr) {
@@ -938,8 +938,11 @@ void observable::compute_entanglement_spectrum_debug(PetscScalar *state) {
           dgesdd("N", &m, &n, &state[start], &lda, &local_svd_spectrum[0], u,
                  &ldu, vt, &ldvt, &wkopt, &lwork, iwork, &info);
 #else
-          dgesdd_("N", &m, &n, &state[start], &lda, &local_svd_spectrum[0],
-                  u, &ldu, vt, &ldvt, &wkopt, &lwork, iwork, &info);
+//LAPACKE_dgesdd(LAPACK_ROW_MAJOR,'N', (lapack_int) m, (lapack_int) n, (double *)&state[start],(lapack_int) lda, &local_svd_spectrum[0], u, (lapack_int) ldu, vt, (lapack_int) ldvt);
+//
+
+  //        dgesdd_("N", &m, &n, &state[start], &lda, &local_svd_spectrum[0],
+   //               u, &ldu, vt, &ldvt, &wkopt, &lwork, iwork, &info);
 #endif
           lwork = (MKL_INT)wkopt;
           work = (double *)malloc(lwork * sizeof(double));
@@ -947,8 +950,10 @@ void observable::compute_entanglement_spectrum_debug(PetscScalar *state) {
           dgesdd("N", &m, &n, &state[start], &lda, &local_svd_spectrum[0], u,
                  &ldu, vt, &ldvt, work, &lwork, iwork, &info);
 #else
-          dgesdd_("N", &m, &n, &state[start], &lda, &local_svd_spectrum[0],
-                  u, &ldu, vt, &ldvt, work, &lwork, iwork, &info);
+LAPACKE_dgesdd(LAPACK_ROW_MAJOR,'N', (lapack_int) m, (lapack_int) n, (double *)&state[start],(lapack_int) lda, &local_svd_spectrum[0], u, (lapack_int) ldu, vt, (lapack_int) ldvt);
+
+      //    dgesdd_("N", &m, &n, &state[start], &lda, &local_svd_spectrum[0],
+     //             u, &ldu, vt, &ldvt, work, &lwork, iwork, &info);
 #endif
 #endif
           free((void *)work);
