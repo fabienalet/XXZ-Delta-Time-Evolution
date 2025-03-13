@@ -59,6 +59,9 @@ PetscErrorCode MatMultUplus(Mat M,int r,Vec x,Vec y)
   // First executable line of user provided PETSc routine
   PetscFunctionBeginUser;
 
+  int myrank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+  
   MatShellGetContext(M,(void**)&ctx);CHKERRQ(ierr);
   VecGetOwnershipRange(x, &lo, &hi);
 
