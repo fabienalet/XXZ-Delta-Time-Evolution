@@ -882,7 +882,7 @@ void observable::compute_entanglement_spectrum_debug(PetscScalar *state) {
 #ifdef USE_MKL
         dsyevd(&jobz, &uplo, &sizeA, &psi_mat[0], &lda, &local_entanglement_spectrum[0], &work[0], &lwork, &iwork[0], &liwork, &info);
 #else
-        dsyevd_(&jobz, &uplo, &sizeA, &psi_mat[0], &lda, &local_entanglement_spectrum[0], &work[0], &lwork, &iwork[0], &liwork, &info);
+        LAPACK_dsyevd(LAPACK_ROW_MAJOR, &jobz, &uplo, &sizeA, &psi_mat[0], &lda, &local_entanglement_spectrum[0], &work[0]);
 #endif
 #endif        
         for (int rr = 0; rr < local_entanglement_spectrum.size(); ++rr) {
