@@ -450,7 +450,7 @@ void Hamiltonian::create_matrix(PetscInt Istart, PetscInt Iend) {
     }    // over ca
   }      // over nsA sectors
 }
-
+/*
 std::vector<unsigned long int> Hamiltonian::get_neighbors(
     unsigned long int index) {
   int i = 0;
@@ -515,7 +515,7 @@ std::vector<unsigned long int> Hamiltonian::get_neighbors(
     }
   }
 }
-
+*/
 void Hamiltonian::create_matrix_lapack(double *A) {
   unsigned long long int nconf = basis_pointer->total_number_of_confs;
 
