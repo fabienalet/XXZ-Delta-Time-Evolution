@@ -25,7 +25,7 @@ using namespace std;
 
 int main(int argc, char **argv) {
   cout.precision(20);
-  SlepcInitialize(&argc, &argv, "slepc.options", help);
+  PetscInitialize(&argc, &argv, "slepc.options", help);
   int myrank, mpisize;
   MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
   MPI_Comm_size(MPI_COMM_WORLD, &mpisize);
