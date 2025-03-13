@@ -53,11 +53,12 @@ using namespace std;
 
 int main(int argc, char **argv) {
   cout.precision(20);
-  //SlepcInitialize(&argc, &argv, "slepc.options", help);
+  SlepcInitialize(&argc, &argv, "slepc.options", help);
   int myrank, mpisize;
-  MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
-  MPI_Comm_size(MPI_COMM_WORLD, &mpisize);
-  cout << "myrank=" << myrank << " says hello\n";
+  //MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+  //MPI_Comm_size(MPI_COMM_WORLD, &mpisize);
+  //cout << "myrank=" << myrank << " says hello\n";
+  cout << "I say hello\n";
 /*
   int ENV_NUM_THREADS=omp_get_num_threads();
   // For parallelization between nodes (MPI)
