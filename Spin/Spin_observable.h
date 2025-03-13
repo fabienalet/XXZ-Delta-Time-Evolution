@@ -751,8 +751,15 @@ void observable::compute_entanglement_spectrum(PetscScalar *state) {
           dgesdd("N", &m, &n, &psi_reshaped[0], &lda, &local_svd_spectrum[0], u,
                  &ldu, vt, &ldvt, &wkopt, &lwork, iwork, &info);
 #else
-          dgesdd_("N", &m, &n, &psi_reshaped[0], &lda, &local_svd_spectrum[0],
-                  u, &ldu, vt, &ldvt, &wkopt, &lwork, iwork, &info);
+//void dgesdd_(const char*, const int32_t*, const int32_t*, double*, const int32_t*, double*, double*, const int32_t*, double*, const int32_t*, double*, const int32_t*, int32_t*, int32_t*, size_t)’
+
+// /lus/home/CT5/c1700225/falet/git/XXZ-Delta-Time-Evolution/Spin/Spin_observable.h:754:18: error: too few arguments to function ‘void dgesdd_(const char*, const int32_t*, const int32_t*, double*, const int32_t*, double*, double*, const int32_t*, double*, const int32_t*, double*, const int32_t*, int32_t*, int32_t*, size_t)’
+//  754 |           dgesdd_("N", &m, &n, &psi_reshaped[0], &lda, &local_svd_spectrum[0],
+//      |           ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//  755 |                   u, &ldu, vt, &ldvt, &wkopt, &lwork, iwork, &info);
+//LAPACKE_dgesdd( LAPACK_ROW_MAJOR, 'S', m, n, a, lda, s,  u, ldu, vt, ldvt ); 
+  //        dgesdd_(LAPACK_ROW_MAJOR,'N', (lapack_int) m, (lapack_int) n, (double *)&psi_reshaped[0],(lapack_int) lda, &local_svd_spectrum[0],
+   //               u, (lapack_int) ldu, vt, (lapack_int) ldvt); //, &wkopt, &lwork, iwork, &info);
 #endif
           lwork = (MKL_INT)wkopt;
           work = (double *)malloc(lwork * sizeof(double));
@@ -760,8 +767,7 @@ void observable::compute_entanglement_spectrum(PetscScalar *state) {
           dgesdd("N", &m, &n, &psi_reshaped[0], &lda, &local_svd_spectrum[0], u,
                  &ldu, vt, &ldvt, work, &lwork, iwork, &info);
 #else
-          dgesdd_("N", &m, &n, &psi_reshaped[0], &lda, &local_svd_spectrum[0],
-                  u, &ldu, vt, &ldvt, work, &lwork, iwork, &info);
+  dgesdd_(LAPACK_ROW_MAJOR,'N', (lapack_int) m, (lapack_int) n, (double *)&psi_reshaped[0],(lapack_int) lda, &local_svd_spectrum[0], u, (lapack_int) ldu, vt, (lapack_int) ldvt);
 #endif
 #endif
           free((void *)work);
