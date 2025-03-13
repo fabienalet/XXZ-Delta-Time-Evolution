@@ -767,7 +767,7 @@ void observable::compute_entanglement_spectrum(PetscScalar *state) {
           dgesdd("N", &m, &n, &psi_reshaped[0], &lda, &local_svd_spectrum[0], u,
                  &ldu, vt, &ldvt, work, &lwork, iwork, &info);
 #else
-  dgesdd_(LAPACK_ROW_MAJOR,'N', (lapack_int) m, (lapack_int) n, (double *)&psi_reshaped[0],(lapack_int) lda, &local_svd_spectrum[0], u, (lapack_int) ldu, vt, (lapack_int) ldvt);
+          LAPACKE_dgesdd_(LAPACK_ROW_MAJOR,'N', (lapack_int) m, (lapack_int) n, (double *)&psi_reshaped[0],(lapack_int) lda, &local_svd_spectrum[0], u, (lapack_int) ldu, vt, (lapack_int) ldvt);
 #endif
 #endif
           free((void *)work);
