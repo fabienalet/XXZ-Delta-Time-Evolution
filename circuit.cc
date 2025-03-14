@@ -105,13 +105,13 @@ int main(int argc, char **argv) {
    /***** Loop over initial states ****/
 
   // list of initial states (each of these consists of one basis vector)
-  std::vector<unsigned long int> init_states;
+  std::vector<PetscInt> init_states;
   
   // If no number of sample is specified, we start from just 1111111111
   
 
 
-  unsigned long int nconf=op->nconf;
+  PetscInt nconf=op->nconf;
   PetscInt num_product_states = 1;
   PetscBool num_product_states_set=PETSC_FALSE;
   PetscOptionsGetInt(NULL, NULL, "-num_product_states",&num_product_states, &num_product_states_set);  
@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
   PetscOptionsGetInt(NULL,NULL,"-seed3",&seed3,NULL);CHKERRQ(ierr);
   std::default_random_engine generator(seed3);
   std::uniform_int_distribution<> distribution(0, nconf-1);
-  for (int r=0;r<num_product_states;++r) { init_states.push_back(distribution(generator));}
+  for (int r=0;r<num_product_states;++r) { init_states.push_back((PetscInt) distribution(generator));}
   if (myrank==0) {std::cout << "# " << num_product_states << " random product states initialized with seed3 = " << seed3 << std::endl;}
   }
   else {
