@@ -56,6 +56,7 @@ using namespace std;
 int main(int argc, char **argv) {
   cout.precision(20);
   PetscBool on_adastra=PETSC_FALSE;
+  int provided;
   if (on_adastra) {
   MPI_Init_thread(NULL, NULL, MPI_THREAD_MULTIPLE, &provided);
   }
@@ -178,7 +179,7 @@ int ENV_NUM_THREADS=omp_get_max_threads();
   // Initialize file names
 
   Vec xr;
-  MatCreateVecs(H, &xr, PETSC_NULL);
+  MatCreateVecs(H, &xr, NULL);
  // MatCreateVecs(H, PETSC_NULL, &xi);
 
   std::vector<double> targets;
