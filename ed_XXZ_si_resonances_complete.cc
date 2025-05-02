@@ -55,6 +55,10 @@ using namespace std;
 
 int main(int argc, char **argv) {
   cout.precision(20);
+  PetscBool on_adastra=PETSC_FALSE;
+  if (on_adastra) {
+  MPI_Init_thread(NULL, NULL, MPI_THREAD_MULTIPLE, &provided);
+  }
   SlepcInitialize(&argc, &argv, "slepc.options", help);
 
   /**** Init parallel work ****/
@@ -285,14 +289,13 @@ int ENV_NUM_THREADS=omp_get_num_threads();
     CHKERRQ(ierr);
     ST st;
     EPSGetST(eps2, &st);
-
+    EPSSetTarget(eps2, target);
     // Get and Set interval from my own parameters ...
     EPSSetFromOptions(eps2);
 
     std::string energy_name;
-    if (special_energy_set) { eps_interval_set=0;}
-
       std::stringstream energy_string;
+      energy_string.precision(20);
       energy_string << ".special_energy=" << special_energy;
       energy_name=energy_string.str();
     ierr = EPSSolve(eps2);  
@@ -343,11 +346,48 @@ int ENV_NUM_THREADS=omp_get_num_threads();
       std::vector< std::vector<pair<int,int> > > pairs_to_follow;
       std::vector< std::vector<double> > sz_to_follow;
 
+
+      PetscBool debug=PETSC_FALSE;
+      PetscOptionsGetBool(NULL, NULL, "-debug", &debug,NULL);
+
+      PetscBool compute_weight=PETSC_TRUE;
+      PetscOptionsGetBool(NULL, NULL, "-compute_weight", &compute_weight,NULL); 
+
+      PetscBool measure_Cmax=PETSC_FALSE;
+      PetscOptionsGetBool(NULL, NULL, "-measure_Cmax", &measure_Cmax,NULL);
+      if (measure_Cmax) { compute_weight=PETSC_TRUE;}
+      
+      PetscInt number_of_weight_cutoff_values=9; 
+      PetscOptionsGetInt(NULL, NULL, "-cutoff_values", &number_of_weight_cutoff_values,NULL);
+      std::vector< std::vector<double> > weight_at_cutoff_at_range;
+      std::vector<double> Normalization; Normalization.resize(L/2+1,0.);
+      std::vector<double> weight_cutoff; 
+
+      PetscInt min_range=0;
+      PetscOptionsGetInt(NULL, NULL, "-min_range", &min_range,NULL); 
+
+      PetscBool measure_everything=PETSC_FALSE;
+      PetscOptionsGetBool(NULL, NULL, "-measure_everything", &measure_everything,NULL); 
+
       PetscBool measure_alllocal=PETSC_TRUE;
       PetscOptionsGetBool(NULL, NULL, "-measure_alllocal", &measure_alllocal,NULL); 
 
       PetscBool other_measurements=PETSC_FALSE;
       PetscOptionsGetBool(NULL, NULL, "-other_measurements", &other_measurements,NULL); 
+
+      PetscBool sz_cutoff_set=PETSC_TRUE;
+      PetscReal sz_cutoff=0.05;
+      PetscOptionsGetReal(NULL, NULL, "-sz_cutoff", &sz_cutoff,&sz_cutoff_set); 
+      PetscBool C_cutoff_set;
+      PetscReal C_cutoff=0.25-sz_cutoff*sz_cutoff;
+      PetscOptionsGetReal(NULL, NULL, "-C_cutoff", &C_cutoff,&C_cutoff_set); 
+       
+      if (!(sz_cutoff_set)) { sz_cutoff=sqrt(0.25-C_cutoff);}
+      if (C_cutoff_set) { sz_cutoff_set=PETSC_TRUE;}
+      
+    //  sz_cutoff*=2;
+     // C_cutoff*=4;
+      if (!(C_cutoff_set) && (!(sz_cutoff_set)) ) { if (myrank==0) { cout << "No cutoff set, exiting\n";} exit(0); }
 
         // TODO : get pbc back !
         PetscBool pbc=PETSC_TRUE;
@@ -360,43 +400,35 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         energies.push_back(PetscRealPart(Er));
         error_energies.push_back(this_error);
         std::vector<double> sz(L,0.);
+        std::vector< pair<int,int> > prediction_strong_correl_pair; prediction_strong_correl_pair.resize(0);
 
         VecPointwiseMult(use1,xr,xr);
         for (int k=0;k<L;++k) { VecDot(use1,sigmas_as_vec[k],&sz[k]); }
-     
       
         if (1)
-          {  double C; 
+          { 
+             double C; 
               VecPointwiseMult(use1,xr,xr);
               int running_pair=0;
-             // if (1) { if (myrank==0) { cout << "Dping eigenstate " << Er << endl;} }
+          
               for (int k=0;k<L;++k) 
-                { for (int range=1;range<=(L/2);++range) 
+                { 
+                  for (int range=1;range<=(L/2);++range) 
                   { 
-                    
-                   
-                    
                     VecDot(sigmasigma_as_vec[running_pair],use1,&C);
-                //  if (i==0) { if (myrank==0) { cout << "Correct correl= @ " << running_pair << " sites " << k << " " << (k+range)%L << 
-                //    " with " << C << " sz=" << sz[k] << "," << sz[(k+range)%L] << " ---> " << 0.25*fabs(C-sz[k]*sz[(k+range)%L]) << endl;} }
-
+                  
                     running_pair++;
                      // do not compute twice for L/2 ...
                     if ( (range!=L/2) || (k<(L/2)) ) {
                     C=0.25*fabs(C-sz[k]*sz[(k+range)%L]);
+                    
                     if ( (C>C_cutoff) && (range>=min_range) ) 
                           { prediction_strong_correl_pair.push_back(make_pair(k,(k+range)%L)); }
-                    if (measure_Cmax) {
-                      if (C>Cmax[range]) { E_Cmax[range]=Er; Cmax[range]=C; site1_Cmax[range]=k; site2_Cmax[range]=(k+range)%L;} 
-                      }
-                    Normalization[range]+=1.0;
-                    for (int c=0;c<number_of_weight_cutoff_values;c++)
-                      { if (C>weight_cutoff[c]) {weight_at_cutoff_at_range[c][range]+=1.0;} else {break;} }
                     }
+                    
                   }
                 }
           }
-
           bool prediction_strong_correl_found=PETSC_FALSE;
         if (prediction_strong_correl_pair.size()!=0) {
             prediction_strong_correl_found=PETSC_TRUE;
@@ -433,14 +465,10 @@ int ENV_NUM_THREADS=omp_get_num_threads();
         EPSGetEigenpair(eps2, eigenstates_to_follow[ll], &Er, &Ei, xr, NULL);
 
         // Measure correlations
-        if (myparameters.measure_correlations) {
-
-        else {  // measure only guessed correlations
         
         int s=sites_to_follow[ll].size();
         std::vector<double> sz=sz_to_follow[ll];
         if (myrank==0) { for (int pp=0;pp<sz.size();++pp)    { alllocout << pp+1 << " " << 0.5*sz[pp] << " " << Er << endl; } }
-        }
         
         
         // measure participation

@@ -55,6 +55,10 @@ using namespace std;
 
 int main(int argc, char **argv) {
   cout.precision(20);
+  PetscBool on_adastra=PETSC_FALSE;
+  if (on_adastra) {
+  MPI_Init_thread(NULL, NULL, MPI_THREAD_MULTIPLE, &provided);
+  }
   SlepcInitialize(&argc, &argv, "slepc.options", help);
 
   /**** Init parallel work ****/
@@ -68,7 +72,7 @@ int main(int argc, char **argv) {
   omp_set_num_threads(ENV_NUM_THREADS);
 #endif
 */
-int ENV_NUM_THREADS=omp_get_num_threads();
+int ENV_NUM_THREADS=omp_get_max_threads();
   // For parallelization between nodes (MPI)
   int myrank, mpisize;
   MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
@@ -174,8 +178,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
   // Initialize file names
 
   Vec xr;
-  MatCreateVecs(H, NULL, &xr);
-  
+  MatCreateVecs(H, &xr, PETSC_NULL);
+ // MatCreateVecs(H, PETSC_NULL, &xi);
 
   std::vector<double> targets;
   if (myparameters.target_infinite_temperature) {
@@ -208,11 +212,11 @@ int ENV_NUM_THREADS=omp_get_num_threads();
   //sigmas.resize(L);
   std::vector<Vec> sigmas_as_vec;
   sigmas_as_vec.resize(L);
-  for (int p=0;p<L;++p) { MatCreateVecs(H, NULL, &sigmas_as_vec[p]);}
+  for (int p=0;p<L;++p) { MatCreateVecs(H, &sigmas_as_vec[p], NULL);}
   std::vector<Vec> sigmasigma_as_vec;
   int nb_pairs=(L*L/2);
   sigmasigma_as_vec.resize(nb_pairs);
-  for (int p=0;p<nb_pairs;++p) { MatCreateVecs(H, NULL, &sigmasigma_as_vec[p]);}
+  for (int p=0;p<nb_pairs;++p) { MatCreateVecs(H, &sigmasigma_as_vec[p], NULL);}
 
   //for (int k=0;k<L;++k) { MatCreateVecs(H, NULL, &sigmas[k]);}
   {
@@ -358,8 +362,8 @@ int ENV_NUM_THREADS=omp_get_num_threads();
 
 
     Vec use1,use2;
-    MatCreateVecs(H, NULL, &use1);
-    MatCreateVecs(H, NULL, &use2);
+    MatCreateVecs(H, &use1, NULL);
+    MatCreateVecs(H, &use2, NULL);
 
     std::vector<double> Cmax(L/2+1,0.); std::vector<double> E_Cmax(L/2+1,0.); 
     std::vector<int> site1_Cmax(L/2+1,-1); std::vector<int> site2_Cmax(L/2+1,-1);
