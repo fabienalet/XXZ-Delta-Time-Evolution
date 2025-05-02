@@ -53,6 +53,11 @@ using namespace std;
 
 int main(int argc, char **argv) {
   cout.precision(20);
+  PetscBool on_adastra=PETSC_FALSE;
+  int provided;
+  if (on_adastra) {
+  MPI_Init_thread(NULL, NULL, MPI_THREAD_MULTIPLE, &provided);
+  }
   SlepcInitialize(&argc, &argv, "slepc.options", help);
 
   /**** Init parallel work ****/
