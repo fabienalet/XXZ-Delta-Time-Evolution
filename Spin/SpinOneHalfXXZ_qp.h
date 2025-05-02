@@ -122,13 +122,12 @@ void Hamiltonian::get_parameters() {
       }
     }
   
-  }
+  
 
 
   PetscBool fields_string_set=PETSC_FALSE;
   char* fields_c_string = new char[10000];
-  ierr = PetscOptionsGetString(NULL, NULL, "-fields", fields_c_string, 10000,
-                               &fields_string_set);  
+  PetscOptionsGetString(NULL, NULL, "-fields", fields_c_string, 10000,&fields_string_set);  
   if (fields_string_set) {
     field.resize(0);
     std::string fields_string(fields_c_string);
