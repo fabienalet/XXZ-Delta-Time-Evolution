@@ -44,7 +44,7 @@ using namespace std;
 
 #include "Spin/Spin_parameters.h"
 
-#include "Spin/SpinOneHalfXXZ_quasiperiodic.h"
+#include "Spin/SpinOneHalfXXZ_qp.h"
 
 #include "Spin/Spin_observable.h"
 
