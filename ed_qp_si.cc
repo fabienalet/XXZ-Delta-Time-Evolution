@@ -258,6 +258,11 @@ int main(int argc, char **argv) {
       std::vector< std::vector<double> > Tij(L);
       for (int k=0;k<L;++k) { Tij[k].resize(L,0.);}
 
+      PetscBool measure_mid_only=PETSC_TRUE;
+      PetscOptionsGetBool(NULL, NULL, "-measure_mid_only", &measure_mid_only, NULL);
+
+
+
       for (int i = 0; i < nconv; i++) {
         ierr = EPSGetEigenpair(eps2, i, &Er, &Ei, xr, NULL);
         CHKERRQ(ierr);
@@ -338,23 +343,29 @@ int main(int argc, char **argv) {
           else {
             double PE = myobservable.part_entropy(state, 1);
             // parout << PetscRealPart(Er) << " " << PE << "\n";}
-            partout << PE << "\n";
+            partout << PE << " " << Er << "\n";
           }
 
           if (myparameters.measure_local) {
             myobservable.compute_local_magnetization(state);
             Siz = myobservable.sz_local;
             for (int r = 0; r < L; ++r) {
-              locout << r << " " << Siz[r] << endl;
+              locout << r << " " << Siz[r] << " " << Er << endl;
             }
           }
 
           if (myparameters.measure_correlations) {
             Gij =myobservable.get_two_points_connected_correlation(state);
             for (int r = 0; r < L; ++r) {
+              if (measure_mid_only) {
+                if (r<(L/2)) { corrout << r << " " << " " << r+L/2 << " " << Gij[r][r+L/2] << " " << Er << endl;}
+                }
+                else {
               for (int s = r; s < L; ++s) {
-	              corrout << r << " " << " " << s << " " << Gij[r][s] << endl;
-            } }
+	              corrout << r << " " << " " << s << " " << Gij[r][s] << " " << Er << endl;
+            } 
+          }
+          }
 
           }
 
@@ -362,18 +373,22 @@ int main(int argc, char **argv) {
             // get two points transverse correlations
             Tij = myobservable.get_SpSm_correlation(state);
             for (int r = 0; r < L; ++r) {
+              if (measure_mid_only) {
+                if (r<(L/2)) { tcorrout << " " << " " << s << " " << Tij[r][r+L/2] << " " << Er << endl; }
               for (int s = r; s < L; ++s) {
-                tcorrout << r << " " << " " << s << " " << Tij[r][s] << endl;
-            } }
+                tcorrout << r << " " << " " << s << " " << Tij[r][s] << " " << Er << endl;
+            } 
           }
+          }
+        }
 
 
           if (myparameters.measure_entanglement) {
             myobservable.compute_entanglement_spectrum(state);
             double S1 = myobservable.entang_entropy(1);
-            entout << S1 << "\n";
+            entout << S1 << " " << Er << "\n";
             double S2=myobservable.entang_entropy(2);
-            cout << "S2 = " << S2 << " " << Er << std::endl;
+         //   cout << "S2 = " << S2 << " " << Er << std::endl;
           }
 
 
@@ -398,7 +413,7 @@ int main(int argc, char **argv) {
         enout << "# Erenorm_target = " << renorm_target << endl;
         
         for (int i = 0; i < nconv; i++) {
-          cout << energies[i] << "\n";
+     //     cout << energies[i] << "\n";
           enout << energies[i] << endl;
         }
         
