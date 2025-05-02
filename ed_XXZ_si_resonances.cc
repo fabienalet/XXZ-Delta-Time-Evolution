@@ -298,7 +298,7 @@ int ENV_NUM_THREADS=omp_get_max_threads();
     PetscBool eps_interval_set=PETSC_FALSE;
     PetscOptionsGetString(NULL, NULL, "-eps_interval", eps_interval_string, 1000,&eps_interval_set); 
  
-    if (special_energy_set) { eps_interval_set=0;}
+    if (special_energy_set) { eps_interval_set=PETSC_FALSE;}
 
     if ((!(eps_interval_set)) && (!(myparameters.interval_set))) { 
       EPSSetWhichEigenpairs(eps2, EPS_TARGET_REAL);
