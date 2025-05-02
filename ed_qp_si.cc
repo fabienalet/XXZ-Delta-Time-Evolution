@@ -238,6 +238,10 @@ int main(int argc, char **argv) {
     CHKERRQ(ierr);
     if (0 == myrank) std::cout << "Solved done. \n";
 
+
+    PetscBool measure_mid_only=PETSC_TRUE;
+    PetscOptionsGetBool(NULL, NULL, "-measure_mid_only", &measure_mid_only, NULL);
+
     if (nconv > 0) {
       ofstream entout;
       ofstream locout;
@@ -258,8 +262,6 @@ int main(int argc, char **argv) {
       std::vector< std::vector<double> > Tij(L);
       for (int k=0;k<L;++k) { Tij[k].resize(L,0.);}
 
-      PetscBool measure_mid_only=PETSC_TRUE;
-      PetscOptionsGetBool(NULL, NULL, "-measure_mid_only", &measure_mid_only, NULL);
 
 
 
