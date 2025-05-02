@@ -62,13 +62,21 @@ int main(int argc, char **argv) {
 
   /**** Init parallel work ****/
  // For parallelization on node (openMP)
-  int ENV_NUM_THREADS=omp_get_num_threads();
+  int ENV_NUM_THREADS=omp_get_max_threads();
+  /*
   omp_set_num_threads(ENV_NUM_THREADS);
   #ifdef USE_MKL
   ENV_NUM_THREADS=mkl_get_max_threads(); /// Get value of OMP_NUM_THREADS 
   mkl_set_num_threads(ENV_NUM_THREADS);
   omp_set_num_threads(ENV_NUM_THREADS)
   #endif
+  */
+  // For parallelization between nodes (MPI)
+  int myrank, mpisize;
+  MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+  MPI_Comm_size(MPI_COMM_WORLD, &mpisize);
+
+
   // For parallelization between nodes (MPI)
   int myrank, mpisize;
   MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
