@@ -289,11 +289,11 @@ int ENV_NUM_THREADS=omp_get_max_threads();
     if (nconv > 0) {
       ofstream Aout;
       std::stringstream filename;
-      filename << "A." << myparameters.string_from_basisstring_from_basis << myparameters.string_from_basisstring_from_H << ".dat";
+      filename << "A." << myparameters.string_from_basis << myparameters.string_from_H << ".dat";
       cout << filename.str() << endl;
       Aout.open((filename.str()).c_str());
       Aout.precision(20);
-
+      double Er,Ei;
       for (int i = 0; i < nconv; i++) 
       {
         EPSGetEigenpair(eps2, i, &Er, &Ei, xr, NULL);
