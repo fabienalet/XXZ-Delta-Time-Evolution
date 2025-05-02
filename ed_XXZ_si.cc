@@ -182,8 +182,8 @@ int main(int argc, char **argv) {
   // Initialize file names
 
   Vec xr, xi;
-  MatCreateVecs(H, PETSC_NULL, &xr);
-  MatCreateVecs(H, PETSC_NULL, &xi);
+  MatCreateVecs(H,  &xr, NULL);
+ // MatCreateVecs(H,  &xi);
 
   std::vector<double> targets;
   if (myparameters.target_infinite_temperature) {
@@ -252,7 +252,7 @@ int main(int argc, char **argv) {
       for (int k=0;k<L;++k) { Tij[k].resize(L,0.);}
 
       for (int i = 0; i < nconv; i++) {
-        ierr = EPSGetEigenpair(eps2, i, &Er, &Ei, xr, xi);
+        ierr = EPSGetEigenpair(eps2, i, &Er, &Ei, xr, NULL);
         CHKERRQ(ierr);
         energies.push_back(PetscRealPart(Er));
         if (myparameters.write_wf) {
