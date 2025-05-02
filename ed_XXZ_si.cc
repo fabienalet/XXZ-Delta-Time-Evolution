@@ -53,7 +53,7 @@ using namespace std;
 
 int main(int argc, char **argv) {
   cout.precision(20);
-  PetscBool on_adastra=PETSC_TRUE:;
+  PetscBool on_adastra=PETSC_TRUE;
   int provided;
   if (on_adastra) {
   MPI_Init_thread(NULL, NULL, MPI_THREAD_MULTIPLE, &provided);
