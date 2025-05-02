@@ -374,7 +374,7 @@ int main(int argc, char **argv) {
             Tij = myobservable.get_SpSm_correlation(state);
             for (int r = 0; r < L; ++r) {
               if (measure_mid_only) {
-                if (r<(L/2)) { tcorrout << " " << " " << s << " " << Tij[r][r+L/2] << " " << Er << endl; }
+                if (r<(L/2)) { tcorrout << " " << " " << r+L/2 << " " << Tij[r][r+L/2] << " " << Er << endl; }
               for (int s = r; s < L; ++s) {
                 tcorrout << r << " " << " " << s << " " << Tij[r][s] << " " << Er << endl;
             } 
