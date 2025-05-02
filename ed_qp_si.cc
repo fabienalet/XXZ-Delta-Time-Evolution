@@ -387,7 +387,7 @@ int main(int argc, char **argv) {
             myobservable.compute_entanglement_spectrum(state);
             double S1 = myobservable.entang_entropy(1);
             entout << S1 << " " << Er << "\n";
-            double S2=myobservable.entang_entropy(2);
+           // double S2=myobservable.entang_entropy(2);
          //   cout << "S2 = " << S2 << " " << Er << std::endl;
           }
 
