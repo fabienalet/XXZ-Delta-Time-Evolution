@@ -340,9 +340,6 @@ int main(int argc, char **argv) {
       std::vector<double> rgap;
       PetscScalar Er, Ei;
       Vec Vec_local;
-      std::vector<double> Siz(L, 0.);
-      std::vector< std::vector<double> > Gij(L);
-      for (int k=0;k<L;++k) { Gij[k].resize(L,0.);}
       std::vector< std::vector<double> > Tij(L);
       for (int k=0;k<L;++k) { Tij[k].resize(L,0.);}
       Vec use1;
@@ -372,28 +369,38 @@ int main(int argc, char **argv) {
           std::vector<double> sz(L,0.);
           for (int k=0;k<L;++k) { VecDot(use1,sigmas_as_vec[k],&sz[k]); }
           if (myparameters.measure_local) {
-        for (int r = 0; r < L; ++r) { locout << "AA " << r << " " << 0.5*sz[r] << " " << Er << endl;}
+        for (int r = 0; r < L; ++r) { locout <<  r << " " << 0.5*sz[r] << " " << Er << endl;}
         }
         if (myparameters.measure_correlations) {
         int running_pair=0; double correl;
         if (measure_mid_only) {
           for (int k=0;k<L/2;++k) { VecDot(use1,sigmasigma_as_vec[running_pair],&correl);
-            corrout << "AA " << k << " " << k+L/2 << " " << 0.25*(correl-sz[k]*sz[k+L/2]) << " " << Er << endl;
+            corrout <<  k << " " << k+L/2 << " " << 0.25*(correl-sz[k]*sz[k+L/2]) << " " << Er << endl;
             running_pair++;
           }
         }
         else {
         for (int k=0;k<L;++k) { for (int range=1;range<=(L/2);++range) { 
             VecDot(use1,sigmasigma_as_vec[running_pair],&correl);
-            corrout << "AA " << k << " " << (k+range)%L << " " << 0.25*(correl-sz[k]*sz[(k+range)%L]) << " " << Er << endl;
+            corrout <<  k << " " << (k+range)%L << " " << 0.25*(correl-sz[k]*sz[(k+range)%L]) << " " << Er << endl;
             running_pair++;
           } }
         }
       }
     }
       
+        if (myparameters.measure_participation) {
+              double pi; double local_S1=0.;
+                for (int row_ctr = Istart; row_ctr<Iend;++row_ctr) {
+                          VecGetValues( xr, 1, &row_ctr, &pi );
+                        if ((pi != 0)) { local_S1 -= 2.0* pi * pi * log(fabs(pi));}
+                    }
+      double global_S1=0.;
+      MPI_Reduce(&local_S1, &global_S1, 1, MPI_DOUBLE, MPI_SUM, 0,PETSC_COMM_WORLD);
+      if (myrank==0) { partout << global_S1 << " " << Er << endl; }
+    }
 
-
+    if (myparameters.transverse_correlations || myparameters.measure_entanglement_at_all_cuts || myparameters.measure_entanglement) { 
         if (mpisize == 1) {
           VecCreateSeq(PETSC_COMM_SELF, nconf, &Vec_local);
           ierr = VecCopy(xr, Vec_local);
@@ -408,81 +415,6 @@ int main(int argc, char **argv) {
         if (myrank == 0) {
           PetscScalar *state;
           VecGetArray(Vec_local, &state);
-
-          // checking out parity ...
-          /*
-          std::cout << "*** Eigenvector " << i << std::endl;
-          for (int p = 0; p < nconf; p++) {
-            std::cout << p << " " << state[p] << std::endl;
-          }
-          if (state[mybasis->ineel] == state[mybasis->ineel2]) {
-            std::cout << "Suggesting Eigenvector " << i
-                      << " is Inversion-symmetric (I=1)\n";
-          } else {
-            std::cout << "Suggesting Eigenvector " << i
-                      << " is not symmetric (I=-1)\n";
-          }
-          */
-          if (myparameters.measure_all_part_entropy) {
-            double qmin = myparameters.qmin;
-            std::vector<double> qs;
-            double mymin = qmin;
-            double current_q;
-            if (qmin < 1) {
-              current_q = qmin;
-              for (int p = 0; p < 9; ++p) {
-                qs.push_back(current_q);
-                current_q += (1. - qmin) / 9.;
-              }
-              mymin = 1;
-            }
-            current_q = mymin;
-            double dq = (myparameters.qmax - mymin) / (myparameters.Nq - 1);
-            for (int nq = 0; nq < myparameters.Nq - 1; ++nq) {
-              qs.push_back(current_q);
-              current_q += dq;
-            }
-            qs.push_back(current_q);
-            double real_Nq = qs.size();
-            std::vector<double> entropies(real_Nq, 0.);
-            entropies = myobservable.all_part_entropy(
-                state, myparameters.Nq, myparameters.qmin, myparameters.qmax);
-
-            for (int nq = 0; nq < real_Nq; ++nq) {
-              partout << "S[q=" << qs[nq] << "] " << entropies[nq] << "\n";
-            }
-            partout << "S[q=infty]= " << myobservable.Smax(state) << "\n";
-          }
-
-          else {
-            double PE = myobservable.part_entropy(state, 1);
-            // parout << PetscRealPart(Er) << " " << PE << "\n";}
-            partout << PE << " " << Er << "\n";
-          }
-
-
-          if (myparameters.measure_local) {
-            myobservable.compute_local_magnetization(state);
-            Siz = myobservable.sz_local;
-            for (int r = 0; r < L; ++r) {
-              locout << r << " " << Siz[r] << " " << Er << endl;
-            }
-          }
-
-          if (myparameters.measure_correlations) {
-            Gij =myobservable.get_two_points_connected_correlation(state);
-            for (int r = 0; r < L; ++r) {
-              if (measure_mid_only) {
-                if (r<(L/2)) { corrout << r << " " << " " << r+L/2 << " " << Gij[r][r+L/2] << " " << Er << endl;}
-                }
-                else {
-              for (int s = r; s < L; ++s) {
-	              corrout << r << " " << " " << s << " " << Gij[r][s] << " " << Er << endl;
-            } 
-          }
-          }
-
-          }
 
           if (myparameters.measure_transverse_correlations){
             // get two points transverse correlations
@@ -514,7 +446,7 @@ int main(int argc, char **argv) {
              
           free(permuted_state);
             }
-            
+        else {
 
           if (myparameters.measure_entanglement) {
             myobservable.compute_entanglement_spectrum(state);
@@ -523,6 +455,7 @@ int main(int argc, char **argv) {
            // double S2=myobservable.entang_entropy(2);
          //   cout << "S2 = " << S2 << " " << Er << std::endl;
           }
+        }
 
 
           VecRestoreArray(Vec_local, &state);
