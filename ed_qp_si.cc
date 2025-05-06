@@ -461,10 +461,10 @@ int main(int argc, char **argv) {
           if (myparameters.measure_entanglement) {
             if (on_adastra) { myobservable.number_threads=192;}
             if (debug) { 
-              myobservable.compute_entanglement_spectrum_debug(permuted_state);
+              myobservable.compute_entanglement_spectrum_debug(state);
             }
             else {
-            myobservable.compute_entanglement_spectrum(permuted_state);
+            myobservable.compute_entanglement_spectrum(state);
             }
             
             double S1 = myobservable.entang_entropy(1);
