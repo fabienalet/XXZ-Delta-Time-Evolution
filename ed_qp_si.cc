@@ -400,7 +400,7 @@ int main(int argc, char **argv) {
       if (myrank==0) { partout << global_S1 << " " << Er << endl; }
     }
 
-    if (myparameters.transverse_correlations || myparameters.measure_entanglement_at_all_cuts || myparameters.measure_entanglement) { 
+    if (myparameters.measure_transverse_correlations || myparameters.measure_entanglement_at_all_cuts || myparameters.measure_entanglement) { 
         if (mpisize == 1) {
           VecCreateSeq(PETSC_COMM_SELF, nconf, &Vec_local);
           ierr = VecCopy(xr, Vec_local);
