@@ -322,9 +322,9 @@ int main(int argc, char **argv) {
       ofstream partout;
       ofstream corrout;
       ofstream tcorrout;
-      std::stringstream energy_name;
+      std::stringstream energy_string;
       energy_string << ".target=" << target;
-      energy_name=energy_string.str();
+      std::string energy_name=energy_string.str();
 
      // if (myparameters.measure_KL) { myparameters.init_filename_KL(KLout,energy_name);}
       if (myparameters.measure_local) { myparameters.init_filename_local(locout,energy_name); }
