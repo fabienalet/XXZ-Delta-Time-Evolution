@@ -378,13 +378,13 @@ int main(int argc, char **argv) {
         int running_pair=0; double correl;
         if (measure_mid_only) {
           for (int k=0;k<L/2;++k) { VecDot(use1,sigmasigma_as_vec[running_pair],&correl);
-            corrout << "AA " << k << " " << k+L/2 << " " < 0.25*correl << " " << Er << endl;
+            corrout << "AA " << k << " " << k+L/2 << " " << 0.25*correl << " " << Er << endl;
             running_pair++;
           }
         }
         else {
         for (int k=0;k<L;++k) { for (int range=1;range<=(L/2);++range) { 
-            VecPointwiseMult(use1,sigmasigma_as_vec[running_pair],&correl);
+            VecDot(use1,sigmasigma_as_vec[running_pair],&correl);
             corrout << "AA " << k << " " << (k+range)%L << " " < 0.25*correl << " " << Er << endl;
             running_pair++;
           } }
@@ -503,7 +503,6 @@ int main(int argc, char **argv) {
         if (myparameters.measure_entanglement_at_all_cuts) {
           PetscScalar * permuted_state;
           permuted_state = (PetscScalar*)calloc( nconf,sizeof(PetscScalar) );
-          entcutout << t;
           for (int shift=0;shift<L/2;shift++)
               {
                 mybasis.change_state_shift(shift, state, permuted_state);
