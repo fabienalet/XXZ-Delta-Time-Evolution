@@ -385,7 +385,7 @@ int main(int argc, char **argv) {
         else {
         for (int k=0;k<L;++k) { for (int range=1;range<=(L/2);++range) { 
             VecDot(use1,sigmasigma_as_vec[running_pair],&correl);
-            corrout << "AA " << k << " " << (k+range)%L << " " < 0.25*correl << " " << Er << endl;
+            corrout << "AA " << k << " " << (k+range)%L << " " << 0.25*correl << " " << Er << endl;
             running_pair++;
           } }
         }
