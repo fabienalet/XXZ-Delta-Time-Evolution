@@ -163,6 +163,10 @@ int main(int argc, char **argv) {
   }
 
 
+
+  PetscBool measure_mid_only=PETSC_TRUE;
+  PetscOptionsGetBool(NULL, NULL, "-measure_mid_only", &measure_mid_only, NULL);
+
   /******************************/
   // Defining sigmas
   //std::vector<Mat> sigmas;
@@ -308,10 +312,6 @@ int main(int argc, char **argv) {
     CHKERRQ(ierr);
     if (0 == myrank) std::cout << "Solved done. \n";
 
-
-    PetscBool measure_mid_only=PETSC_TRUE;
-    PetscOptionsGetBool(NULL, NULL, "-measure_mid_only", &measure_mid_only, NULL);
-
    
     
 
@@ -323,7 +323,7 @@ int main(int argc, char **argv) {
       ofstream corrout;
       ofstream tcorrout;
       std::string energy_name;
-      char* eps_interval_string = new char[1000];
+      char* energy_string = new char[1000];
       energy_string << ".target=" << target;
       energy_name=energy_string.str();
      // if (myparameters.measure_KL) { myparameters.init_filename_KL(KLout,energy_name);}
@@ -378,14 +378,14 @@ int main(int argc, char **argv) {
         int running_pair=0; double correl;
         if (measure_mid_only) {
           for (int k=0;k<L/2;++k) { VecPointwiseMult(use1,sigmasigma_as_vec[running_pair],&correl);
-            correlout << "AA " << k << " " << k+L/2 << " " < 0.25*correl << " " << Er << endl;
+            corrout << "AA " << k << " " << k+L/2 << " " < 0.25*correl << " " << Er << endl;
             running_pair++;
           }
         }
         else {
         for (int k=0;k<L;++k) { for (int range=1;range<=(L/2);++range) { 
             VecPointwiseMult(use1,sigmasigma_as_vec[running_pair],&correl);
-            correlout << "AA " << k << " " << (k+range)%L << " " < 0.25*correl << " " << Er << endl;
+            corrout << "AA " << k << " " << (k+range)%L << " " < 0.25*correl << " " << Er << endl;
             running_pair++;
           } }
         }
@@ -506,7 +506,7 @@ int main(int argc, char **argv) {
           entcutout << t;
           for (int shift=0;shift<L/2;shift++)
               {
-                mybasis(shift, state, permuted_state);
+                mybasis.change_state_shift(shift, state, permuted_state);
                 obs.compute_entanglement_spectrum(permuted_state);
                 double S1 = obs.entang_entropy(1);
                 entcutout << S1 << " " << Er << " " << shift << endl;

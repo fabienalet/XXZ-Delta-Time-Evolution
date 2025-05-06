@@ -14,9 +14,6 @@ class basis {
   void change_basis(const basis& b0, const PetscScalar* state,
                     PetscScalar* new_state);
 
-  void change_basis(const basis& b0, const PetscScalar* state,
-                      PetscScalar* new_state);
-
   void change_state_shift(int shift, const PetscScalar* state,
                         PetscScalar* new_state);
 
@@ -324,8 +321,6 @@ Conf cA(LA, 0);
 Conf cB(LB, 0);
 Conf shifted_cA(LA, 0);
 Conf shifted_cB(LB, 0);
-Conf cA0(LA0, 0);
-Conf cB0(LB0, 0);
 
 int running_index=0; int nleft,nright,new_index,new_nsa;
 for (int nsa = 0; nsa < valid_sectors; ++nsa) {
