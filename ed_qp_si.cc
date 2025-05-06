@@ -332,7 +332,7 @@ int main(int argc, char **argv) {
       if (myparameters.measure_transverse_correlations) { myparameters.init_filename_transverse_correlations(tcorrout,energy_name);}
       if (myparameters.measure_participation) { myparameters.init_filename_participation(partout,energy_name);}
       if (myparameters.measure_entanglement) { myparameters.init_filename_entanglement(entout,energy_name);}
-      if (myparameters.measure_entanglement_at_all_cuts) { myparameters.init_filename_entanglement(entcutout,energy_name);}
+      if (myparameters.measure_entanglement_at_all_cuts) { myparameters.init_filename_entanglement_all_cuts(entcutout,energy_name);}
 
 
 
