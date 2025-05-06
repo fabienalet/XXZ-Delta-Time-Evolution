@@ -49,6 +49,7 @@ class Parameters {
   void init_filename_entanglement(ofstream& entout,int inistate);
   void init_filename_entanglement(ofstream& entout);
   void init_filename_entanglement(ofstream& f,string energyname);
+  void init_filename_entanglement_all_cuts(ofstream& f,string energyname);
 
   void init_filename_Cmax(ofstream& entout);
   void init_filename_Cmax(ofstream& f,string energyname);
@@ -276,6 +277,15 @@ void Parameters::init_filename_entanglement(ofstream& fileout,string energyname)
 {
   std::stringstream filename;
     filename << "Ent." << string_from_basis << string_from_H
+                << energyname << ".dat";
+    fileout.open((filename.str()).c_str());
+    fileout.precision(20);
+}
+
+void Parameters::init_filename_entanglement_all_cuts(ofstream& fileout,string energyname)
+{
+  std::stringstream filename;
+    filename << "EntCUT." << string_from_basis << string_from_H
                 << energyname << ".dat";
     fileout.open((filename.str()).c_str());
     fileout.precision(20);

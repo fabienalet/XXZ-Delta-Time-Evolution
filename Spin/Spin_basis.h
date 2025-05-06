@@ -14,6 +14,12 @@ class basis {
   void change_basis(const basis& b0, const PetscScalar* state,
                     PetscScalar* new_state);
 
+  void change_basis(const basis& b0, const PetscScalar* state,
+                      PetscScalar* new_state);
+
+  void change_state_shift(int shift, const PetscScalar* state,
+                        PetscScalar* new_state);
+
   short int NUMBER_OF_STATES;
   std::vector<int> numberparticle_for_basis_state;
   std::vector<double> sz_for_basis_state;
@@ -78,6 +84,8 @@ basis::basis(int L_, int LA_, double Sz_, int myrank_, int num_states_) {
   LB = L - LA;
   init();
 }
+
+
 
 void basis::clean_basis() {
   number_conf_in_A.clear();
@@ -301,6 +309,52 @@ void basis::change_basis(const basis& b0, const PetscScalar* state,
     }
   }
 }
+
+
+void basis::change_state_shift(int shift, const PetscScalar* state,
+  PetscScalar* new_state) {
+// loop over all configurations, shift them, find the new index, put new_state(new_index) <-- state(old_index) 
+
+int LA0 = b0.LA;
+int LB0 = b0.LB;
+int conf_idx = 0;
+Conf cur_conf(L, 0);
+Conf shifted_conf(L, 0);
+Conf cA(LA, 0);
+Conf cB(LB, 0);
+Conf shifted_cA(LA, 0);
+Conf shifted_cB(LB, 0);
+Conf cA0(LA0, 0);
+Conf cB0(LB0, 0);
+
+int running_index=0; int nleft,nright,new_index,new_nsa;
+for (int nsa = 0; nsa < valid_sectors; ++nsa) {
+for (int p = 0; p < Confs_in_A[nsa].size(); ++p) {
+cA = Confs_in_A[nsa][p];
+for (int q = 0; q < Confs_in_B[nsa].size(); ++q) {
+cB = Confs_in_B[nsa][q];
+// std::cout << "# New B part: ";
+// for (int ib=0;ib<cB.size();ib++) std::cout << cB[ib];
+// std::cout << std::endl;
+// update cur_conf
+for (int i = 0; i < LA; i++) cur_conf[i] = cA[i];
+for (int j = 0; j < LB; j++) cur_conf[LA + j] = cB[j];
+// create shifted_conf
+for (int i = 0; i < L; i++) shifted_conf[(i+shift)%L]=cur_conf[i];
+for (int i = 0; i < LA; i++) shifted_cA[i]=shifted_conf[i];
+for (int j = 0; j < LB; j++) shifted_cB[j] = shifted_conf[j + LA];
+
+nleft = 0; for (int i = 0; i < LA; i++) { nleft+=shifted_cA[i];}
+nright=0; for (int j = 0; j < LB; j++) { nright+=shifted_cB[j];}
+new_nsa = particle_sector.at(std::make_pair(nleft, nright));
+new_index = starting_conf[new_nsa] + InverseMapA[new_nsa][shifted_cA] * Confs_in_B[new_nsa].size() + InverseMapB[new_nsa][shifted_cB];
+new_state[new_index] = state[running_index];
+running_index++;
+} 
+}
+}
+}
+
 
 unsigned long int basis::index(Conf conf) {
   /*

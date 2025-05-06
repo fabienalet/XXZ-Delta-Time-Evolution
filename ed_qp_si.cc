@@ -99,6 +99,7 @@ int main(int argc, char **argv) {
   }
   observable myobservable(&mybasis, ENV_NUM_THREADS);
 
+
   PetscInt Istart, Iend;
   /************************** Hamiltonian **********************************/
   {
@@ -160,6 +161,75 @@ int main(int argc, char **argv) {
     std::cout << " number of states= " << nconf;
     std::cout << "\n";
   }
+
+
+  /******************************/
+  // Defining sigmas
+  //std::vector<Mat> sigmas;
+  //sigmas.resize(L);
+  std::vector<Vec> sigmas_as_vec;
+  sigmas_as_vec.resize(L);
+  for (int p=0;p<L;++p) { MatCreateVecs(H, &sigmas_as_vec[p], NULL);}
+  std::vector<Vec> sigmasigma_as_vec;
+  
+  int nb_pairs=(L*L/2);
+  if (measure_mid_only) { nb_pairs=L/2;}
+  sigmasigma_as_vec.resize(nb_pairs);
+  for (int p=0;p<nb_pairs;++p) { MatCreateVecs(H, &sigmasigma_as_vec[p], NULL);}
+
+  int row_ctr = 0;
+  for (int nsa = 0; nsa < mybasis.valid_sectors; ++nsa) {
+    for (int ca = 0; ca < mybasis.Confs_in_A[nsa].size(); ++ca) {
+      std::vector<unsigned short int> config(L, 0);
+      std::vector<unsigned short int> confA =mybasis.Confs_in_A[nsa][ca];
+      for (int r = 0; r < mybasis.LA; ++r) {config[r] = confA[r];}
+      for (int cb = 0; cb < mybasis.Confs_in_B[nsa].size(); ++cb) {
+        if ((row_ctr >= Istart) && (row_ctr < Iend)) {
+          std::vector<unsigned short int> confB =mybasis. Confs_in_B[nsa][cb];
+          for (int r = 0; r < mybasis.LB; ++r) { config[r + mybasis.LA] = confB[r]; }
+          for (int k = 0; k < L; ++k) {
+                if (config[k]) { 
+                  VecSetValue(sigmas_as_vec[k],row_ctr,1.,INSERT_VALUES);
+                  }
+                else { 
+                  VecSetValue(sigmas_as_vec[k],row_ctr,-1.,INSERT_VALUES);
+                  }
+          }
+        }
+        row_ctr++;
+      }
+    }
+  }
+
+  for (int k = 0; k < L; ++k) {
+  VecAssemblyBegin(sigmas_as_vec[k]);
+  VecAssemblyEnd(sigmas_as_vec[k]);
+  }
+
+  int running_pair=0;
+  if (measure_mid_only) {
+    for (int k=0;k<L/2;++k) {
+      VecPointwiseMult(sigmasigma_as_vec[running_pair],sigmas_as_vec[k],sigmas_as_vec[(k+L/2)%L]);
+      running_pair++;
+    }
+  }
+  else {
+  for (int k=0;k<L;++k) {
+    for (int range=1;range<=(L/2);++range) { 
+      VecPointwiseMult(sigmasigma_as_vec[running_pair],sigmas_as_vec[k],sigmas_as_vec[(k+range)%L]);
+   //   if (1) { if (myrank==0) { cout << "running_pair=" << running_pair << " sites " << k << " " << (k+range)%L << endl;} }
+      running_pair++;
+    }
+  }
+  }
+  for (int p=0;p<nb_pairs;++p)
+  {
+  VecAssemblyBegin(sigmasigma_as_vec[p]);
+  VecAssemblyEnd(sigmasigma_as_vec[p]);
+  }
+  /******************************/
+
+
 
   PetscScalar Eminc, Emaxc;
   bool do_ev = 1;
@@ -242,14 +312,28 @@ int main(int argc, char **argv) {
     PetscBool measure_mid_only=PETSC_TRUE;
     PetscOptionsGetBool(NULL, NULL, "-measure_mid_only", &measure_mid_only, NULL);
 
+   
+    
+
     if (nconv > 0) {
       ofstream entout;
+      ofstream entcutout;
       ofstream locout;
       ofstream partout;
       ofstream corrout;
       ofstream tcorrout;
-      myparameters.init_filenames_eigenstate(entout, locout, partout,corrout, tcorrout,
-                                             renorm_target);
+      std::string energy_name;
+      char* eps_interval_string = new char[1000];
+      energy_string << ".target=" << target;
+      energy_name=energy_string.str();
+     // if (myparameters.measure_KL) { myparameters.init_filename_KL(KLout,energy_name);}
+      if (myparameters.measure_local) { myparameters.init_filename_local(locout,energy_name); }
+      if (myparameters.measure_correlations) { myparameters.init_filename_correlations(corrout,energy_name);}
+      if (myparameters.measure_transverse_correlations) { myparameters.init_filename_transverse_correlations(tcorrout,energy_name);}
+      if (myparameters.measure_participation) { myparameters.init_filename_participation(partout,energy_name);}
+      if (myparameters.measure_entanglement) { myparameters.init_filename_entanglement(entout,energy_name);}
+      if (myparameters.measure_entanglement_at_all_cuts) { myparameters.init_filename_entanglement(entcutout,energy_name);}
+
 
 
       std::vector<double> energies;
@@ -261,8 +345,8 @@ int main(int argc, char **argv) {
       for (int k=0;k<L;++k) { Gij[k].resize(L,0.);}
       std::vector< std::vector<double> > Tij(L);
       for (int k=0;k<L;++k) { Tij[k].resize(L,0.);}
-
-
+      Vec use1;
+      if (myparameters.measure_local || myparameters.measure_correlations) { MatCreateVecs(H,  &use1, NULL);}
 
 
       for (int i = 0; i < nconv; i++) {
@@ -281,6 +365,34 @@ int main(int argc, char **argv) {
                                 &viewer);
           VecView(xr, viewer);
         }
+
+
+        if (myparameters.measure_local || myparameters.measure_correlations) { 
+          VecPointwiseMult(use1,xr,xr);
+        if (myparameters.measure_local) {
+        std::vector<double> sz(L,0.);
+        for (int k=0;k<L;++k) { VecDot(use1,sigmas_as_vec[k],&sz[k]); }
+        for (int r = 0; r < L; ++r) { locout << "AA " << r << " " << 0.5*sz[r] << " " << Er << endl;}
+        }
+        if (myparameters.measure_correlations) {
+        int running_pair=0; double correl;
+        if (measure_mid_only) {
+          for (int k=0;k<L/2;++k) { VecPointwiseMult(use1,sigmasigma_as_vec[running_pair],&correl);
+            correlout << "AA " << k << " " << k+L/2 << " " < 0.25*correl << " " << Er << endl;
+            running_pair++;
+          }
+        }
+        else {
+        for (int k=0;k<L;++k) { for (int range=1;range<=(L/2);++range) { 
+            VecPointwiseMult(use1,sigmasigma_as_vec[running_pair],&correl);
+            correlout << "AA " << k << " " << (k+range)%L << " " < 0.25*correl << " " << Er << endl;
+            running_pair++;
+          } }
+        }
+      }
+    }
+      
+
 
         if (mpisize == 1) {
           VecCreateSeq(PETSC_COMM_SELF, nconf, &Vec_local);
@@ -348,6 +460,7 @@ int main(int argc, char **argv) {
             partout << PE << " " << Er << "\n";
           }
 
+
           if (myparameters.measure_local) {
             myobservable.compute_local_magnetization(state);
             Siz = myobservable.sz_local;
@@ -387,6 +500,22 @@ int main(int argc, char **argv) {
           }
         }
 
+        if (myparameters.measure_entanglement_at_all_cuts) {
+          PetscScalar * permuted_state;
+          permuted_state = (PetscScalar*)calloc( nconf,sizeof(PetscScalar) );
+          entcutout << t;
+          for (int shift=0;shift<L/2;shift++)
+              {
+                mybasis(shift, state, permuted_state);
+                obs.compute_entanglement_spectrum(permuted_state);
+                double S1 = obs.entang_entropy(1);
+                entcutout << S1 << " " << Er << " " << shift << endl;
+              //  cout << "ENTANGLEMENT " << " " << S1 << " AT SHIFT " << shift << endl;
+              }
+             
+          free(permuted_state);
+            }
+            
 
           if (myparameters.measure_entanglement) {
             myobservable.compute_entanglement_spectrum(state);
@@ -403,6 +532,7 @@ int main(int argc, char **argv) {
       }
 
       entout.close();
+      entcutout.close();
       locout.close();
       partout.close();
       corrout.close();
