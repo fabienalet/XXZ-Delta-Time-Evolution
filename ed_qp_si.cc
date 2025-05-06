@@ -167,6 +167,9 @@ int main(int argc, char **argv) {
   PetscBool measure_mid_only=PETSC_TRUE;
   PetscOptionsGetBool(NULL, NULL, "-measure_mid_only", &measure_mid_only, NULL);
 
+  PetscBool debug=PETSC_FALSE;
+  PetscOptionsGetBool(NULL, NULL, "-debug", &debug, NULL);
+
   /******************************/
   // Defining sigmas
   //std::vector<Mat> sigmas;
@@ -440,7 +443,7 @@ int main(int argc, char **argv) {
               {
                 mybasis.change_state_shift(shift, state, permuted_state);
             
-                if (myparameters.debug) { 
+                if (debug) { 
                   myobservable.compute_entanglement_spectrum_debug(permuted_state);
                 }
                 else {
@@ -457,7 +460,7 @@ int main(int argc, char **argv) {
 
           if (myparameters.measure_entanglement) {
             if (on_adastra) { myobservable.number_threads=192;}
-            if (myparameters.debug) { 
+            if (debug) { 
               myobservable.compute_entanglement_spectrum_debug(permuted_state);
             }
             else {
