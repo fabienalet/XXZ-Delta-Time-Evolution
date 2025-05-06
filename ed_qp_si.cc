@@ -313,7 +313,7 @@ int main(int argc, char **argv) {
     if (0 == myrank) std::cout << "Solved done. \n";
 
    
-    
+    if (myparameters.measure_entanglement_at_all_cuts) { myparameters.measure_entanglement=PETSC_FALSE; }
 
     if (nconv > 0) {
       ofstream entout;
