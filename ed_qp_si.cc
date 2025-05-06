@@ -433,12 +433,19 @@ int main(int argc, char **argv) {
         }
 
         if (myparameters.measure_entanglement_at_all_cuts) {
+          if (on_adastra) { myobservable.number_threads=192;}
           PetscScalar * permuted_state;
           permuted_state = (PetscScalar*)calloc( nconf,sizeof(PetscScalar) );
           for (int shift=0;shift<L/2;shift++)
               {
                 mybasis.change_state_shift(shift, state, permuted_state);
+            
+                if (myparameters.debug) { 
+                  myobservable.compute_entanglement_spectrum_debug(permuted_state);
+                }
+                else {
                 myobservable.compute_entanglement_spectrum(permuted_state);
+                }
                 double S1 = myobservable.entang_entropy(1);
                 entcutout << S1 << " " << Er << " " << shift << endl;
               //  cout << "ENTANGLEMENT " << " " << S1 << " AT SHIFT " << shift << endl;
@@ -449,7 +456,14 @@ int main(int argc, char **argv) {
         else {
 
           if (myparameters.measure_entanglement) {
-            myobservable.compute_entanglement_spectrum(state);
+            if (on_adastra) { myobservable.number_threads=192;}
+            if (myparameters.debug) { 
+              myobservable.compute_entanglement_spectrum_debug(permuted_state);
+            }
+            else {
+            myobservable.compute_entanglement_spectrum(permuted_state);
+            }
+            
             double S1 = myobservable.entang_entropy(1);
             entout << S1 << " " << Er << "\n";
            // double S2=myobservable.entang_entropy(2);
