@@ -369,23 +369,23 @@ int main(int argc, char **argv) {
 
         if (myparameters.measure_local || myparameters.measure_correlations) { 
           VecPointwiseMult(use1,xr,xr);
-        if (myparameters.measure_local) {
-        std::vector<double> sz(L,0.);
-        for (int k=0;k<L;++k) { VecDot(use1,sigmas_as_vec[k],&sz[k]); }
+          std::vector<double> sz(L,0.);
+          for (int k=0;k<L;++k) { VecDot(use1,sigmas_as_vec[k],&sz[k]); }
+          if (myparameters.measure_local) {
         for (int r = 0; r < L; ++r) { locout << "AA " << r << " " << 0.5*sz[r] << " " << Er << endl;}
         }
         if (myparameters.measure_correlations) {
         int running_pair=0; double correl;
         if (measure_mid_only) {
           for (int k=0;k<L/2;++k) { VecDot(use1,sigmasigma_as_vec[running_pair],&correl);
-            corrout << "AA " << k << " " << k+L/2 << " " << 0.25*correl << " " << Er << endl;
+            corrout << "AA " << k << " " << k+L/2 << " " << 0.25*(correl-sz[k]*sz[k+L/2]) << " " << Er << endl;
             running_pair++;
           }
         }
         else {
         for (int k=0;k<L;++k) { for (int range=1;range<=(L/2);++range) { 
             VecDot(use1,sigmasigma_as_vec[running_pair],&correl);
-            corrout << "AA " << k << " " << (k+range)%L << " " << 0.25*correl << " " << Er << endl;
+            corrout << "AA " << k << " " << (k+range)%L << " " << 0.25*(correl-sz[k]*sz[(k+range)%L]) << " " << Er << endl;
             running_pair++;
           } }
         }
