@@ -333,7 +333,7 @@ cB = Confs_in_B[nsa][q];
 for (int i = 0; i < LA; i++) cur_conf[i] = cA[i];
 for (int j = 0; j < LB; j++) cur_conf[LA + j] = cB[j];
 // create shifted_conf
-for (int i = 0; i < L; i++) shifted_conf[(i+shift)%L]=cur_conf[i];
+for (int i = 0; i < L; i++) shifted_conf[(i+L-shift)%L]=cur_conf[i];
 for (int i = 0; i < LA; i++) shifted_cA[i]=shifted_conf[i];
 for (int j = 0; j < LB; j++) shifted_cB[j] = shifted_conf[j + LA];
 
