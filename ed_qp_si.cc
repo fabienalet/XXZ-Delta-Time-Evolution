@@ -462,6 +462,7 @@ int main(int argc, char **argv) {
         }
         VecDestroy(&Vec_local);
       }
+      }
 
       entout.close();
       entcutout.close();
