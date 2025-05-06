@@ -312,8 +312,6 @@ void basis::change_state_shift(int shift, const PetscScalar* state,
   PetscScalar* new_state) {
 // loop over all configurations, shift them, find the new index, put new_state(new_index) <-- state(old_index) 
 
-int LA0 = b0.LA;
-int LB0 = b0.LB;
 int conf_idx = 0;
 Conf cur_conf(L, 0);
 Conf shifted_conf(L, 0);

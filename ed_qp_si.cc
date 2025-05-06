@@ -322,10 +322,10 @@ int main(int argc, char **argv) {
       ofstream partout;
       ofstream corrout;
       ofstream tcorrout;
-      std::string energy_name;
-      char* energy_string = new char[1000];
+      std::stringstream energy_name;
       energy_string << ".target=" << target;
       energy_name=energy_string.str();
+
      // if (myparameters.measure_KL) { myparameters.init_filename_KL(KLout,energy_name);}
       if (myparameters.measure_local) { myparameters.init_filename_local(locout,energy_name); }
       if (myparameters.measure_correlations) { myparameters.init_filename_correlations(corrout,energy_name);}
@@ -377,7 +377,7 @@ int main(int argc, char **argv) {
         if (myparameters.measure_correlations) {
         int running_pair=0; double correl;
         if (measure_mid_only) {
-          for (int k=0;k<L/2;++k) { VecPointwiseMult(use1,sigmasigma_as_vec[running_pair],&correl);
+          for (int k=0;k<L/2;++k) { VecDot(use1,sigmasigma_as_vec[running_pair],&correl);
             corrout << "AA " << k << " " << k+L/2 << " " < 0.25*correl << " " << Er << endl;
             running_pair++;
           }
@@ -507,8 +507,8 @@ int main(int argc, char **argv) {
           for (int shift=0;shift<L/2;shift++)
               {
                 mybasis.change_state_shift(shift, state, permuted_state);
-                obs.compute_entanglement_spectrum(permuted_state);
-                double S1 = obs.entang_entropy(1);
+                myobservable.compute_entanglement_spectrum(permuted_state);
+                double S1 = myobservable.entang_entropy(1);
                 entcutout << S1 << " " << Er << " " << shift << endl;
               //  cout << "ENTANGLEMENT " << " " << S1 << " AT SHIFT " << shift << endl;
               }
