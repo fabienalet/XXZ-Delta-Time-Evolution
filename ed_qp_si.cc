@@ -439,6 +439,14 @@ int main(int argc, char **argv) {
           }
         }
 
+        if (myparameters.measure_local) {
+          myobservable.compute_local_magnetization(state);
+          Siz = myobservable.sz_local;
+          for (int r = 0; r < L; ++r) {
+            locout << r << " " << Siz[r] << endl;
+          }
+        }
+        
         if (myparameters.measure_correlations) {
           if (measure_mid_only) {  Gij =myobservable.get_two_points_connected_correlation_distance(state,L/2);}
            else { Gij =myobservable.get_two_points_connected_correlation(state);}
