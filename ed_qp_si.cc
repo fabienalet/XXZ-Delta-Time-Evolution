@@ -339,7 +339,7 @@ int main(int argc, char **argv) {
 
       PetscBool special_cut_set=PETSC_FALSE;
       PetscInt special_cut=L/4;
-      PetscOptionsGetBool(NULL, NULL, "-measure_entanglement_special_cut", &special_cut, &special_cut_set);
+      PetscOptionsGetInt(NULL, NULL, "-measure_entanglement_special_cut", &special_cut, &special_cut_set);
 
 
 
