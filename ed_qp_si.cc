@@ -318,6 +318,12 @@ int main(int argc, char **argv) {
    
     if (myparameters.measure_entanglement_at_all_cuts) { myparameters.measure_entanglement=PETSC_FALSE; }
 
+    PetscBool special_cut_set=PETSC_FALSE;
+    PetscInt special_cut=L/4;
+    PetscOptionsGetInt(NULL, NULL, "-measure_entanglement_special_cut", &special_cut, &special_cut_set);
+    if (special_cut_set) { myparameters.measure_entanglement=PETSC_FALSE; }
+
+
     if (nconv > 0) {
       ofstream entout;
       ofstream entcutout;
@@ -336,12 +342,8 @@ int main(int argc, char **argv) {
       if (myparameters.measure_participation) { myparameters.init_filename_participation(partout,energy_name);}
       if (myparameters.measure_entanglement) { myparameters.init_filename_entanglement(entout,energy_name);}
       if (myparameters.measure_entanglement_at_all_cuts) { myparameters.init_filename_entanglement_all_cuts(entcutout,energy_name);}
-
-      PetscBool special_cut_set=PETSC_FALSE;
-      PetscInt special_cut=L/4;
-      PetscOptionsGetInt(NULL, NULL, "-measure_entanglement_special_cut", &special_cut, &special_cut_set);
-
-
+      if (special_cut_set) { myparameters.init_filename_entanglement_all_cuts(entcutout,energy_name);}
+      
 
       std::vector<double> energies;
       std::vector<double> rgap;
@@ -467,6 +469,7 @@ int main(int argc, char **argv) {
           }
 
           if (special_cut_set) {
+            cout << "set ...\n";
             if (on_adastra) { myobservable.number_threads=192;}
             PetscScalar * permuted_state;
             permuted_state = (PetscScalar*)calloc( nconf,sizeof(PetscScalar) );
