@@ -337,6 +337,10 @@ int main(int argc, char **argv) {
       if (myparameters.measure_entanglement) { myparameters.init_filename_entanglement(entout,energy_name);}
       if (myparameters.measure_entanglement_at_all_cuts) { myparameters.init_filename_entanglement_all_cuts(entcutout,energy_name);}
 
+      PetscBool special_cut_set=PETSC_FALSE;
+      PetscInt special_cut=L/4;
+      PetscOptionsGetBool(NULL, NULL, "-measure_entanglement_special_cut", &special_cut, &special_cut_set);
+
 
 
       std::vector<double> energies;
@@ -444,7 +448,7 @@ int main(int argc, char **argv) {
           myobservable.compute_local_magnetization(state);
           Siz = myobservable.sz_local;
           for (int r = 0; r < L; ++r) {
-            locout << r << " " << Siz[r] << endl;
+            locout << r << " " << Siz[r] << " " << Er << endl;
           }
         }
 
@@ -461,6 +465,26 @@ int main(int argc, char **argv) {
             } }
           }
           }
+
+          if (special_cut_set) {
+            if (on_adastra) { myobservable.number_threads=192;}
+            PetscScalar * permuted_state;
+            permuted_state = (PetscScalar*)calloc( nconf,sizeof(PetscScalar) );
+            int shift=(int) special_cut;
+            mybasis.change_state_shift(shift, state, permuted_state);
+              
+                  if (debug) { 
+                    myobservable.compute_entanglement_spectrum_debug(permuted_state);
+                  }
+                  else {
+                  myobservable.compute_entanglement_spectrum(permuted_state);
+                  }
+                  double S1 = myobservable.entang_entropy(1);
+                  entcutout << S1 << " " << Er << " " << shift << endl;
+                //  cout << "ENTANGLEMENT " << " " << S1 << " AT SHIFT " << shift << endl;
+                             
+            free(permuted_state);
+              }
 
 
         if (myparameters.measure_entanglement_at_all_cuts) {
