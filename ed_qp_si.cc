@@ -343,11 +343,14 @@ int main(int argc, char **argv) {
       std::vector<double> rgap;
       PetscScalar Er, Ei;
       Vec Vec_local;
+      std::vector< std::vector<double> > Gij(L);
+      for (int k=0;k<L;++k) { Gij[k].resize(L,0.);}
       std::vector< std::vector<double> > Tij(L);
       for (int k=0;k<L;++k) { Tij[k].resize(L,0.);}
       Vec use1;
+      if (!(debug)) {
       if (myparameters.measure_local || myparameters.measure_correlations) { MatCreateVecs(H,  &use1, NULL);}
-
+      }
 
       for (int i = 0; i < nconv; i++) {
         ierr = EPSGetEigenpair(eps2, i, &Er, &Ei, xr, NULL);
