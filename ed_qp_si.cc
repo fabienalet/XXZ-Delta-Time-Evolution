@@ -343,6 +343,7 @@ int main(int argc, char **argv) {
       std::vector<double> rgap;
       PetscScalar Er, Ei;
       Vec Vec_local;
+      std::vector<double> Siz(L, 0.);
       std::vector< std::vector<double> > Gij(L);
       for (int k=0;k<L;++k) { Gij[k].resize(L,0.);}
       std::vector< std::vector<double> > Tij(L);
@@ -446,10 +447,10 @@ int main(int argc, char **argv) {
             locout << r << " " << Siz[r] << endl;
           }
         }
-        
+
         if (myparameters.measure_correlations) {
-          if (measure_mid_only) {  Gij =myobservable.get_two_points_connected_correlation_distance(state,L/2);}
-           else { Gij =myobservable.get_two_points_connected_correlation(state);}
+          if (measure_mid_only) {  Gij =myobservable.get_two_points_connected_correlation_distance(state,L/2,myparameters.measure_local);}
+           else { Gij =myobservable.get_two_points_connected_correlation(state,myparameters.measure_local);}
             for (int r = 0; r < L; ++r) {
               if (measure_mid_only) {
                 if (r<(L/2)) { corrout << " " << r << " " << r+L/2 << " " << Gij[r][r+L/2] << " " << Er << endl; }

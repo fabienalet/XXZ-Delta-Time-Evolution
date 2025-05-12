@@ -40,10 +40,12 @@ class observable {
 
   void compute_two_points_correlation(PetscScalar *state);
   void compute_two_points_correlation_distance(PetscScalar *state, int d);
-  std::vector<std::vector<double>> get_two_points_connected_correlation(
-      PetscScalar *state);
-      std::vector<std::vector<double>> get_two_points_connected_correlation_distance(
-        PetscScalar *state,int d);
+  std::vector<std::vector<double>> get_two_points_connected_correlation(PetscScalar *state);
+  std::vector<std::vector<double>> get_two_points_connected_correlation_distance(PetscScalar *state,int d);
+  std::vector<std::vector<double>> get_two_points_connected_correlation(PetscScalar *state,PetscBool local_done);
+  std::vector<std::vector<double>> get_two_points_connected_correlation_distance(PetscScalar *state,int d,PetscBool local_done);
+ // std::vector<std::vector<double>> get_two_points_connected_correlation(
+        
   std::vector<std::vector<double>> get_SpSm_correlation(PetscScalar *state);
   
   std::vector<std::vector<double>> get_fermionic_correlation(
@@ -553,8 +555,36 @@ observable::get_two_points_connected_correlation(PetscScalar *state) {
 }
 
 std::vector<std::vector<double>>
+observable::get_two_points_connected_correlation(PetscScalar *state, PetscBool local_done) {
+  if (!(local_done)) { compute_local_magnetization(state); }
+  compute_two_points_correlation(state);
+  int L = basis_pointer->L;
+  std::vector<std::vector<double>> Gc(L, std::vector<double>(L));
+  for (int i = 0; i < L; i++) {
+    for (int j = 0; j < L; j++) {
+      Gc[i][j] = G[i][j] - sz_local[i] * sz_local[j];
+    }
+  }
+  return Gc;
+}
+
+std::vector<std::vector<double>>
 observable::get_two_points_connected_correlation_distance(PetscScalar *state, int distance) {
   compute_local_magnetization(state);
+  compute_two_points_correlation_distance(state,distance);
+  int L = basis_pointer->L;
+  std::vector<std::vector<double>> Gc(L, std::vector<double>(L));
+  for (int i = 0; i < L; i++) {
+    for (int j = 0; j < L; j++) {
+      Gc[i][j] = G[i][j] - sz_local[i] * sz_local[j];
+    }
+  }
+  return Gc;
+}
+
+std::vector<std::vector<double>>
+observable::get_two_points_connected_correlation_distance(PetscScalar *state, int distance,PetscBool local_done) {
+  if (!(local_done)) { compute_local_magnetization(state); }
   compute_two_points_correlation_distance(state,distance);
   int L = basis_pointer->L;
   std::vector<std::vector<double>> Gc(L, std::vector<double>(L));
