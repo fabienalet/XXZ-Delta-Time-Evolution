@@ -322,7 +322,7 @@ int main(int argc, char **argv) {
     PetscInt special_cut=L/4;
     PetscOptionsGetInt(NULL, NULL, "-measure_entanglement_special_cut", &special_cut, &special_cut_set);
     if (special_cut_set) { myparameters.measure_entanglement=PETSC_FALSE; }
-
+    cout << special_cut << " " << special_cut_set << endl;
 
     if (nconv > 0) {
       ofstream entout;
