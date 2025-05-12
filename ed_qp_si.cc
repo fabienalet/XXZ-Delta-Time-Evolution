@@ -366,7 +366,7 @@ int main(int argc, char **argv) {
           VecView(xr, viewer);
         }
 
-
+        if (!(debug)) {
         if (myparameters.measure_local || myparameters.measure_correlations) { 
           VecPointwiseMult(use1,xr,xr);
           std::vector<double> sz(L,0.);
@@ -391,6 +391,7 @@ int main(int argc, char **argv) {
         }
       }
     }
+  }
       
         if (myparameters.measure_participation) {
               double pi; double local_S1=0.;
@@ -403,7 +404,7 @@ int main(int argc, char **argv) {
       if (myrank==0) { partout << global_S1 << " " << Er << endl; }
     }
 
-    if (myparameters.measure_transverse_correlations || myparameters.measure_entanglement_at_all_cuts || myparameters.measure_entanglement) { 
+    if ((debug) || (myparameters.measure_transverse_correlations || myparameters.measure_entanglement_at_all_cuts || myparameters.measure_entanglement)) { 
         if (mpisize == 1) {
           VecCreateSeq(PETSC_COMM_SELF, nconf, &Vec_local);
           ierr = VecCopy(xr, Vec_local);
@@ -434,6 +435,21 @@ int main(int argc, char **argv) {
           
           }
         }
+
+        if (myparameters.measure_correlations) {
+          if (measure_mid_only) {  Gij =myobservable.get_two_points_connected_correlation_distance(state,L/2);}
+           else { Gij =myobservable.get_two_points_connected_correlation(state);}
+            for (int r = 0; r < L; ++r) {
+              if (measure_mid_only) {
+                if (r<(L/2)) { corrout << " " << r << " " << r+L/2 << " " << Gij[r][r+L/2] << " " << Er << endl; }
+              }
+              else {
+              for (int s = r; s < L; ++s) {
+	              corrout << r << " " << " " << s << " " << Gij[r][s] << " " << Er << endl;
+            } }
+          }
+          }
+
 
         if (myparameters.measure_entanglement_at_all_cuts) {
           if (on_adastra) { myobservable.number_threads=192;}

@@ -39,8 +39,11 @@ class observable {
   void compute_local_magnetization_sandwich(PetscScalar *state1,PetscScalar *state2 );
 
   void compute_two_points_correlation(PetscScalar *state);
+  void compute_two_points_correlation_distance(PetscScalar *state, int d);
   std::vector<std::vector<double>> get_two_points_connected_correlation(
       PetscScalar *state);
+      std::vector<std::vector<double>> get_two_points_connected_correlation_distance(
+        PetscScalar *state,int d);
   std::vector<std::vector<double>> get_SpSm_correlation(PetscScalar *state);
   
   std::vector<std::vector<double>> get_fermionic_correlation(
@@ -282,6 +285,56 @@ void observable::compute_two_points_correlation(PetscScalar *state) {
   }
 }
 
+void observable::compute_two_points_correlation_distance(PetscScalar *state, int distance) {
+  int L = basis_pointer->L;
+  int LA = basis_pointer->LA;
+  // two points correlation function
+  G.resize(L, std::vector<double>(L, 0.));
+  for (int i = 0; i < L; i++)
+    for (int j = 0; j < L; j++) G[i][j] = 0.;
+
+    int maxi=L;
+    if (distance==L/2) { maxi=L/2;} 
+  int c = 0;  // configuration index
+  for (int nsa = 0; nsa < basis_pointer->valid_sectors;
+       ++nsa) {  // int nsb=basis_pointer->partner_sector[nsa];
+    for (int ca = 0; ca < basis_pointer->Confs_in_A[nsa].size(); ++ca) {
+      for (int cb = 0; cb < basis_pointer->Confs_in_B[nsa].size(); ++cb) {
+        for (int i = 0; i < maxi; ++i) {
+          int statei;
+          if (i < LA)
+            statei = basis_pointer->Confs_in_A[nsa][ca][i];
+          else
+            statei = basis_pointer->Confs_in_B[nsa][cb][i - LA];
+          int j=(i+distance)%L;
+            int statej;
+            if (j < LA)
+              statej = basis_pointer->Confs_in_A[nsa][ca][j];
+            else
+              statej = basis_pointer->Confs_in_B[nsa][cb][j - LA];
+            // sz_for_basis_state[local_state[d]] = {Sz at site d in the current
+            // configuration}
+            double SizSjz =
+                sz_for_basis_state[statei] * sz_for_basis_state[statej];
+#ifdef PETSC_USE_COMPLEX
+            G[i][j] +=
+                SizSjz * PetscRealPart(state[c] * PetscConjComplex(state[c]));
+#else
+            G[i][j] += SizSjz * state[c] * state[c];
+#endif
+        }
+        c++;
+      }
+    }
+  }
+  // the matrix is symmetric
+  for (int i = 0; i < L; i++) {
+    for (int j = 0; j < i; j++) {
+      G[i][j] = G[j][i];
+    }
+  }
+}
+
 std::vector<std::vector<double>> observable::get_SpSm_correlation(
     PetscScalar *state) {
   /* Return <state|S_i^+ S_j^-|state> */
@@ -489,6 +542,20 @@ std::vector<std::vector<double>>
 observable::get_two_points_connected_correlation(PetscScalar *state) {
   compute_local_magnetization(state);
   compute_two_points_correlation(state);
+  int L = basis_pointer->L;
+  std::vector<std::vector<double>> Gc(L, std::vector<double>(L));
+  for (int i = 0; i < L; i++) {
+    for (int j = 0; j < L; j++) {
+      Gc[i][j] = G[i][j] - sz_local[i] * sz_local[j];
+    }
+  }
+  return Gc;
+}
+
+std::vector<std::vector<double>>
+observable::get_two_points_connected_correlation_distance(PetscScalar *state, int distance) {
+  compute_local_magnetization(state);
+  compute_two_points_correlation_distance(state,distance);
   int L = basis_pointer->L;
   std::vector<std::vector<double>> Gc(L, std::vector<double>(L));
   for (int i = 0; i < L; i++) {
