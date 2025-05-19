@@ -110,8 +110,9 @@ void Hamiltonian::get_parameters() {
         std::uniform_real_distribution<double> box(0, 2*PI);
         for (int i = 0; i < L; i++) {
           double phi=box(generator);
+          cout << "AA phi=" << phi << endl;
           field[i] = disorder*cos(two_PI_beta_quasiperiodic*(i+1)+phi);
-          cout << "AA " << i << " " << disorder << " " << cos(two_PI_beta_quasiperiodic*(i+1)+phi) << " " << field[i] << endl;
+          cout << "AA " << i << " " << disorder << " " << cos(two_PI_beta_quasiperiodic*(i+1)) << " " << field[i] << endl;
         }
       }
       else {
@@ -120,8 +121,9 @@ void Hamiltonian::get_parameters() {
       std::uniform_real_distribution<double> box(0, 2*PI);
       for (int i = 0; i < L; i++) {
         double phi=box(generator);
+        cout << "BB phi=" << phi << endl;
         field[i] = disorder*cos(two_PI_beta_quasiperiodic*(i+1)+phi);
-        cout << "AA " << i << " " << disorder << " " << cos(two_PI_beta_quasiperiodic*(i+1)+phi) << " " << field[i] << endl;
+        cout << "BB " << i << " " << disorder << " " << cos(two_PI_beta_quasiperiodic*(i+1)+phi) << " " << field[i] << endl;
 
       }
     }
