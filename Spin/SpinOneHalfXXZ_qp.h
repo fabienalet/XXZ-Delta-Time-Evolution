@@ -97,6 +97,7 @@ void Hamiltonian::get_parameters() {
   }
  
   double two_PI_beta_quasiperiodic=PI*(sqrt(5)-1.0);
+  cout << "2pibeta= " <<  two_PI_beta_quasiperiodic << endl;
       PetscBool without_boost_rng=PETSC_FALSE;
       ierr = PetscOptionsGetBool(NULL, NULL, "-without_boost_rng", &without_boost_rng,
                                  NULL);
@@ -110,6 +111,7 @@ void Hamiltonian::get_parameters() {
         for (int i = 0; i < L; i++) {
           double phi=box(generator);
           field[i] = disorder*cos(two_PI_beta_quasiperiodic*(i+1)+phi);
+          cout << "AA " << i << " " << disorder << " " << cos(two_PI_beta_quasiperiodic*(i+1)+phi) << " " << field[i] << endl;
         }
       }
       else {
@@ -119,6 +121,8 @@ void Hamiltonian::get_parameters() {
       for (int i = 0; i < L; i++) {
         double phi=box(generator);
         field[i] = disorder*cos(two_PI_beta_quasiperiodic*(i+1)+phi);
+        cout << "AA " << i << " " << disorder << " " << cos(two_PI_beta_quasiperiodic*(i+1)+phi) << " " << field[i] << endl;
+
       }
     }
   
